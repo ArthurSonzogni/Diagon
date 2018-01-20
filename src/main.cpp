@@ -5,14 +5,14 @@
 #include "MyParser.h"
 #include "analysis.h"
 
-//using namespace antlrcpptest;
-//using namespace antlr4;
+// using namespace antlrcpptest;
+// using namespace antlr4;
 
-int main(int , const char **) {
-
+int main(int, const char**) {
   // Ask the user for an input.
   std::string text_input;
-  std::cout << "Please enter an expression (for instance (1+2)*(3-4)/(5-6))" << std::endl;
+  std::cout << "Please enter an expression (for instance (1+2)*(3-4)/(5-6))"
+            << std::endl;
   std::cout << "input = ";
   std::cin >> text_input;
   antlr4::ANTLRInputStream input(text_input);
@@ -32,7 +32,7 @@ int main(int , const char **) {
   // Print the tree.
   std::cout << "Tree = " << std::endl;
   analysis::DisplayTree tree = analysis::display_tree(expression);
-  for(const auto& line : tree.content)
+  for (const auto& line : tree.content)
     std::cout << line << std::endl;
 
   return 0;
