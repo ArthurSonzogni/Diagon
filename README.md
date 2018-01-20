@@ -8,7 +8,7 @@ There are no dependencies. The script `/tools/antlr/download_and_patch.sh` will
 download ANTLR and it will be used as a CMake dependency.
 
 ## Demo
-[Demo](https://ArthurSonzogni.github.com/ANTLR-cmake-starter)
+[Demo](http://arthursonzogni.github.io/ANTLR-cmake-Emscripten-starter)
 
 ## Instructions
 
