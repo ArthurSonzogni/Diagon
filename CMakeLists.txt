@@ -1,9 +1,26 @@
 cmake_minimum_required (VERSION 2.9)
-project(Diagon)
+project(ANTLR-cmake-emscripten)
 
-# ┌─────────────┐
-# │ ANTLR       │
-# └─────────────┘
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+# ┌─────────────────────────────────────────────────┐
+# │ Print Information about the compilation system  │
+# └─────────────────────────────────────────────────┘
+if(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
+  set(Web true)
+else()
+  set(Web false)
+endif()
+message(" * Build type : " ${CMAKE_BUILD_TYPE})
+message(" * C compiler: ${CMAKE_C_COMPILER}")
+message(" * C++ compiler: ${CMAKE_CXX_COMPILER}")
+message(" * System: " ${CMAKE_SYSTEM_NAME} )
+message(" * Use Web : " ${Web})
+
+# ┌─────────────────────────────────────────────────┐
+# │ ANTLR                                           │
+# └─────────────────────────────────────────────────┘
 find_program (antlr antlr4)
 if (antlr)
   message(STATUS "ANTLR4 (parser generator) found: " ${antlr})
@@ -53,9 +70,9 @@ function(ANTLR)
   set(output ${source_gen_dir}/${source_filename}.cpp)
 endfunction()
 
-# Include and link with ANTLR runtime.
-include_directories(ANTLR_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/tools/antlr/runtime/Cpp/run/usr/local/include/antlr4-runtime)
-set(ANTLR_LIBRARIES ${CMAKE_SOURCE_DIR}/tools/antlr/runtime/Cpp/run/usr/local/lib/libantlr4-runtime.a)
+# Build the ANTLR runtime.
+add_subdirectory(${CMAKE_SOURCE_DIR}/tools/antlr/cpp_runtime/)
+include_directories(${CMAKE_SOURCE_DIR}/tools/antlr/cpp_runtime/runtime/src)
 
 #-------------------------------------------------------------------------------
 

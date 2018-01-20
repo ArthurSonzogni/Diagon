@@ -2,56 +2,33 @@
 
 ## Description
 
-A ready to use starter project using ANTLR with cmake.
+A ready to use starter project using ANTLR, Cmake and Emscripten.
 
-There are no dependencies. The script `/tools/antlr/download_and_build.sh` will
-get you ANTLR.
+There are no dependencies. The script `/tools/antlr/download_and_patch.sh` will
+download ANTLR and it will be used as a CMake dependency.
+
+## Demo
+[Demo](https://ArthurSonzogni.github.com/ANTLR-cmake-starter)
 
 ## Instructions
 
 ```bash
 
-# Download ANTLR and build the CPP runtime.
+# Download ANTLR.
 cd tools/antlr
-./download_and_build.sh
+./download_and_patch.sh
 cd ../..
 
 # Build the project
 mkdir build
 cd build
 cmake ..
-make
+make main.js
 ./src/main
 
-```
+# Test the demo
+cd src
+./run_web_server.sh
+navigate to http://localhost:8080
 
-## Output example
-
-```bash
-Please enter an expression (for instance (1+2)*(3-4)/(5-6))
-input = 4/2-3*3+1-1
-Result = -9
-Tree = 
-             
-             4
-            ╱
-           ÷ 
-          ╱ ╲
-         ╱   2
-        ╱    
-       ╱        
-      -         3
-     ╱ ╲       ╱
-    ╱   ╲     x 
-   ╱     ╲   ╱ ╲
-  ╱       ╲ ╱   3
- ╱         +    
--           ╲ 
- ╲           ╲
-  ╲           1
-   ╲          
-    ╲ 
-     ╲
-      1
-      
 ```

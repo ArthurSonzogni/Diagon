@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ANTLR cmake emscripten starter</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+  <body>
+
+  Input:
+  <textarea id="input" placeholder='input, for instance  (1+2)*(3-4)/5'></textarea>
+
+  Output:
+  <textarea id="output" placeholder='output' readonly></textarea>
+
+  Errors:
+  <textarea id="errors" placeholder='errors' readonly></textarea>
+
+<script>
+
+var input = document.getElementById('input');
+var output = document.getElementById('output');
+var errors = document.getElementById('errors');
+
+window.Module = (function() {
+
+  // clear the output.
+  errors.value = '';
+
+  function printErr(text) {
+    if (arguments.length > 1)
+      text = Array.prototype.slice.call(arguments).join(' ');
+    console.error(text);
+    errors.value += text + "\n";
+    errors.scrollTop = output.scrollHeight; // focus on bottom
+  };
+
+  return {
+    preRun: [],
+    postRun: [],
+    print: printErr
+    printErr: printErr,
+    canvas: undefined
+  };
+
+})();
+
+</script>
+<script src="main.js"></script>
+
+<script>
+let translate = Module.cwrap('translate', 'void', ['string']);
+input.addEventListener('input', function() {
+  translate(input.value);
+});
+</script>
+
+  </body>
+</html>
+

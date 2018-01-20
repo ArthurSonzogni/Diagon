@@ -1,0 +1,2 @@
+120d119
+<     message(FATAL_ERROR "Your C++ compiler does not support C++11.")
