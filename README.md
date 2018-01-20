@@ -22,7 +22,7 @@ cd ../..
 # Build the project
 mkdir build
 cd build
-cmake ..
+CC=emcc CXX=em++ cmake ..
 make main.js
 ./src/main
 
