@@ -7,7 +7,7 @@ A ready to use starter project using ANTLR with cmake.
 There are no dependencies. The script `/tools/antlr/download_and_build.sh` will
 get you ANTLR.
 
-## Instruction
+## Instruction
 
 ```bash
 
