@@ -1,0 +1,7 @@
+1) Renderer -> Browser : BeginNavigation
+2) Renderer -> Browser : DidCommitNavigation
+3) Renderer <- Browser : CommitNavigation
+4) Renderer -> Browser : DidCommitNavigation
+
+Renderer: 1,2,3,4
+Browser: 1,3,2,4
