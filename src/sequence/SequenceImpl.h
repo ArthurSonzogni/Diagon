@@ -17,16 +17,16 @@ class SequenceImpl : public Sequence {
 
  private:
   struct Actor {
-    std::string name;
+    std::wstring name;
     std::vector<int> message_id;
   };
   std::vector<Actor> actors;
 
   struct Message {
-    std::string from;
-    std::string to;
+    std::wstring from;
+    std::wstring to;
     int id = -1;
-    std::vector<std::string> messages;
+    std::vector<std::wstring> messages;
   };
   std::vector<Message> messages;
 
@@ -36,7 +36,7 @@ class SequenceImpl : public Sequence {
   void AddMessage(SequenceParser::MessageContext* message);
   void AddActor(SequenceParser::ActorContext* actor_context);
   int GetMessageID(SequenceParser::MessageIDContext* message_id);
-  std::vector<std::string> GetMessageText(
+  std::vector<std::wstring> GetMessageText(
       SequenceParser::MessageTextContext* message_text);
 
 

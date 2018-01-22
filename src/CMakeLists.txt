@@ -46,7 +46,10 @@ add_executable(${main}
 # Sequence
 add_subdirectory(sequence)
 target_link_libraries(${main} sequence)
-target_link_libraries(${main} antlr4_static)
+
+# Scren
+add_subdirectory(screen)
+target_link_libraries(${main} screen)
 
 # ANTLR
-target_link_libraries(${main} ${ANTLR_LIBRARIES})
+target_link_libraries(${main} antlr4_static)

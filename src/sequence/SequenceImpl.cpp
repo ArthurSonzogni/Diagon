@@ -5,6 +5,7 @@
 
 #include "sequence/SequenceLexer.h"
 #include "sequence/SequenceParser.h"
+#include "screen/Screen.h"
 
 void SequenceImpl::Process(const std::string& input) {
   ComputeInternalRepresentation(input);
@@ -44,12 +45,12 @@ void SequenceImpl::UniformizeInternalRepresentation() {
 
 void SequenceImpl::UniformizeActors() {
   // Look at missing Actors.
-  std::set<std::string> used_actors;
+  std::set<std::wstring> used_actors;
   for (auto& message : messages) {
     used_actors.insert(message.from);
     used_actors.insert(message.to);
   }
-  std::set<std::string> declared_actors;
+  std::set<std::wstring> declared_actors;
   for (auto& actor : actors) {
     declared_actors.insert(actor.name);
   }
@@ -169,15 +170,15 @@ void SequenceImpl::AddMessage(SequenceParser::MessageContext* message_context) {
     message.id = GetMessageID(message_id);
   }
 
-  message.from = message_context->Words(0)->getSymbol()->getText();
-  message.to = message_context->Words(1)->getSymbol()->getText();
+  message.from = to_wstring(message_context->Words(0)->getSymbol()->getText());
+  message.to = to_wstring(message_context->Words(1)->getSymbol()->getText());
   message.messages = GetMessageText(message_context->messageText());
   messages.push_back(message);
 }
 
 void SequenceImpl::AddActor(SequenceParser::ActorContext* actor_context) {
   Actor actor;
-  actor.name = actor_context->Words()->getSymbol()->getText();
+  actor.name = to_wstring(actor_context->Words()->getSymbol()->getText());
 
   for (const auto& message_id : actor_context->Number()) {
     actor.message_id.push_back(std::stoi(message_id->getSymbol()->getText()));
@@ -189,45 +190,56 @@ int SequenceImpl::GetMessageID(SequenceParser::MessageIDContext* message_id) {
   return std::stoi(message_id->Number()->getSymbol()->getText());
 }
 
-std::vector<std::string> SequenceImpl::GetMessageText(
+std::vector<std::wstring> SequenceImpl::GetMessageText(
     SequenceParser::MessageTextContext* message_text) {
-  std::vector<std::string> messages;
+  std::vector<std::wstring> messages;
   if (message_text->getRuleIndex() == 0) {
-    messages.push_back(
+    messages.push_back(to_wstring(
         static_cast<SequenceParser::SingleLineTextContext*>(message_text)
             ->Words()
             ->getSymbol()
-            ->getText());
+            ->getText()));
   } else {
     auto m = static_cast<SequenceParser::MultiLineTextContext*>(message_text);
     for (const auto& line : m->Words()) {
-      messages.push_back(line->getSymbol()->getText());
+      messages.push_back(to_wstring(line->getSymbol()->getText()));
     }
   }
   return messages;
 }
 
 void SequenceImpl::Draw() {
-  std::stringstream ss;
+  int width = 100;
+  int height = 100;
+  std::vector<std::wstring> lines(height, std::wstring(width, U' '));
 
+  Screen screen(width, height);
+
+  int x = 0;
   for (auto& actor : actors) {
-    ss << "Actor " << actor.name << std::endl;
-    for (auto& i : actor.message_id) {
-      ss << " " << i << std::endl;
-    }
+    screen.DrawBoxedText(x, 0, actor.name);
+    x += actor.name.size() + 2;
   }
 
-  for (auto& message : messages) {
-    ss << "Message " << std::endl;
-    ss << "  From " << message.from << std::endl;
-    ss << "  To   " << message.to << std::endl;
-    ss << "  Id   " << message.id << std::endl;
-    for (auto& i : message.messages) {
-      ss << "    " << i << std::endl;
-    }
-  }
+  output_ = screen.ToString();
 
-  output_ = ss.str();
+  //for (auto& actor : actors) {
+    //ss << "Actor " << actor.name << std::endl;
+    //for (auto& i : actor.message_id) {
+      //ss << " " << i << std::endl;
+    //}
+  //}
+
+  //for (auto& message : messages) {
+    //ss << "Message " << std::endl;
+    //ss << "  From " << message.from << std::endl;
+    //ss << "  To   " << message.to << std::endl;
+    //ss << "  Id   " << message.id << std::endl;
+    //for (auto& i : message.messages) {
+      //ss << "    " << i << std::endl;
+    //}
+  //}
+
 }
 
 std::string SequenceImpl::Output() {
