@@ -10,6 +10,7 @@
 void SequenceImpl::Process(const std::string& input) {
   ComputeInternalRepresentation(input);
   UniformizeInternalRepresentation();
+  Layout();
   Draw();
 }
 
@@ -45,21 +46,19 @@ void SequenceImpl::UniformizeInternalRepresentation() {
 
 void SequenceImpl::UniformizeActors() {
   // Look at missing Actors.
-  std::set<std::wstring> used_actors;
-  for (auto& message : messages) {
-    used_actors.insert(message.from);
-    used_actors.insert(message.to);
-  }
   std::set<std::wstring> declared_actors;
   for (auto& actor : actors) {
     declared_actors.insert(actor.name);
   }
   // Add the missing Actors.
-  for (auto& actor : used_actors) {
-    if (!declared_actors.count(actor)) {
-      Actor a;
-      a.name = actor;
-      actors.push_back(a);
+  for (auto& message : messages) {
+    for (auto& actor : {message.from, message.to}) {
+      if (declared_actors.count(actor) == 0) {
+        declared_actors.insert(actor);
+        Actor a;
+        a.name = actor;
+        actors.push_back(a);
+      }
     }
   }
 }
@@ -172,6 +171,11 @@ void SequenceImpl::AddMessage(SequenceParser::MessageContext* message_context) {
 
   message.from = to_wstring(message_context->Words(0)->getSymbol()->getText());
   message.to = to_wstring(message_context->Words(1)->getSymbol()->getText());
+
+  if (message_context->arrow()->NormalLeftArrow()) {
+    std::swap(message.from, message.to);
+  }
+
   message.messages = GetMessageText(message_context->messageText());
   messages.push_back(message);
 }
@@ -208,38 +212,148 @@ std::vector<std::wstring> SequenceImpl::GetMessageText(
   return messages;
 }
 
+void SequenceImpl::Layout() {
+  LayoutComputeMessageWidth();
+  LayoutComputeActorsPositions();
+  LayoutComputeMessagesPositions();
+}
+
+void SequenceImpl::LayoutComputeMessageWidth() {
+  for (auto& message : messages) {
+    for (auto& text : message.messages) {
+      message.width = std::max(message.width, int(text.size()));
+    }
+  }
+}
+
+// Define minimum space between two actors.
+struct ActorSpace {
+  int a;
+  int b;
+  int space;
+};
+
+void SequenceImpl::LayoutComputeActorsPositions() {
+  for (int i = 0; i < actors.size(); ++i)
+    actor_index[actors[i].name] = i;
+
+  std::vector<ActorSpace> spaces;
+  for (int i = 0; i < actors.size() - 1; ++i) {
+    int size_1 = actors[i].name.size();
+    int size_2 = actors[i + 1].name.size();
+    spaces.push_back({
+        i,                                        //
+        i + 1,                                    //
+        size_1 / 2 + size_2 / 2 + size_2 % 2 + 2  //
+    });
+  }
+
+  for (auto& message : messages) {
+    ActorSpace space{actor_index[message.from],  //
+                     actor_index[message.to],    //
+                     message.width + 1};         //
+    if (space.a > space.b)
+      std::swap(space.a, space.b);
+    spaces.push_back(space);
+  }
+
+  actors[0].center = actors[0].name.size() / 2 + 1;
+
+  bool modified = true;
+  while (modified) {
+    modified = false;
+    for (const ActorSpace& s : spaces) {
+      if (actors[s.b].center - actors[s.a].center < s.space) {
+        actors[s.b].center = actors[s.a].center + s.space;
+        modified = true;
+      }
+    }
+  }
+
+  for (auto& actor : actors) {
+    actor.left = actor.center - actor.name.size() / 2 - 1;
+    actor.right = actor.left + actor.name.size() + 2;
+  }
+}
+
+void SequenceImpl::LayoutComputeMessagesPositions() {
+  int y = 4;
+
+  for (auto& message : messages) {
+    message.left = actors[actor_index[message.from]].center;
+    message.right = actors[actor_index[message.to]].center;
+    if (message.left > message.right) {
+      std::swap(message.left, message.right);
+      message.direction = Message::Direction::Left;
+    } else {
+      message.direction = Message::Direction::Right;
+    }
+    message.left += 1;
+    message.right -= 1;
+    message.line_left = message.left;
+    message.line_right = message.right;
+    int k = 0;
+    while (message.right - message.left > message.width) {
+      if (++k % 2)
+        message.left++;
+      else
+        message.right--;
+    }
+
+    message.top = y;
+    message.bottom = message.top + message.messages.size();
+    y = message.bottom + 2;
+  }
+}
+
 void SequenceImpl::Draw() {
-  int width = 100;
-  int height = 100;
+  int width = actors.back().right;
+  int height = messages.back().bottom+1+3;
   std::vector<std::wstring> lines(height, std::wstring(width, U' '));
 
   Screen screen(width, height);
 
   int x = 0;
   for (auto& actor : actors) {
-    screen.DrawBoxedText(x, 0, actor.name);
-    x += actor.name.size() + 2;
+    screen.DrawBoxedText(actor.left, 0, actor.name);
+    screen.DrawVerticalLine(3, height - 4, actor.center);
+    screen.DrawBoxedText(actor.left, height - 3, actor.name);
+    screen.DrawPixel(actor.center, 2, U'┬');
+    screen.DrawPixel(actor.center, height-3, U'┴');
+  }
+
+  for (auto& message : messages) {
+    int y = message.top;
+    for (auto& line : message.messages) {
+      screen.DrawText(message.left, y, line);
+      ++y;
+    }
+    screen.DrawHorizontalLine(message.line_left, message.line_right, y);
+    if (message.direction == Message::Direction::Left) {
+      screen.DrawPixel(message.line_left, y, U'<');
+    } else {
+      screen.DrawPixel(message.line_right, y, U'>');
+    }
   }
 
   output_ = screen.ToString();
 
-  //for (auto& actor : actors) {
-    //ss << "Actor " << actor.name << std::endl;
-    //for (auto& i : actor.message_id) {
-      //ss << " " << i << std::endl;
-    //}
+  // for (auto& actor : actors) {
+  // ss << "Actor " << actor.name << std::endl;
+  // for (auto& i : actor.message_id) {
+  // ss << " " << i << std::endl;
+  //}
   //}
 
-  //for (auto& message : messages) {
-    //ss << "Message " << std::endl;
-    //ss << "  From " << message.from << std::endl;
-    //ss << "  To   " << message.to << std::endl;
-    //ss << "  Id   " << message.id << std::endl;
-    //for (auto& i : message.messages) {
-      //ss << "    " << i << std::endl;
-    //}
+  // for (auto& message : messages) {
+  // ss << "Message " << std::endl;
+  // ss << "  From " << message.from << std::endl;
+  // ss << "  To   " << message.to << std::endl;
+  // ss << "  Id   " << message.id << std::endl;
+  // for (auto& i : message.messages) {
+  // ss << "    " << i << std::endl;
   //}
-
+  //}
 }
 
 std::string SequenceImpl::Output() {

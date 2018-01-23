@@ -10,9 +10,12 @@ std::wstring to_wstring(const std::string& s);
 class Screen {
  public:
   Screen(int width, int height);
+  void DrawPixel(int x, int y, wchar_t c);
   void DrawText(int x, int y, const std::wstring& text);
   void DrawBox(int x, int y, int w, int h);
   void DrawBoxedText(int x, int y, const std::wstring& text);
+  void DrawHorizontalLine(int left, int right, int y);
+  void DrawVerticalLine(int top, int bottom, int x);
   std::string ToString();
 
  private:

@@ -19,6 +19,11 @@ class SequenceImpl : public Sequence {
   struct Actor {
     std::wstring name;
     std::vector<int> message_id;
+
+    // Computed position.
+    int left = 0;
+    int center = 0;
+    int right = 0;
   };
   std::vector<Actor> actors;
 
@@ -27,10 +32,24 @@ class SequenceImpl : public Sequence {
     std::wstring to;
     int id = -1;
     std::vector<std::wstring> messages;
+
+    enum class Direction{Left, Right};
+    Direction direction = Direction::Right;
+
+    // Computed position.
+    int left = 0;
+    int right = 0;
+    int top = 0;
+    int bottom = 0;
+    int width = 0;
+    int line_left = 0;
+    int line_right = 0;
   };
   std::vector<Message> messages;
 
-  // 
+  std::map<std::wstring, int> actor_index;
+
+  // 1) Parse.
   void ComputeInternalRepresentation(const std::string& input);
   void AddCommand(SequenceParser::CommandContext* command);
   void AddMessage(SequenceParser::MessageContext* message);
@@ -39,11 +58,18 @@ class SequenceImpl : public Sequence {
   std::vector<std::wstring> GetMessageText(
       SequenceParser::MessageTextContext* message_text);
 
-
+  // 2) Clean the representation.
   void UniformizeInternalRepresentation();
   void UniformizeActors();
   void UniformizeMessageID();
 
+  // 3) Layout.
+  void Layout();
+  void LayoutComputeMessageWidth();
+  void LayoutComputeActorsPositions();
+  void LayoutComputeMessagesPositions();
+
+  // 4)
   void Draw();
   std::string output_;
 };

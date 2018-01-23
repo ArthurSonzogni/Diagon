@@ -19,6 +19,10 @@ Screen::Screen(int width, int height)
       height_(height),
       lines_(height, std::wstring(width, U' ')) {}
 
+void Screen::DrawPixel(int x, int y, wchar_t c) {
+  lines_[y][x] = c;
+}
+
 void Screen::DrawText(int x, int y, const std::wstring& text) {
   for (auto& c : text)
     lines_[y][x++] = c;
@@ -50,4 +54,16 @@ std::string Screen::ToString() {
     ss << to_string(lines_[y]) << '\n';
   }
   return ss.str();
+}
+
+void Screen::DrawHorizontalLine(int left, int right, int y) {
+  for (int x = left; x <= right; ++x) {
+    lines_[y][x] = U'─';
+  }
+}
+
+void Screen::DrawVerticalLine(int top, int bottom, int x) {
+  for (int y = top; y <= bottom; ++y) {
+    lines_[y][x] = U'│';
+  }
 }
