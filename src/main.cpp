@@ -22,7 +22,6 @@ void translate(const char *input) {
   auto sequence = Sequence::Create();
   sequence->Process(input);
   std::string command = "output.value='" + sequence->Output() + "';";
-  std::cout << "command = " << command << std::endl;
   replaceAll(command, "\n", "\\n");
   emscripten_run_script(command.c_str());
 }

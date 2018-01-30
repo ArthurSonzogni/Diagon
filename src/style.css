@@ -3,7 +3,7 @@
   left:0;
   top:0;
   width:50%;
-  height:80%;
+  height:50%;
 }
 
 #output {
@@ -11,7 +11,7 @@
   right:0;
   top:0;
   width:50%;
-  height:80%;
+  height:50%;
 }
 
 #errors {
@@ -19,5 +19,5 @@
   left:0;
   bottom:0;
   width:100%;
-  height:20%;
+  height:50%;
 }

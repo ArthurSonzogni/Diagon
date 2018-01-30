@@ -1,26 +1,23 @@
 lexer grammar SequenceLexer;
 
-Space:  (' ' | '\t') {skip();} ;
-EOL: '\n' | '\r\n';
-
-// Fragments
+// Fragments.
 fragment Digit: [0-9]+;
-fragment Letter: [a-z] | [A-Z];
+fragment Letter: ~[<:>\-0-9\r\n) \t];
 fragment Word: Letter ( Letter | Digit )*;
+fragment EscapedString: '"' (~'"')* '"';
 
-// The Arrow with different styles
+// The Arrows.
 NormalLeftArrow: '<-';
-DashedLeftArrow: '<--';
-DottedLeftArrow: '<..';
 NormalRightArrow: '->';
-DashedRightArrow: '-->';
-DottedRightArrow: '..>';
 
-Words: Word (Space+ Word)*;
+Words: Word (Space+ Word)* | EscapedString;
 Number: Digit+;
 
 Colon: ':';
-Comma: ',';
+Less: '<';
 CloseParenthesis: ')';
+
+Space:  (' ' | '\t') {skip();} ;
+EOL: '\n' | '\r\n';
 
 // vim: filetype=antlr

@@ -8,6 +8,8 @@
 #include "sequence/SequenceLexer.h"
 #include "sequence/SequenceParser.h"
 
+class Screen;
+
 class SequenceImpl : public Sequence {
  public:
   SequenceImpl() = default;
@@ -15,15 +17,24 @@ class SequenceImpl : public Sequence {
   void Process(const std::string& input) override;
   std::string Output() override;
 
+ public: // Not really public.
+  struct Dependency {
+    int from;
+    int to;
+    bool operator<(const Dependency&) const;
+    Dependency& operator=(const Dependency&) = default;
+  };
+
  private:
   struct Actor {
     std::wstring name;
-    std::vector<int> message_id;
+    std::set<Dependency> dependencies;
 
     // Computed position.
     int left = 0;
     int center = 0;
     int right = 0;
+    void Draw(Screen& screen, int height);
   };
   std::vector<Actor> actors;
 
@@ -44,10 +55,16 @@ class SequenceImpl : public Sequence {
     int width = 0;
     int line_left = 0;
     int line_right = 0;
+    int line_top = 0;
+    int line_bottom = 0;
+    bool is_separated = false;
+    int offset = 0;
+    void Draw(Screen& screen);
   };
   std::vector<Message> messages;
 
   std::map<std::wstring, int> actor_index;
+  std::map<int, int> message_index;
 
   // 1) Parse.
   void ComputeInternalRepresentation(const std::string& input);

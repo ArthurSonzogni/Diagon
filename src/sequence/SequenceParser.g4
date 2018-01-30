@@ -8,14 +8,10 @@ program: command (EOL command)* EOF;
 command: message | actor | /* empty */;
 
 message: messageID? Words arrow Words Colon messageText;
-actor: Words Colon (Number (Comma Number)*);
+actor: Words Colon (Number (Less Number)*)?;
 
 arrow: NormalLeftArrow
-     | DashedLeftArrow
-     | DottedLeftArrow
-     | NormalRightArrow
-     | DashedRightArrow
-     | DottedRightArrow;
+     | NormalRightArrow;
 
 messageText: Words        # singleLineText
            | (EOL Words)+ # multiLineText;
