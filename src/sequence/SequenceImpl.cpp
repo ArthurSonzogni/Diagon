@@ -3,6 +3,7 @@
 #include <queue>
 #include <set>
 #include <sstream>
+#include <functional>
 
 #include "sequence/SequenceLexer.h"
 #include "sequence/SequenceParser.h"
@@ -342,43 +343,122 @@ struct MessageDependencies {
   std::set<Dependency> dependencies;
 };
 
-std::vector<std::set<int>> Cut(
-    const MessageDependencies& message_dependencies) {
-  // Compute initial state.
-  std::map<int, std::set<int>> reachable_from;
-  for (int message : message_dependencies.messages) {
-    reachable_from[message].insert(message);
+struct MessageSetWithWeight {
+  std::set<int> messages;
+  size_t weight;
+  bool operator<(const MessageSetWithWeight& other) const {
+    return weight > other.weight;
   }
-  std::map<int, std::set<int>> new_reachable_from(reachable_from);
+};
 
-  std::cout << "reachable_from size = " << reachable_from.size() << std::endl;
+std::vector<std::set<int>> Cut(const MessageDependencies& message_dependencies,
+                               std::function<bool(int, int)> preference) {
+  std::vector<std::set<int>> output;
 
-  // Find the closure.
-  while (true) {
+  // Groups the nodes that independants on each other.
+  std::vector<MessageDependencies> independants;
+  {
+    std::map<int, std::set<int>> neighbours;
     for (const Dependency& dependency : message_dependencies.dependencies) {
-      const auto& addition = reachable_from[dependency.to];
-      new_reachable_from[dependency.from].insert(addition.cbegin(),
-                                                 addition.cend());
+      neighbours[dependency.from].insert(dependency.to);
+      neighbours[dependency.to].insert(dependency.from);
+    }
+    std::set<int> non_used;
+    for (int message : message_dependencies.messages) {
+      non_used.insert(message);
+    }
+    while (!non_used.empty()) {
+      MessageDependencies dependant;
+      std::queue<int> tasks;
+      tasks.push(*non_used.begin());
+      while (!tasks.empty()) {
+        // Take a new task
+        int message = tasks.front();
+        tasks.pop();
+
+        // Check there is work to do for this task.
+        {
+          auto it = non_used.find(message);
+          if (it == non_used.end())
+            continue;
+          non_used.erase(it);
+        }
+
+        dependant.messages.insert(message);
+        for (int next : neighbours[message]) {
+          tasks.push(next);
+        }
+      }
+      independants.push_back(std::move(dependant));
     }
 
-    if (reachable_from == new_reachable_from)
-      break;
-    reachable_from = new_reachable_from;
+    // Split the dependencies between each independant groups.
+    std::map<int, int> index;
+    for (int i = 0; i < independants.size(); ++i) {
+      for (int j : independants[i].messages)
+        index[j] = i;
+    }
+    for (const Dependency& dependency : message_dependencies.dependencies) {
+      independants[index[dependency.from]].dependencies.insert(dependency);
+    }
+
+    // Sort indepents groups such that messages are displayed in the order they
+    // are written.
+    std::sort(
+        independants.begin(), independants.end(),
+        [&](const MessageDependencies left, const MessageDependencies right) {
+          return preference(*left.messages.begin(), *right.messages.begin());
+        });
   }
 
-  std::cout << "reachable_from size = " << reachable_from.size() << std::endl;
+  std::cout << "independants.size() = " << independants.size() << std::endl;
 
-  // Group elements that can reach the same set of elements.
-  std::map<std::set<int>, std::set<int>> cycles;
-  for (const auto& it : reachable_from) {
-    cycles[it.second].insert(it.first);
+  for (auto& dependant : independants) {
+    // Find cycles.
+    std::vector<MessageSetWithWeight> cycles;
+    {
+      // Compute initial state.
+      std::map<int, std::set<int>> reachable_from;
+      for (int message : dependant.messages) {
+        reachable_from[message].insert(message);
+      }
+      std::map<int, std::set<int>> new_reachable_from(reachable_from);
+
+      // Find the closure.
+      while (true) {
+        for (const Dependency& dependency : dependant.dependencies) {
+          const auto& addition = reachable_from[dependency.to];
+          new_reachable_from[dependency.from].insert(addition.cbegin(),
+                                                     addition.cend());
+        }
+
+        if (reachable_from == new_reachable_from)
+          break;
+        reachable_from = new_reachable_from;
+      }
+
+      // Group elements that can reach the same set of elements.
+      std::map<std::set<int>, std::set<int>> groups;
+      for (const auto& it : reachable_from) {
+        groups[it.second].insert(it.first);
+      }
+
+      for (auto& group : groups) {
+        cycles.push_back(
+            MessageSetWithWeight{std::move(group.second), group.first.size()});
+      }
+
+      // This is implicit, but it is indeed a topological sort.
+      sort(cycles.begin(), cycles.end());
+    }
+
+    std::cout << "cycles.size() = " << cycles.size() << std::endl;
+    for (auto& it : cycles)
+      output.push_back(std::move(it.messages));
   }
 
-  std::vector<std::set<int>> output;
-  for (auto& cycle : cycles) {
-    output.push_back(cycle.second);
-  }
-
+  // Separate cycles th
+  
   // std::set<Dependency> external_dependencies;
   // for(const Dependency& dependency : message_dependencies.dependencies) {
   // bool found = false;
@@ -396,54 +476,6 @@ std::vector<std::set<int>> Cut(
   //}
 
   // TODO: sort the cycles.
-
-  return output;
-}
-
-std::vector<Graph> ConnectedComponents(const Graph& graph) {
-  std::vector<Graph> output;
-
-  std::set<Node> nodes;
-  std::map<Node, std::set<Vertex>> outgoing;
-  std::map<Node, std::set<Vertex>> ingoing;
-  for (const auto& vertex : graph) {
-    nodes.insert(vertex.from);
-    nodes.insert(vertex.to);
-    outgoing[vertex.from].insert(vertex);
-    ingoing[vertex.to].insert(vertex);
-  }
-
-  std::cout << "nodes.size() = " << nodes.size() << std::endl;
-  std::cout << "outgoing.size() = " << outgoing.size() << std::endl;
-  std::cout << "ingoing.size() = " << ingoing.size() << std::endl;
-
-  while (nodes.size()) {
-    std::queue<Node> tasks;
-    tasks.push(*nodes.begin());
-    Graph new_graph;
-    while (!tasks.empty()) {
-      // Take an element from the tasks.
-      Node node = tasks.front();
-      tasks.pop();
-
-      // Check if this element has not been used.
-      auto node_iterator = nodes.find(node);
-      if (node_iterator == nodes.end())
-        continue;
-      nodes.erase(node_iterator);
-
-      // Use this element.
-      for (auto& out_vertex : outgoing[node]) {
-        new_graph.insert(out_vertex);
-        tasks.push(out_vertex.to);
-      }
-      for (auto& in_vertex : ingoing[node]) {
-        new_graph.insert(in_vertex);
-        tasks.push(in_vertex.from);
-      }
-    }
-    output.push_back(new_graph);
-  }
 
   return output;
 }
@@ -494,7 +526,54 @@ void SequenceImpl::LayoutComputeMessagesPositions() {
 
   int y = 4;
 
-  for (auto& cut : graph::Cut(message_dependencies)) {
+  auto add_message = [&](Message& message, int& y, int& offset) {
+    message.left = actors[actor_index[message.from]].center;
+    message.right = actors[actor_index[message.to]].center;
+    if (message.left > message.right) {
+      std::swap(message.left, message.right);
+      message.direction = Message::Direction::Left;
+    } else {
+      message.direction = Message::Direction::Right;
+    }
+    message.left += 1;
+    message.right -= 1;
+    message.line_left = message.left;
+    message.line_right = message.right;
+    int k = 0;
+    while (message.right - message.left > message.width) {
+      if (++k % 2)
+        message.left++;
+      else
+        message.right--;
+    }
+
+    message.top = y;
+    message.bottom = message.top + message.messages.size();
+    message.line_bottom = message.bottom;
+
+    if (message.is_separated) {
+      message.offset = offset++;
+    } else {
+      message.line_top = message.bottom;
+    }
+    y = message.bottom + 2;
+  };
+
+  auto preference = [&](int a, int b) -> bool {
+    return message_index[a] < message_index[b];
+  };
+
+  for (auto& cut : graph::Cut(message_dependencies, preference)) {
+    int offset = 1;
+
+    // Fast path: Only one message, no crossing.
+    if (cut.size() == 1) {
+      int id = *(cut.begin());
+      auto& message = messages[message_index[id]];
+      add_message(message, y, offset);
+      continue;
+    }
+
     // Build graph;
     graph::Graph graph;
     for (int a = 0; a < actors.size(); ++a) {
@@ -506,6 +585,7 @@ void SequenceImpl::LayoutComputeMessagesPositions() {
         }
       }
     }
+
     for (auto& message : messages) {
       if (cut.count(message.id)) {
         graph::Node from{actor_index[message.from], message.id};
@@ -513,15 +593,8 @@ void SequenceImpl::LayoutComputeMessagesPositions() {
         graph.insert(graph::Vertex(from, to));
       }
     }
-
-    std::cout << "graph.size() = " << graph.size() << std::endl;
-
-    // TODO(remove connected components).
     std::set<int> started_message;
     auto topological_order = FindTopologicalOrder(graph);
-    std::cout << "topological_order.size() = " << topological_order.size()
-              << std::endl;
-    int offset = 1;
     for (int i = 0; i < topological_order.size(); ++i) {
       const graph::Node& node = topological_order[i];
       auto& message = messages[message_index[node.message]];
@@ -539,41 +612,7 @@ void SequenceImpl::LayoutComputeMessagesPositions() {
         continue;
       }
 
-      message.left = actors[actor_index[message.from]].center;
-      message.right = actors[actor_index[message.to]].center;
-      if (message.left > message.right) {
-        std::swap(message.left, message.right);
-        message.direction = Message::Direction::Left;
-      } else {
-        message.direction = Message::Direction::Right;
-      }
-      message.left += 1;
-      message.right -= 1;
-      message.line_left = message.left;
-      message.line_right = message.right;
-      int k = 0;
-      while (message.right - message.left > message.width) {
-        if (++k % 2)
-          message.left++;
-        else
-          message.right--;
-      }
-
-      message.top = y;
-      message.bottom = message.top + message.messages.size();
-      message.line_bottom = message.bottom;
-
-      if (message.is_separated) {
-        message.offset = offset++;
-      } else {
-        message.line_top = message.bottom;
-      }
-      y = message.bottom + 2;
-      std::cout << to_string(message.messages.front()) << std::endl;
-      std::cout << "message.top = " << message.top << std::endl;
-      std::cout << "message.left = " << message.left << std::endl;
-      std::cout << "message.right = " << message.right << std::endl;
-      std::cout << "message.bottom = " << message.bottom << std::endl;
+      add_message(message, y, offset);
     }
   }
 }
@@ -665,13 +704,12 @@ void SequenceImpl::Draw() {
     ss << '\n';
   }
 
-  for(auto& it : message_index) {
+  for (auto& it : message_index) {
     ss << "(" << it.first << "," << it.second << ")\n";
   }
-  for(auto& it : actor_index) {
+  for (auto& it : actor_index) {
     ss << "(" << it.first << "," << it.second << ")\n";
   }
-
 
   ss << " width = " << width << " height = " << height << "\n";
 
