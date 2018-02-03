@@ -1,5 +1,5 @@
-1) A -> B : Make me a sandwitch.
-2) A -> B : Make me a sandwitch.
+1) A -> B : message 1
+2) A -> B : message 2
 
-A: 1,2
-B: 2,1
+A: 1<2
+B: 1>2

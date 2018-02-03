@@ -1,19 +1,19 @@
-#ifndef SEQUENCE_SEQUENCE_IMPL_H
-#define SEQUENCE_SEQUENCE_IMPL_H
+#ifndef TRANSLATOR_SEQUENCE_SEQUENCE_H
+#define TRANSLATOR_SEQUENCE_SEQUENCE_H
 
 #include <string>
 #include <vector>
 
-#include "sequence/Sequence.h"
-#include "sequence/SequenceLexer.h"
-#include "sequence/SequenceParser.h"
+#include "translator/Translator.h"
+#include "translator/sequence/Sequence.h"
+#include "translator/sequence/SequenceLexer.h"
+#include "translator/sequence/SequenceParser.h"
 
 class Screen;
 
-class SequenceImpl : public Sequence {
+class Sequence : public Translator {
  public:
-  SequenceImpl() = default;
-  virtual ~SequenceImpl() = default;
+  virtual ~Sequence() = default;
   void Process(const std::string& input) override;
   std::string Output() override;
 
@@ -69,11 +69,11 @@ class SequenceImpl : public Sequence {
   // 1) Parse.
   void ComputeInternalRepresentation(const std::string& input);
   void AddCommand(SequenceParser::CommandContext* command);
-  void AddMessage(SequenceParser::MessageContext* message);
-  void AddActor(SequenceParser::ActorContext* actor_context);
-  int GetMessageID(SequenceParser::MessageIDContext* message_id);
-  std::vector<std::wstring> GetMessageText(
-      SequenceParser::MessageTextContext* message_text);
+  void AddMessageCommand(SequenceParser::MessageCommandContext* message);
+  void AddDependencyCommand(
+      SequenceParser::DependencyCommandContext* actor_context);
+  int GetNumber(SequenceParser::NumberContext* number);
+  std::wstring GetText(SequenceParser::TextContext* text);
 
   // 2) Clean the representation.
   void UniformizeInternalRepresentation();
@@ -91,4 +91,4 @@ class SequenceImpl : public Sequence {
   std::string output_;
 };
 
-#endif /* end of include guard: SEQUENCE_SEQUENCE_IMPL_H */
+#endif /* end of include guard: TRANSLATOR_SEQUENCE_SEQUENCE_H */

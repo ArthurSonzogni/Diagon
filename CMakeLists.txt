@@ -3,7 +3,6 @@ project(Diagon)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-
 # ┌─────────────────────────────────────────────────┐
 # │ Print Information about the compilation system  │
 # └─────────────────────────────────────────────────┘
@@ -23,7 +22,7 @@ message(" * Use Web : " ${Web})
 # └─────────────────────────────────────────────────┘
 
 # Function
-#   ANTLR(INPUT <input> (DEPENDENCIES <dependencies>))
+#   ANTLR(<file.g4>)
 #
 # Description:
 #   Take an ANTLR file and produce a CMake rule to generate the corresponding
@@ -33,24 +32,17 @@ message(" * Use Web : " ${Web})
 #   The ANTLR file path must be relative to ${CMAKE_CURRENT_SOURCE_DIR}
 #
 # Example:
-#   ANTLR(INPUT MyLexer.g4)
-#   ANTLR(INPUT MyParser.g4 DEPENDENCIES MyLexer.cpp)
-function(ANTLR)
-  cmake_parse_arguments(ARGUMENTS "DEPENDENCIES" "INPUT" "" ${ARGN} )
-  set(source ${ARGUMENTS_INPUT})
-  set(dependencies ${ARGUMENTS_UNPARSED_ARGUMENTS})
+#   ANTLR(Grammar.g4)
+function(ANTLR source)
   get_filename_component(source_filename ${CMAKE_CURRENT_SOURCE_DIR}/${source} NAME_WE)
   get_filename_component(source_src_dir  ${CMAKE_CURRENT_SOURCE_DIR}/${source} DIRECTORY)
   get_filename_component(source_gen_dir  ${CMAKE_CURRENT_BINARY_DIR}/${source} DIRECTORY)
   add_custom_command(
-    DEPENDS
-      ${source_src_dir}/${source_filename}.g4
-      ${dependencies}
     OUTPUT
-      ${source_gen_dir}/${source_filename}.h
-      ${source_gen_dir}/${source_filename}.cpp
-      ${source_gen_dir}/${source_filename}.interp
-      ${source_gen_dir}/${source_filename}.tokens
+      ${source_gen_dir}/${source_filename}Lexer.cpp
+      ${source_gen_dir}/${source_filename}Parser.cpp
+      ${source_gen_dir}/${source_filename}Lexer.h
+      ${source_gen_dir}/${source_filename}Parser.h
     COMMAND
       java
     ARGS
@@ -60,8 +52,9 @@ function(ANTLR)
       -no-visitor
       -o ${source_gen_dir}
       ${source_src_dir}/${source_filename}.g4
+    MAIN_DEPENDENCY
+      ${source_src_dir}/${source_filename}.g4
   )
-  set(output ${source_gen_dir}/${source_filename}.cpp)
 endfunction()
 
 # Build the ANTLR runtime.

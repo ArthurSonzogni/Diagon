@@ -1,10 +1,11 @@
 ┌─┐                      ┌─┐
 │A│                      │B│
 └┬┘                      └┬┘
- │  Make me a sandwitch.  │ 
+ │                        │ 
+ │  Make me a sandwitch   │ 
  │───────────────────────>│ 
  │                        │ 
- │          No.           │ 
+ │           No           │ 
  │<───────────────────────│ 
  │                        │ 
  │Sudo make me a sandwitch│ 

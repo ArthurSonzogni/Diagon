@@ -1,16 +1,19 @@
-#include "sequence/SequenceImpl.h"
+#include "translator/sequence/Sequence.h"
 
 #include <queue>
 #include <set>
 #include <sstream>
 #include <functional>
 
-#include "sequence/SequenceLexer.h"
-#include "sequence/SequenceParser.h"
 #include "screen/Screen.h"
+#include "translator/sequence/SequenceLexer.h"
+#include "translator/sequence/SequenceParser.h"
 
-bool SequenceImpl::Dependency::operator<(
-    const SequenceImpl::Dependency& other) const {
+std::unique_ptr<Translator> SequenceTranslator() {
+  return std::make_unique<Sequence>();
+}
+
+bool Sequence::Dependency::operator<(const Sequence::Dependency& other) const {
   if (from < other.from)
     return true;
   if (from > other.from)
@@ -18,15 +21,15 @@ bool SequenceImpl::Dependency::operator<(
   return to < other.to;
 }
 
-void SequenceImpl::Process(const std::string& input) {
+void Sequence::Process(const std::string& input) {
   ComputeInternalRepresentation(input);
   UniformizeInternalRepresentation();
   Layout();
   Draw();
 }
 
-void SequenceImpl::ComputeInternalRepresentation(const std::string& input) {
-  std::cout << "input = " << std::endl << input << std::endl;
+void Sequence::ComputeInternalRepresentation(const std::string& input) {
+  //std::cout << "input = " << std::endl << input << std::endl;
   antlr4::ANTLRInputStream input_stream(input);
 
   // Lexer.
@@ -35,27 +38,28 @@ void SequenceImpl::ComputeInternalRepresentation(const std::string& input) {
   tokens.fill();
 
   for (auto token : tokens.getTokens()) {
-    std::cout << token->toString() << std::endl;
+    //std::cout << token->toString() << std::endl;
   }
 
+  //return;
   // Parser.
   SequenceParser parser(&tokens);
 
   // Print the tree.
   auto program = parser.program();
-  std::cout << program->toStringTree(&parser) << std::endl << std::endl;
+  //std::cout << program->toStringTree(&parser) << std::endl << std::endl;
 
   for (SequenceParser::CommandContext* command : program->command()) {
     AddCommand(command);
   }
 }
 
-void SequenceImpl::UniformizeInternalRepresentation() {
+void Sequence::UniformizeInternalRepresentation() {
   UniformizeActors();
   UniformizeMessageID();
 }
 
-void SequenceImpl::UniformizeActors() {
+void Sequence::UniformizeActors() {
   // Look at missing Actors.
   std::set<std::wstring> declared_actors;
   for (auto& actor : actors) {
@@ -74,7 +78,7 @@ void SequenceImpl::UniformizeActors() {
   }
 }
 
-void SequenceImpl::UniformizeMessageID() {
+void Sequence::UniformizeMessageID() {
   // Remove duplicate in message.id
   {
     std::set<int> used;
@@ -147,38 +151,40 @@ void SequenceImpl::UniformizeMessageID() {
   }
 }
 
-void SequenceImpl::AddCommand(SequenceParser::CommandContext* command) {
-  if (auto message = command->message()) {
-    AddMessage(message);
+void Sequence::AddCommand(SequenceParser::CommandContext* command) {
+  if (auto message_command = command->messageCommand()) {
+    AddMessageCommand(message_command);
     return;
   }
 
-  if (auto actor = command->actor()) {
-    AddActor(actor);
+  if (auto dependency_command = command->dependencyCommand()) {
+    AddDependencyCommand(dependency_command);
     return;
   }
 }
 
-void SequenceImpl::AddMessage(SequenceParser::MessageContext* message_context) {
+void Sequence::AddMessageCommand(
+    SequenceParser::MessageCommandContext* message_command) {
   Message message;
-  if (auto message_id = message_context->messageID()) {
-    message.id = GetMessageID(message_id);
+  if (auto dependency_id = message_command->dependencyID()) {
+    message.id =
+        std::stoi(dependency_id->number()->Number()->getSymbol()->getText());
   }
 
-  message.from = to_wstring(message_context->Words(0)->getSymbol()->getText());
-  message.to = to_wstring(message_context->Words(1)->getSymbol()->getText());
+  message.from = GetText(message_command->text(0));
+  message.to = GetText(message_command->text(1));
 
-  if (message_context->arrow()->NormalLeftArrow()) {
+  if (message_command->arrow()->NormalLeftArrow()) {
     std::swap(message.from, message.to);
   }
 
-  message.messages = GetMessageText(message_context->messageText());
+  message.messages.push_back(GetText(message_command->text(2)));
   messages.push_back(message);
 }
 
-void SequenceImpl::AddActor(SequenceParser::ActorContext* actor_context) {
-  std::wstring name =
-      to_wstring(actor_context->Words()->getSymbol()->getText());
+void Sequence::AddDependencyCommand(
+    SequenceParser::DependencyCommandContext* dependency_command) {
+  std::wstring name = GetText(dependency_command->text());
   if (!actor_index.count(name)) {
     actor_index[name] = actors.size();
     actors.emplace_back();
@@ -186,44 +192,47 @@ void SequenceImpl::AddActor(SequenceParser::ActorContext* actor_context) {
   Actor& actor = actors[actor_index[name]];
   actor.name = name;
 
-  std::vector<int> numbers;
-  for (const auto& number : actor_context->Number()) {
-    numbers.push_back(std::stoi(number->getSymbol()->getText()));
-  }
-  for (int i = 0, j = 1; j < numbers.size(); ++i, ++j) {
-    actor.dependencies.insert(Dependency{numbers[i], numbers[j]});
-  }
-}
-
-int SequenceImpl::GetMessageID(SequenceParser::MessageIDContext* message_id) {
-  return std::stoi(message_id->Number()->getSymbol()->getText());
-}
-
-std::vector<std::wstring> SequenceImpl::GetMessageText(
-    SequenceParser::MessageTextContext* message_text) {
-  std::vector<std::wstring> messages;
-  if (message_text->getRuleIndex() == 0) {
-    messages.push_back(to_wstring(
-        static_cast<SequenceParser::SingleLineTextContext*>(message_text)
-            ->Words()
-            ->getSymbol()
-            ->getText()));
-  } else {
-    auto m = static_cast<SequenceParser::MultiLineTextContext*>(message_text);
-    for (const auto& line : m->Words()) {
-      messages.push_back(to_wstring(line->getSymbol()->getText()));
+  for (auto dependency : dependency_command->dependencies()->dependency()) {
+    auto numbers = dependency->number();
+    auto comparison = dependency->comparison();
+    for (int i = 0; i < comparison.size(); ++i) {
+      int left = std::stoi(numbers[i]->Number()->getSymbol()->getText());
+      int right = std::stoi(numbers[i + 1]->Number()->getSymbol()->getText());
+      if (comparison[i]->More()) {
+        std::swap(left, right);
+      }
+      actor.dependencies.insert(Dependency{left, right});
     }
   }
-  return messages;
 }
 
-void SequenceImpl::Layout() {
+std::wstring Sequence::GetText(SequenceParser::TextContext* text) {
+  return to_wstring(text->textInternal()->getText());
+}
+
+int Sequence::GetNumber(SequenceParser::NumberContext* number) {
+  return std::stoi(number->Number()->getSymbol()->getText());
+}
+
+//std::vector<std::wstring> Sequence::GetMessage(
+    //SequenceParser::MessageContext* message) {
+  //std::vector<std::wstring> messages;
+
+    //messages.push_back(to_wstring(message->text()->getText()));
+  ////for (auto text : message->text()) {
+    ////messages.push_back(to_wstring(text->getText()));
+  ////}
+
+  //return messages;
+//}
+
+void Sequence::Layout() {
   LayoutComputeMessageWidth();
   LayoutComputeActorsPositions();
   LayoutComputeMessagesPositions();
 }
 
-void SequenceImpl::LayoutComputeMessageWidth() {
+void Sequence::LayoutComputeMessageWidth() {
   for (auto& message : messages) {
     for (auto& text : message.messages) {
       message.width = std::max(message.width, int(text.size()));
@@ -238,7 +247,7 @@ struct ActorSpace {
   int space;
 };
 
-void SequenceImpl::LayoutComputeActorsPositions() {
+void Sequence::LayoutComputeActorsPositions() {
   std::vector<ActorSpace> spaces;
   for (int i = 0, j = 1; j < actors.size(); ++i, ++j) {
     int size_1 = actors[i].name.size();
@@ -251,10 +260,10 @@ void SequenceImpl::LayoutComputeActorsPositions() {
   }
 
   for (auto& message : messages) {
-    std::cout << "from = " << to_string(message.from) << " to "
-              << to_string(message.to) << std::endl;
-    std::cout << "from = " << actor_index[message.from] << " to "
-              << actor_index[message.to] << std::endl;
+    //std::cout << "from = " << to_string(message.from) << " to "
+              //<< to_string(message.to) << std::endl;
+    //std::cout << "from = " << actor_index[message.from] << " to "
+              //<< actor_index[message.to] << std::endl;
     ActorSpace space{actor_index[message.from],  //
                      actor_index[message.to],    //
                      message.width + 1};         //
@@ -263,13 +272,13 @@ void SequenceImpl::LayoutComputeActorsPositions() {
     spaces.push_back(space);
   }
 
-  std::cout << "spaces.size()  = " << spaces.size() << std::endl;
-  for (auto& it : spaces) {
-    std::cout << " * " << it.a;
-    std::cout << " , " << it.b;
-    std::cout << " , " << it.space;
-    std::cout << std::endl;
-  }
+  //std::cout << "spaces.size()  = " << spaces.size() << std::endl;
+  //for (auto& it : spaces) {
+    //std::cout << " * " << it.a;
+    //std::cout << " , " << it.b;
+    //std::cout << " , " << it.space;
+    //std::cout << std::endl;
+  //}
 
   actors[0].center = actors[0].name.size() / 2 + 1;
 
@@ -288,7 +297,7 @@ void SequenceImpl::LayoutComputeActorsPositions() {
   }
 
   for (auto& actor : actors) {
-    actor.left = actor.center - actor.name.size() / 2 - 1;
+    actor.left = actor.center - actor.name.size() / 2 - actor.name.size()%2;
     actor.right = actor.left + actor.name.size() + 2;
   }
 }
@@ -301,7 +310,7 @@ struct Message {
   int to;    // actor.
 };
 
-using Dependency = SequenceImpl::Dependency;
+using Dependency = Sequence::Dependency;
 
 struct Node {
   int actor;
@@ -411,7 +420,7 @@ std::vector<std::set<int>> Cut(const MessageDependencies& message_dependencies,
         });
   }
 
-  std::cout << "independants.size() = " << independants.size() << std::endl;
+  //std::cout << "independants.size() = " << independants.size() << std::endl;
 
   for (auto& dependant : independants) {
     // Find cycles.
@@ -452,13 +461,13 @@ std::vector<std::set<int>> Cut(const MessageDependencies& message_dependencies,
       sort(cycles.begin(), cycles.end());
     }
 
-    std::cout << "cycles.size() = " << cycles.size() << std::endl;
+    //std::cout << "cycles.size() = " << cycles.size() << std::endl;
     for (auto& it : cycles)
       output.push_back(std::move(it.messages));
   }
 
   // Separate cycles th
-  
+
   // std::set<Dependency> external_dependencies;
   // for(const Dependency& dependency : message_dependencies.dependencies) {
   // bool found = false;
@@ -511,7 +520,7 @@ std::vector<Node> FindTopologicalOrder(const Graph& graph) {
 
 }  // namespace Graph
 
-void SequenceImpl::LayoutComputeMessagesPositions() {
+void Sequence::LayoutComputeMessagesPositions() {
   // Build graph
   graph::MessageDependencies message_dependencies;
   for (int a = 0; a < actors.size(); ++a) {
@@ -617,7 +626,7 @@ void SequenceImpl::LayoutComputeMessagesPositions() {
   }
 }
 
-void SequenceImpl::Actor::Draw(Screen& screen, int height) {
+void Sequence::Actor::Draw(Screen& screen, int height) {
   screen.DrawBoxedText(left, 0, name);
   screen.DrawVerticalLine(3, height - 4, center);
   screen.DrawBoxedText(left, height - 3, name);
@@ -625,7 +634,7 @@ void SequenceImpl::Actor::Draw(Screen& screen, int height) {
   screen.DrawPixel(center, height - 3, U'┴');
 }
 
-void SequenceImpl::Message::Draw(Screen& screen) {
+void Sequence::Message::Draw(Screen& screen) {
   if (line_top == line_bottom) {
     screen.DrawHorizontalLine(line_left, line_right, line_top);
   } else {
@@ -659,7 +668,7 @@ void SequenceImpl::Message::Draw(Screen& screen) {
   }
 }
 
-void SequenceImpl::Draw() {
+void Sequence::Draw() {
   // Estimate output dimension.
   int width = actors.back().right;
   int height = 0;
@@ -681,41 +690,41 @@ void SequenceImpl::Draw() {
 
   output_ = screen.ToString();
 
-  std::wstringstream ss;
-  for (auto& actor : actors) {
-    ss << "Actor " << actor.name << '\n';
-    for (auto& dependency : actor.dependencies) {
-      ss << " * " << dependency.from << "<" << dependency.to << '\n';
-    }
-    ss << " - left = " << actor.left << '\n';
-    ss << " - center = " << actor.center << '\n';
-    ss << " - right = " << actor.right << '\n';
-    ss << '\n';
-  }
+  //std::wstringstream ss;
+  //for (auto& actor : actors) {
+    //ss << "Actor " << actor.name << '\n';
+    //for (auto& dependency : actor.dependencies) {
+      //ss << " * " << dependency.from << "<" << dependency.to << '\n';
+    //}
+    //ss << " - left = " << actor.left << '\n';
+    //ss << " - center = " << actor.center << '\n';
+    //ss << " - right = " << actor.right << '\n';
+    //ss << '\n';
+  //}
 
-  for (auto& message : messages) {
-    ss << "Message " << '\n';
-    ss << "  From " << message.from << '\n';
-    ss << "  To   " << message.to << '\n';
-    ss << "  Id   " << message.id << '\n';
-    for (auto& i : message.messages) {
-      ss << "    " << i << '\n';
-    }
-    ss << '\n';
-  }
+  //for (auto& message : messages) {
+    //ss << "Message " << '\n';
+    //ss << "  From " << message.from << '\n';
+    //ss << "  To   " << message.to << '\n';
+    //ss << "  Id   " << message.id << '\n';
+    //for (auto& i : message.messages) {
+      //ss << "    " << i << '\n';
+    //}
+    //ss << '\n';
+  //}
 
-  for (auto& it : message_index) {
-    ss << "(" << it.first << "," << it.second << ")\n";
-  }
-  for (auto& it : actor_index) {
-    ss << "(" << it.first << "," << it.second << ")\n";
-  }
+  //for (auto& it : message_index) {
+    //ss << "(" << it.first << "," << it.second << ")\n";
+  //}
+  //for (auto& it : actor_index) {
+    //ss << "(" << it.first << "," << it.second << ")\n";
+  //}
 
-  ss << " width = " << width << " height = " << height << "\n";
+  //ss << " width = " << width << " height = " << height << "\n";
 
-  output_ += '\n' + to_string(ss.str());
+  //output_ += '\n' + to_string(ss.str());
 }
 
-std::string SequenceImpl::Output() {
+std::string Sequence::Output() {
   return output_;
 }
