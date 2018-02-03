@@ -28,16 +28,13 @@ int main(int, const char**) {
       sequence->Process(input_string);
 
       if (sequence->Output() == output_string) {
-        std::cout << "[PASS] " << test << std::endl;
+        std::cout << "  [PASS] " << test << std::endl;
       } else {
-        std::cout << "[FAIL] " << test << std::endl;
+        std::cout << "  [FAIL] " << test << std::endl;
         std::cout << "---[Output]------------------" << std::endl;
         std::cout << sequence->Output() << std::endl;
-        std::cout << "-----------------------------" << std::endl;
-        std::cout << " vs " << std::endl;
         std::cout << "---[Expected]----------------" << std::endl;
         std::cout << output_string << std::endl;
-        std::cout << "-----------------------------" << std::endl;
       }
     }
   }

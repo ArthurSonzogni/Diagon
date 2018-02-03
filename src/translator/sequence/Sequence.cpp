@@ -41,7 +41,6 @@ void Sequence::ComputeInternalRepresentation(const std::string& input) {
     //std::cout << token->toString() << std::endl;
   }
 
-  //return;
   // Parser.
   SequenceParser parser(&tokens);
 
@@ -561,7 +560,8 @@ void Sequence::LayoutComputeMessagesPositions() {
     message.line_bottom = message.bottom;
 
     if (message.is_separated) {
-      message.offset = offset++;
+      message.offset = offset;
+      offset += 2;
     } else {
       message.line_top = message.bottom;
     }
@@ -573,7 +573,7 @@ void Sequence::LayoutComputeMessagesPositions() {
   };
 
   for (auto& cut : graph::Cut(message_dependencies, preference)) {
-    int offset = 1;
+    int offset = 2;
 
     // Fast path: Only one message, no crossing.
     if (cut.size() == 1) {
@@ -624,6 +624,11 @@ void Sequence::LayoutComputeMessagesPositions() {
       add_message(message, y, offset);
     }
   }
+
+  // Sort message by y.
+  std::sort(messages.begin(), messages.end(), [](const Message& a, const Message& b) {
+    return a.line_bottom > b.line_bottom;
+  });
 }
 
 void Sequence::Actor::Draw(Screen& screen, int height) {
@@ -684,7 +689,7 @@ void Sequence::Draw() {
     actor.Draw(screen, height);
   }
 
-  for (auto& message : messages) {
+  for(auto message : messages) {
     message.Draw(screen);
   }
 
