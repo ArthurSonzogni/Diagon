@@ -1,2 +1,2 @@
-const char* testing_directory = "@testing_directory@";
+const char* test_directory = "@test_directory@";
 const char* git_version = "@git_version@";

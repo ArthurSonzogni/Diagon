@@ -6,8 +6,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # Environment variable available in C++ source
 #-------------------------------------------------------------------------------
 
-set(testing_directory ${CMAKE_SOURCE_DIR}/testing)
-
+set(test_directory ${CMAKE_SOURCE_DIR}/test) 
 execute_process(
   COMMAND 
     git rev-list --count HEAD
@@ -27,6 +26,7 @@ configure_file(
 
 add_subdirectory(translator/example)
 add_subdirectory(translator/sequence)
+add_subdirectory(translator/line_number)
 add_subdirectory(screen)
 
 if (Web)
@@ -64,6 +64,7 @@ if (Web)
   target_link_libraries(main.js
     translator_example
     translator_sequence
+    translator_line_number
     screen
     antlr4_static
   )
@@ -74,6 +75,7 @@ else()
   target_link_libraries(main
     translator_example
     translator_sequence
+    translator_line_number
     screen
     antlr4_static
   )
@@ -82,6 +84,7 @@ else()
   target_link_libraries(input_output_test
     translator_example
     translator_sequence
+    translator_line_number
     screen
     antlr4_static
     stdc++fs

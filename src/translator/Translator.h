@@ -13,6 +13,7 @@ class Translator {
 
 std::unique_ptr<Translator> ExampleTranslator();
 std::unique_ptr<Translator> SequenceTranslator();
+std::unique_ptr<Translator> LineNumberTranslator();
 
 
 #endif /* end of include guard: TRANSLATOR_TRANSLATOR */

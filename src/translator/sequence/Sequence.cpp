@@ -84,8 +84,8 @@ void Sequence::UniformizeMessageID() {
     for (auto& message : messages) {
       if (message.id != -1) {
         if (used.count(message.id)) {
+          std::cout << "Found two messages with the same id: " << message.id << std::endl;
           message.id = -1;
-          // TODO(arthursonzogni): Add warning.
         } else {
           used.insert(message.id);
         }
@@ -107,12 +107,25 @@ void Sequence::UniformizeMessageID() {
         for (int id : {dependency.from, dependency.to}) {
           auto it = message_index.find(id);
           if (it == message_index.end()) {
+            std::wcout << "* Ignored dependency: \"" << actor.name << ": "
+                       << dependency.from << " < " << dependency.to << "\"."
+                       << std::endl;
+            std::wcout << "  It cannot be used because the message ID \"" << id
+                       << "\" doesn't exist" << std::endl;
             return true;
           }
 
           const Message& message = messages[it->second];
           if (actor.name != message.from &&  //
               actor.name != message.to) {
+            std::wcout << "* Ignored dependency: \"" << actor.name << ": "
+                       << dependency.from << " < " << dependency.to << "\"."
+                       << std::endl;
+            std::wcout << "  It cannot be used because the message \""
+                       << message.from << " -> " << message.to << ": "
+                       << message.messages[0]
+                       << "\" has nothing to do with actor " << actor.name
+                       << std::endl;
             return true;
           }
         }
@@ -291,8 +304,10 @@ void Sequence::LayoutComputeActorsPositions() {
         modified = true;
       }
     }
-    if (i++ > 500)
+    if (i++ > 500) {
+      std::cout << "Something goes wrong!" << std::endl;
       break;
+    }
   }
 
   for (auto& actor : actors) {
@@ -502,8 +517,10 @@ std::vector<Node> FindTopologicalOrder(const Graph& graph) {
     }
 
     iteration++;
-    if (iteration >= 1000)
+    if (iteration >= 1000) {
+      std::cout << "There are cycles" << std::endl;
       break;
+    }
   }
 
   std::vector<Node> nodes;

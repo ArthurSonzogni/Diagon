@@ -9,7 +9,7 @@
 int main(int, const char**) {
   int result = 0;
 
-  std::string path = testing_directory;
+  std::string path = test_directory;
   for (auto& dir : std::experimental::filesystem::directory_iterator(path)) {
     std::string type = dir.path().filename();
     std::cout << "Testing " << type << std::endl;

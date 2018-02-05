@@ -17,10 +17,20 @@ void replaceAll(std::string& str,
 
 extern "C" {
 
-void translate(const char* input) {
-  auto sequence = SequenceTranslator();
-  sequence->Process(input);
-  std::string command = "output.value='" + sequence->Output() + "';";
+void translate(const char* translator_name, const char* input) {
+  std::string translator_string = translator_name;
+  std::unique_ptr<Translator> translator;
+  if (translator_string == "Example") 
+    translator = ExampleTranslator();
+  else if (translator_string == "Sequence") 
+    translator = SequenceTranslator();
+  else if (translator_string == "LineNumber") 
+    translator = LineNumberTranslator();
+  else
+    return;
+
+  translator->Process(input);
+  std::string command = "output.value='" + translator->Output() + "';";
   replaceAll(command, "\n", "\\n");
   emscripten_run_script(command.c_str());
 }

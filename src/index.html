@@ -7,28 +7,53 @@
   </head>
   <body>
 
-  Input:
-  <textarea id="input" placeholder='input, for instance  (1+2)*(3-4)/5'></textarea>
+    <div id="code_area">
+      <div class="container vertical fill_space">
 
-  Output:
-  <textarea id="output" placeholder='output' readonly></textarea>
+        <!--1 Menu bar-->
+        <div>
+          <label for="translator">Translator</label>
+          <select list="translator_list" type="text" id="translator">
+            <option value="Sequence">Sequence diagram.</option>
+            <option value="Example">Example.</option>
+            <option value="LineNumber">Numbered lines with box.</option>
+          </select>
+        </div>
 
-  Errors:
-  <textarea id="errors" placeholder='errors' readonly></textarea>
+        <div class="gutter"></div>
+
+        <!--2 Input / Output -->
+        <div class="container horizontal" id="inputoutput">
+          <textarea id="input" placeholder='input, for instance  (1+2)*(3-4)/5'></textarea>
+          <div class="gutter"></div>
+          <textarea id="output" placeholder='output' readonly></textarea>
+        </div>
+
+        <div class="gutter"></div>
+
+        <!--3 Errors-->
+        <textarea id="errors" placeholder='errors' readonly rows=4 ></textarea>
+
+      </div>
+    </div>
+
+
+    Some content below.
+
+  </body>
 
 <script>
 
-var input = document.getElementById('input');
-var output = document.getElementById('output');
-var errors = document.getElementById('errors');
+let translator = document.getElementById('translator');
+let input = document.getElementById('input');
+let output = document.getElementById('output');
+let errors = document.getElementById('errors');
 errors.value = '';
 
 function print(text) {
   if (arguments.length > 1)
     text = Array.prototype.slice.call(arguments).join(' ');
   errors.value += text + '\n';
-  errors.scrollTop = errors.scrollHeight; // focus on bottom
-
   //console.log(text);
 };
 
@@ -44,13 +69,16 @@ window.Module = {
 <script src="main.js"></script>
 
 <script>
-let translate = Module.cwrap('translate', 'void', ['string']);
-input.addEventListener('input', function() {
+let translate = Module.cwrap('translate', 'void', ['string','string']);
+let OnChange = function() {
   errors.value = '';
-  translate(input.value);
-});
+  let translator = document.getElementById("translator").value;
+  console.log(translator, input.value);
+  translate(translator, input.value);
+}
+input.addEventListener('input', OnChange);
+translator.addEventListener('change', OnChange);
 </script>
 
-  </body>
 </html>
 
