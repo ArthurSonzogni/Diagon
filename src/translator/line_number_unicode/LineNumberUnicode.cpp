@@ -4,9 +4,9 @@
 #include "screen/Screen.h"
 #include "translator/Translator.h"
 
-class LineNumber : public Translator {
+class LinNumberUnicode : public Translator {
  public:
-  virtual ~LineNumber() = default;
+  virtual ~LinNumberUnicode() = default;
   virtual void Process(const std::string& input) {
     // cut by lines.
     std::stringstream ss(input);
@@ -52,6 +52,6 @@ class LineNumber : public Translator {
   std::string output_;
 };
 
-std::unique_ptr<Translator> LineNumberTranslator() {
-  return std::make_unique<LineNumber>();
+std::unique_ptr<Translator> LineNumberUnicodeTranslator() {
+  return std::make_unique<LinNumberUnicode>();
 }

@@ -15,7 +15,7 @@ int main(int, const char**) {
     std::cout << "Testing " << type << std::endl;
     for (auto& test :
          std::experimental::filesystem::directory_iterator(dir.path())) {
-      auto sequence = SequenceTranslator();
+      auto translator = TranslatorFromName(type);
 
       std::ifstream input(test.path() / "input");
       std::ifstream output(test.path() / "output");
@@ -25,14 +25,14 @@ int main(int, const char**) {
       std::string output_string((std::istreambuf_iterator<char>(output)),
                                 std::istreambuf_iterator<char>());
 
-      sequence->Process(input_string);
+      translator->Process(input_string);
 
-      if (sequence->Output() == output_string) {
+      if (translator->Output() == output_string) {
         std::cout << "  [PASS] " << test << std::endl;
       } else {
         std::cout << "  [FAIL] " << test << std::endl;
         std::cout << "---[Output]------------------" << std::endl;
-        std::cout << sequence->Output() << std::endl;
+        std::cout << translator->Output() << std::endl;
         std::cout << "---[Expected]----------------" << std::endl;
         std::cout << output_string << std::endl;
       }

@@ -1,0 +1,107 @@
+[
+  {
+    "tool": "Sequence",
+    "description": "Sequence diagram",
+    "examples": [
+      {
+        "title": "-------",
+        "empty": true
+      },
+      {
+        "title":"basic",
+        "content": [
+          "Alice -> Bob: Hello Bob!",
+          "Alice <- Bob: Hello Alice!"
+        ]
+      },
+      {
+        "title":"More actors",
+        "content": [
+          "Renderer -> Browser: BeginNavigation()",
+          "Browser -> Network: URLRequest()",
+          "Browser <- Network: URLResponse()",
+          "Renderer <- Browser: CommitNavigation()",
+          "Renderer -> Browser: DidCommitNavigation()"
+        ]
+      },
+      {
+        "title":"Actors order",
+        "content": [
+          "Actor 2 -> Actor 3: message 1",
+          "Actor 1 -> Actor 2: message 2",
+          "",
+          "Actor 1:",
+          "Actor 2:",
+          "Actor 3:"
+        ]
+      },
+      {
+        "title":"Message order",
+        "content": [
+          "2) Actor 2 -> Actor 3: message 1",
+          "1) Actor 1 -> Actor 2: message 2",
+          "",
+          "Actor 1:",
+          "Actor 2: 1<2",
+          "Actor 3:"
+        ]
+      },
+      {
+        "title":"Message crossing",
+        "content": [
+          "1) Renderer -> Browser: Message 1",
+          "2) Renderer <- Browser: Message 2",
+          "",
+          "Renderer: 1<2",
+          "Browser: 2<1"
+        ]
+      }
+    ]
+  },
+  {
+    "tool": "LineNumberUnicode",
+    "description": "Line number unicode",
+    "examples": [
+      {
+        "title": "-------",
+        "empty": true
+      },
+      {
+        "title":"Hello world",
+        "content": [
+          "#include <iostream>",
+          "using namespace std;",
+          "",
+          "int main() ",
+          "{",
+          "    cout << \"Hello, World!\";",
+          "    return 0;",
+          "}"
+        ]
+      }
+    ]
+  },
+  {
+    "tool": "LineNumberASCII",
+    "description": "Line number ASCII",
+    "examples": [
+      {
+        "title": "-------",
+        "empty": true
+      },
+      {
+        "title":"Hello world",
+        "content": [
+          "#include <iostream>",
+          "using namespace std;",
+          "",
+          "int main() ",
+          "{",
+          "    cout << \"Hello, World!\";",
+          "    return 0;",
+          "}"
+        ]
+      }
+    ]
+  }
+]

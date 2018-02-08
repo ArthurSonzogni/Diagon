@@ -24,9 +24,9 @@ configure_file(
 
 #-------------------------------------------------------------------------------
 
-add_subdirectory(translator/example)
 add_subdirectory(translator/sequence)
-add_subdirectory(translator/line_number)
+add_subdirectory(translator/line_number_unicode)
+add_subdirectory(translator/line_number_ascii)
 add_subdirectory(screen)
 
 if (Web)
@@ -56,35 +56,49 @@ if (Web)
     COPYONLY)
 
   configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/tools.json
+    ${CMAKE_CURRENT_BINARY_DIR}/tools.json
+    COPYONLY)
+
+  configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/../tools/webserver/run_web_server.sh
     ${CMAKE_CURRENT_BINARY_DIR}/run_web_server.sh
     COPYONLY)
 
-  add_executable(main.js main_webassembly.cpp)
+  add_executable(main.js
+    main_webassembly.cpp
+    translator/Translator.cpp
+  )
   target_link_libraries(main.js
-    translator_example
     translator_sequence
-    translator_line_number
+    translator_line_number_unicode
+    translator_line_number_ascii
     screen
     antlr4_static
   )
 
 else()
 
-  add_executable(main main.cpp)
+  add_executable(main
+    main.cpp
+    translator/Translator.cpp
+  )
   target_link_libraries(main
-    translator_example
     translator_sequence
-    translator_line_number
+    translator_line_number_unicode
+    translator_line_number_ascii
     screen
     antlr4_static
   )
 
-  add_executable(input_output_test input_output_test.cpp)
+  add_executable(input_output_test
+    translator/Translator.cpp
+    input_output_test.cpp
+  )
   target_link_libraries(input_output_test
-    translator_example
     translator_sequence
-    translator_line_number
+    translator_line_number_unicode
+    translator_line_number_ascii
     screen
     antlr4_static
     stdc++fs

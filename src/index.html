@@ -6,27 +6,41 @@
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-
-    <div id="code_area">
+    <div class="fullscreen" id="landing_page">
+      <div id="landing_page_content">
+        <h1>Diagon</h1>
+        <h2><b>Diag</b>ram <b>On</b>line</h2>
+        <p>Interactive text→text tools collection.</p>
+        <a href="#code_area" id="begin_button">Begin</a>
+      </div>
+    </div>
+    <div class="fullscreen" id="code_area">
       <div class="container vertical fill_space">
 
         <!--1 Menu bar-->
-        <div>
-          <label for="translator">Translator</label>
-          <select list="translator_list" type="text" id="translator">
-            <option value="Sequence">Sequence diagram.</option>
-            <option value="Example">Example.</option>
-            <option value="LineNumber">Numbered lines with box.</option>
-          </select>
-        </div>
+        <div id="menu_bar">
+          <div id="menu_bar_submenu">
+            <label for="tools">Tool:</label>
+            <select type="text" id="tools">
+              <option>Chargement...</option>
+            </select>
+          </div>
 
-        <div class="gutter"></div>
+          <div id="menu_bar_submenu">
+            <label for="examples">Example:</label>
+            <select type="text" id="examples">
+              <option>Chargement...</option>
+            </select>
+          </div>
+        </div>
 
         <!--2 Input / Output -->
         <div class="container horizontal" id="inputoutput">
+          <div class="gutter"></div>
           <textarea id="input" placeholder='input, for instance  (1+2)*(3-4)/5'></textarea>
           <div class="gutter"></div>
           <textarea id="output" placeholder='output' readonly></textarea>
+          <div class="gutter"></div>
         </div>
 
         <div class="gutter"></div>
@@ -37,24 +51,22 @@
       </div>
     </div>
 
-
-    Some content below.
-
   </body>
 
 <script>
 
-let translator = document.getElementById('translator');
+let tools = document.getElementById('tools');
+let examples = document.getElementById('examples');
 let input = document.getElementById('input');
 let output = document.getElementById('output');
 let errors = document.getElementById('errors');
-errors.value = '';
+let tools_data = [];
 
+errors.value = ''; 
 function print(text) {
   if (arguments.length > 1)
     text = Array.prototype.slice.call(arguments).join(' ');
   errors.value += text + '\n';
-  //console.log(text);
 };
 
 window.Module = {
@@ -67,18 +79,66 @@ window.Module = {
 
 </script>
 <script src="main.js"></script>
-
 <script>
-let translate = Module.cwrap('translate', 'void', ['string','string']);
-let OnChange = function() {
-  errors.value = '';
-  let translator = document.getElementById("translator").value;
-  console.log(translator, input.value);
-  translate(translator, input.value);
+
+function ClearSelectBox(select_box) {
+  while(select_box.options.length > 0)
+    select_box.options[0] = null;
 }
-input.addEventListener('input', OnChange);
-translator.addEventListener('change', OnChange);
+
+function UpdateTools() {
+  ClearSelectBox(tools);
+  for(let i in tools_data) {
+    let tool = tools_data[i];
+    tools.options[i] = new Option(tool.description, i);
+  }
+}
+
+function UpdateExamples() {
+  let index = tools.value;
+  let tool = tools_data[index];
+  ClearSelectBox(examples);
+  for(let i in tool.examples) {
+    let example = tool.examples[i];
+    examples.options[i] = new Option(example.title, i);
+  }
+}
+
+function UpdateInput() {
+  let tool_index = tools.value;
+  let example_index = examples.value;
+  let example = tools_data[tool_index].examples[example_index];
+  if (example.empty)
+    return;
+  input.value = '';
+  for(let i in example.content) {
+    if (i != 0)
+      input.value += "\n";
+    input.value += example.content[i]
+  }
+  UpdateOutput();
+}
+let translate = Module.cwrap('translate', 'void', ['string','string']);
+function UpdateOutput() {
+  errors.value = '';
+  console.log("tool", tools_data[tools.value].tool, input.value);
+  translate(tools_data[tools.value].tool, input.value);
+}
+
+tools.addEventListener("input", UpdateExamples);
+examples.addEventListener("input", UpdateInput);
+tools.addEventListener("input", UpdateOutput);
+input.addEventListener('input', UpdateOutput);
+
+fetch("tools.json")
+.then(response => response.json())
+.then(data => {
+  tools_data = data;
+  UpdateTools();
+  UpdateExamples()
+  UpdateInput();
+  UpdateOutput();
+})
+
 </script>
-
 </html>
-

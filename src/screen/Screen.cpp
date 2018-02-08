@@ -67,3 +67,20 @@ void Screen::DrawVerticalLine(int top, int bottom, int x) {
     lines_[y][x] = U'│';
   }
 }
+
+void Screen::ASCIIfy() {
+  for(auto& line : lines_) {
+    for(auto& c : line) {
+      switch(c) {
+        case U'─': c = '-'; break;
+        case U'│': c = '|'; break;
+        case U'┐': c = '.'; break;
+        case U'┘': c = '`'; break;
+        case U'┌': c = '.'; break;
+        case U'└': c = '\''; break;
+        case U'┬': c = '-'; break;
+        case U'┴': c = '-'; break;
+      }
+    }
+  }
+}

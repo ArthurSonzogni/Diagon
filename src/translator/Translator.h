@@ -11,9 +11,10 @@ class Translator {
   virtual std::string Output() = 0;
 };
 
-std::unique_ptr<Translator> ExampleTranslator();
 std::unique_ptr<Translator> SequenceTranslator();
-std::unique_ptr<Translator> LineNumberTranslator();
+std::unique_ptr<Translator> LineNumberASCIITranslator();
+std::unique_ptr<Translator> LineNumberUnicodeTranslator();
 
+std::unique_ptr<Translator> TranslatorFromName(const std::string name);
 
 #endif /* end of include guard: TRANSLATOR_TRANSLATOR */

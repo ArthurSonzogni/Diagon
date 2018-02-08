@@ -1,29 +1,7 @@
-/*#input {*/
-  /*width:100%;*/
-  /*[>position:absolute;<]*/
-  /*[>left:0;<]*/
-  /*[>top:0;<]*/
-  /*[>width:50%;<]*/
-  /*[>height:50%;<]*/
-/*}*/
-
-/*#output {*/
-  /*width:100%;*/
-  /*[>position:absolute;<]*/
-  /*[>right:0;<]*/
-  /*[>top:0;<]*/
-  /*[>width:50%;<]*/
-  /*[>height:50%;<]*/
-/*}*/
-
-/*#errors {*/
-  /*width:100%;*/
-  /*[>position:absolute;<]*/
-  /*[>left:0;<]*/
-  /*[>bottom:0;<]*/
-  /*[>width:100%;<]*/
-  /*[>height:50%;<]*/
-/*}*/
+html {
+  font-family: Arial;
+  scroll-behavior: smooth;
+}
 
 html, body {
   margin:0;
@@ -45,17 +23,22 @@ html, body {
   flex-direction: row;
 }
 
-#code_area {
+.fullscreen {
   width:100%;
   height:100vh;
   margin:0;
   padding:0;
 }
 
+.fill_space {
+  width:100%;
+  height:100%;
+}
+
 #input, #output, #errors {
   display:block;
   padding:10px;
-  background-color:#EEE;
+  background-color:#FFF;
   border:solid 1px black;
 }
 
@@ -67,7 +50,74 @@ html, body {
   flex:1;
 }
 
-.fill_space {
-  width:100%;
-  height:100%;
+#landing_page {
+  background-color:white;
+  position:relative
+}
+
+#landing_page_content {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+}
+
+#landing_page_content h1 {
+  font-size:20vmin;
+  margin:0;
+  padding:0;
+}
+
+#landing_page_content h2 {
+  font-weight:normal;
+  font-size:4vmin;
+  margin:0;
+  padding:0;
+  margin-top:-4vmin;
+  margin-left:1vmin;
+}
+
+#landing_page_content p {
+  font-size:5vmin;
+  white-space: nowrap;
+}
+
+#landing_page_content a {
+  font-size:10vmin;
+}
+
+#begin_button {
+  border-radius: 16px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 60px;
+  padding: 12px 12px 12px 12px;
+  text-decoration: none;
+  color:black;
+  border:1vmin black solid;
+}
+
+#begin_button:hover {
+  background: #3cb0fd;
+  text-decoration: none;
+}
+
+#code_area {
+  background-color:#888;
+}
+
+#menu_bar {
+  background-color:#EEE;
+  border:1px solid gray;
+}
+
+#menu_bar_submenu {
+  padding:12px;
+  display:inline-block;
+  border-right: 1px solid gray;
+}
+
+select {
+  font:inherit;
+  size:50px;
 }
