@@ -4,7 +4,7 @@
     "description": "Sequence diagram",
     "examples": [
       {
-        "title": "-------",
+        "title": "------------------------",
         "empty": true
       },
       {
@@ -63,7 +63,7 @@
     "description": "Line number unicode",
     "examples": [
       {
-        "title": "-------",
+        "title": "------------------------",
         "empty": true
       },
       {
@@ -86,7 +86,7 @@
     "description": "Line number ASCII",
     "examples": [
       {
-        "title": "-------",
+        "title": "------------------------",
         "empty": true
       },
       {
