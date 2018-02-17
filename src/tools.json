@@ -8,14 +8,14 @@
         "empty": true
       },
       {
-        "title":"basic",
+        "title":"1-basic",
         "content": [
           "Alice -> Bob: Hello Bob!",
           "Alice <- Bob: Hello Alice!"
         ]
       },
       {
-        "title":"More actors",
+        "title":"2-More actors",
         "content": [
           "Renderer -> Browser: BeginNavigation()",
           "Browser -> Network: URLRequest()",
@@ -25,7 +25,7 @@
         ]
       },
       {
-        "title":"Actors order",
+        "title":"3-Actors order",
         "content": [
           "Actor 2 -> Actor 3: message 1",
           "Actor 1 -> Actor 2: message 2",
@@ -36,7 +36,7 @@
         ]
       },
       {
-        "title":"Message order",
+        "title":"4-Message order",
         "content": [
           "2) Actor 2 -> Actor 3: message 1",
           "1) Actor 1 -> Actor 2: message 2",
@@ -47,7 +47,7 @@
         ]
       },
       {
-        "title":"Message crossing",
+        "title":"5-Message crossing",
         "content": [
           "1) Renderer -> Browser: Message 1",
           "2) Renderer <- Browser: Message 2",
@@ -55,6 +55,16 @@
           "Renderer: 1<2",
           "Browser: 2<1"
         ]
+      }
+    ]
+  },
+  {
+    "tool": "PlanarGraph",
+    "description": "Planar graph",
+    "examples": [
+      {
+        "title": "------------------------",
+        "empty": true
       }
     ]
   },
@@ -67,16 +77,16 @@
         "empty": true
       },
       {
-        "title":"Hello world",
+        "title":"1-Hello world",
         "content": [
           "#include <iostream>",
           "using namespace std;",
           "",
           "int main() ",
           "{",
-          "    cout << \"Hello, World!\";",
-          "    return 0;",
-          "}"
+            "    cout << \"Hello, World!\";",
+            "    return 0;",
+            "}"
         ]
       }
     ]
@@ -97,9 +107,9 @@
           "",
           "int main() ",
           "{",
-          "    cout << \"Hello, World!\";",
-          "    return 0;",
-          "}"
+            "    cout << \"Hello, World!\";",
+            "    return 0;",
+            "}"
         ]
       }
     ]

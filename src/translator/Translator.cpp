@@ -7,5 +7,7 @@ std::unique_ptr<Translator> TranslatorFromName(const std::string name) {
     return LineNumberASCIITranslator();
   if (name == "LineNumberUnicode")
     return LineNumberUnicodeTranslator();
+  if (name == "PlanarGraph")
+    return PlanarGraphTranslator();
   return nullptr;
 }

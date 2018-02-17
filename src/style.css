@@ -8,6 +8,10 @@ html, body {
   padding:0;
 }
 
+textarea {
+  font: "Lucida Console", Monaco, monospace;
+}
+
 .gutter {
   min-width:12px;
   min-height:12px;

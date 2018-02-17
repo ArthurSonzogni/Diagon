@@ -24,10 +24,11 @@ configure_file(
 
 #-------------------------------------------------------------------------------
 
-add_subdirectory(translator/sequence)
-add_subdirectory(translator/line_number_unicode)
-add_subdirectory(translator/line_number_ascii)
 add_subdirectory(screen)
+add_subdirectory(translator/line_number_ascii)
+add_subdirectory(translator/line_number_unicode)
+add_subdirectory(translator/planar_graph)
+add_subdirectory(translator/sequence)
 
 if (Web)
 
@@ -70,9 +71,10 @@ if (Web)
     translator/Translator.cpp
   )
   target_link_libraries(main.js
-    translator_sequence
-    translator_line_number_unicode
     translator_line_number_ascii
+    translator_line_number_unicode
+    translator_planar_graph
+    translator_sequence
     screen
     antlr4_static
   )
@@ -84,9 +86,10 @@ else()
     translator/Translator.cpp
   )
   target_link_libraries(main
-    translator_sequence
-    translator_line_number_unicode
     translator_line_number_ascii
+    translator_line_number_unicode
+    translator_planar_graph
+    translator_sequence
     screen
     antlr4_static
   )
@@ -96,11 +99,12 @@ else()
     input_output_test.cpp
   )
   target_link_libraries(input_output_test
-    translator_sequence
-    translator_line_number_unicode
     translator_line_number_ascii
-    screen
+    translator_line_number_unicode
+    translator_planar_graph
+    translator_sequence
     antlr4_static
+    screen
     stdc++fs
   )
 

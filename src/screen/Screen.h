@@ -19,7 +19,6 @@ class Screen {
   void ASCIIfy();
   std::string ToString();
 
-
  private:
   int width_;
   int height_;

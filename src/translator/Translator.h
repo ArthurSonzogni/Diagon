@@ -14,6 +14,7 @@ class Translator {
 std::unique_ptr<Translator> SequenceTranslator();
 std::unique_ptr<Translator> LineNumberASCIITranslator();
 std::unique_ptr<Translator> LineNumberUnicodeTranslator();
+std::unique_ptr<Translator> PlanarGraphTranslator();
 
 std::unique_ptr<Translator> TranslatorFromName(const std::string name);
 
