@@ -49,7 +49,7 @@ if (Web)
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/index.html
     ${CMAKE_CURRENT_BINARY_DIR}/index.html
-    COPYONLY)
+  )
 
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/style.css
