@@ -58,6 +58,7 @@
       }
     ]
   },
+
   {
     "tool": "PlanarGraph",
     "description": "Planar graph",
@@ -65,6 +66,71 @@
       {
         "title": "------------------------",
         "empty": true
+      },
+      {
+        "title":"if then else loop",
+        "content": [
+          "if -> \"then A\" -> end",
+          "if -> \"then B\" -> end",
+          "end -> loop -> if"
+        ]
+      },
+      {
+        "title":"test",
+        "content": [
+          "A -- B",
+          "A -- C",
+          "A -- D -- G",
+          "B -- Z",
+          "C -- Z"
+        ]
+      },
+      {
+        "title": "Big graph",
+        "content": [
+          "a -- b",
+          "a -- c",
+          "a -- d",
+          "b -- c",
+          "b -- e",
+          "c -- e",
+          "c -- f",
+          "d -- f",
+          "d -- g",
+          "e -- h",
+          "f -- h",
+          "f -- i",
+          "f -- j",
+          "f -- g",
+          "g -- k",
+          "h -- o",
+          "h -- l",
+          "i -- l",
+          "i -- m",
+          "i -- j",
+          "j -- m",
+          "j -- n",
+          "j -- k",
+          "k -- n",
+          "k -- r",
+          "l -- o",
+          "l -- m",
+          "m -- o",
+          "m -- p",
+          "m -- n",
+          "n -- q",
+          "n -- r",
+          "o -- s",
+          "o -- p",
+          "p -- s",
+          "p -- t",
+          "p -- q",
+          "q -- t",
+          "q -- r",
+          "r -- t",
+          "s -- z",
+          "t -- z"
+        ]
       }
     ]
   },

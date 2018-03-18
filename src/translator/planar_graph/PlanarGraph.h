@@ -8,6 +8,15 @@
 #include "translator/Translator.h"
 #include "translator/planar_graph/PlanarGraphParser.h"
 
+struct Box {
+  int left;
+  int right;
+  int top;
+  int bottom;
+  static Box Union(Box A, Box B);
+  static Box Translate(Box A, int x, int y);
+};
+
 class PlanarGraph : public Translator {
  public:
   virtual ~PlanarGraph() = default;
@@ -16,6 +25,12 @@ class PlanarGraph : public Translator {
 
   //----------------------------------------------------------------------------
  private:
+  std::string output_;
+
+  std::map<std::wstring, int> name_to_id;
+  std::vector<std::wstring> id_to_name;
+  int next_id = 0;
+
   enum class Arrow {
     RIGHT,
     LEFT_RIGHT,
@@ -23,19 +38,27 @@ class PlanarGraph : public Translator {
     LEFT,
   };
 
-
-  struct Vertex {
+  struct Edge {
     int from;
     int to;
     Arrow arrow;
   };
+  std::vector<Edge> vertex;
 
-  std::vector<Vertex> vertex;
-  std::map<std::wstring, int> name_to_id;
-  std::vector<std::wstring> id_to_name;
-  int next_id = 0;
+  enum class ArrowStyle {
+    NONE,
+    LINE,
+    ARROW
+  };
+  std::map<int, std::map<int, ArrowStyle>> arrow_style;
 
-  std::string output_;
+  struct DrawnEdge;
+  struct DrawnVertex;
+
+  struct Node {
+    int id;
+    std::vector<Node> childs;
+  };
 
   //----------------------------------------------------------------------------
   void Read(const std::string& input);
@@ -45,6 +68,8 @@ class PlanarGraph : public Translator {
   Arrow ReadArrow(PlanarGraphParser::ArrowContext* arrow);
   void Write();
   std::wstring ArrowToString(Arrow arrow);
+  std::vector<std::vector<Edge>> ConnectedComponent(
+      const std::vector<Edge>& vertex);
   //----------------------------------------------------------------------------
 };
 

@@ -60,7 +60,7 @@
         <div class="gutter"></div>
 
         <!--3 Errors-->
-        <textarea id="errors" placeholder='errors' readonly rows=4 ></textarea>
+        <textarea id="errors" placeholder='errors' readonly rows=8 ></textarea>
 
       </div>
     </div>
@@ -77,23 +77,6 @@ let errors = document.getElementById('errors');
 let tools_data = [];
 
 errors.value = ''; 
-function print(text) {
-  if (arguments.length > 1)
-    text = Array.prototype.slice.call(arguments).join(' ');
-  errors.value += text + '\n';
-};
-
-window.Module = {
-  preRun: [],
-  postRun: [],
-  print: print,
-  printErr: print,
-  canvas: undefined,
-};
-
-</script>
-<script src="main.js"></script>
-<script>
 
 function ClearSelectBox(select_box) {
   while(select_box.options.length > 0)
@@ -132,27 +115,48 @@ function UpdateInput() {
   }
   UpdateOutput();
 }
-let translate = Module.cwrap('translate', 'void', ['string','string']);
+
+let translate = function(){};
 function UpdateOutput() {
   errors.value = '';
   console.log("tool", tools_data[tools.value].tool, input.value);
+  console.log(translate);
   translate(tools_data[tools.value].tool, input.value);
 }
 
-tools.addEventListener("input", UpdateExamples);
-examples.addEventListener("input", UpdateInput);
-tools.addEventListener("input", UpdateOutput);
-input.addEventListener('input', UpdateOutput);
+function OnRuntimeInitialized() {
+  tools.addEventListener("input", UpdateExamples);
+  examples.addEventListener("input", UpdateInput);
+  tools.addEventListener("input", UpdateOutput);
+  input.addEventListener('input', UpdateOutput);
 
-fetch("tools.json")
-.then(response => response.json())
-.then(data => {
-  tools_data = data;
-  UpdateTools();
-  UpdateExamples()
-  UpdateInput();
-  UpdateOutput();
-})
+  fetch("tools.json")
+  .then(response => response.json())
+  .then(data => {
+    tools_data = data;
+    UpdateTools();
+    UpdateExamples()
+    UpdateInput();
+    UpdateOutput();
+    translate = Module.cwrap('translate', 'void', ['string','string']);
+  })
+}
+
+function print(text) {
+  if (arguments.length > 1)
+    text = Array.prototype.slice.call(arguments).join(' ');
+  errors.value += text + '\n';
+};
+
+window.Module = {
+  preRun: [],
+  postRun: [],
+  print: print,
+  printErr: print,
+  canvas: undefined,
+  onRuntimeInitialized: OnRuntimeInitialized,
+};
 
 </script>
+<script src="main.js"></script>
 </html>
