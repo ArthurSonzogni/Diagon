@@ -1,6 +1,6 @@
 grammar PlanarGraph;
 
-graph: edges (EOL edges)* EOF;
+graph: EOL* edges (EOL+ edges)* EOL* EOF;
 edges: node (arrow node)+;
 arrow: RIGHT_ARROW | NONE_ARROW | LEFT_RIGHT_ARROW | LEFT_ARROW;
 node: ID | STRING;

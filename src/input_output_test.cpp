@@ -10,6 +10,7 @@ int main(int, const char**) {
   int result = 0;
 
   std::string path = test_directory;
+  std::cout << "test_directory = " << test_directory;
   for (auto& dir : std::experimental::filesystem::directory_iterator(path)) {
     std::string type = dir.path().filename();
     std::cout << "Testing " << type << std::endl;
@@ -35,6 +36,7 @@ int main(int, const char**) {
         std::cout << translator->Output() << std::endl;
         std::cout << "---[Expected]----------------" << std::endl;
         std::cout << output_string << std::endl;
+        std::cout << "---------------------" << std::endl;
       }
     }
   }

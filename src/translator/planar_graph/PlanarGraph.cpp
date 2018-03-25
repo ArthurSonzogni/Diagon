@@ -47,8 +47,6 @@ struct PlanarGraph::DrawnEdge {
   int y_up;
   int y_down;
   void Draw(Screen& screen, PlanarGraph& graph) {
-    if (graph.arrow_style[vertex_up][vertex_down] == ArrowStyle::NONE)
-      return;
 
     int top = 3 * y_up - 1;
     int bottom = 3 * y_down + 3;
@@ -153,19 +151,6 @@ PlanarGraph::Arrow PlanarGraph::ReadArrow(
   return Arrow::RIGHT;
 }
 
-std::wstring PlanarGraph::ArrowToString(PlanarGraph::Arrow arrow) {
-  switch (arrow) {
-    case Arrow::RIGHT:
-      return L"->";
-    case Arrow::NONE:
-      return L"--";
-    case Arrow::LEFT_RIGHT:
-      return L"<->";
-    case Arrow::LEFT:
-      return L"<-";
-  }
-}
-
 void InitializeEdgeIndex(Graph& graph) {
   boost::property_map<Graph, boost::edge_index_t>::type e_index =
       boost::get(boost::edge_index, graph);
@@ -175,15 +160,6 @@ void InitializeEdgeIndex(Graph& graph) {
     boost::put(e_index, *ei, edge_count++);
 }
 
-void Print(Graph& graph) {
-  std::cout << "-----" << std::endl;
-  auto edges = boost::edges(graph);
-  for (auto edge = edges.first; edge != edges.second; ++edge) {
-    std::cout << boost::source(*edge, graph) << "->" << boost::target(*edge, graph) << std::endl;
-  }
-  std::cout << "-----" << std::endl;
-}
-
 bool ComputePlanarEmbedding(const Graph& graph, Embedding& embedding) {
   embedding = Embedding(boost::num_vertices(graph));
   return boost::boyer_myrvold_planarity_test(
@@ -191,13 +167,7 @@ bool ComputePlanarEmbedding(const Graph& graph, Embedding& embedding) {
       boost::boyer_myrvold_params::embedding = embedding.data());
 }
 
-void PlanarGraph::Write() {
-
-  if (id_to_name.size() <= 2)
-    return;
-
-  int num_vertices = id_to_name.size();
-
+void PlanarGraph::ComputeArrowStyle() {
   // Compute ArrowStyle
   for(auto& v : vertex) {
     switch(v.arrow) {
@@ -219,15 +189,22 @@ void PlanarGraph::Write() {
         break;
     }
   }
+}
+
+void PlanarGraph::Write() {
+  ComputeArrowStyle();
+
+  if (id_to_name.size() <= 2) {
+    return;
+  }
+
+  int num_vertices = id_to_name.size();
 
   // Create a graph.
-  std::cout << id_to_name.size() << " nodes and " << num_vertices<< " vertex" << std::endl;
-  Graph graph(id_to_name.size());
+  Graph graph(num_vertices);
   for (auto& it : vertex)
     add_edge(it.from, it.to, graph);
   InitializeEdgeIndex(graph);
-  Graph initial_graph(graph);
-  Print(graph);
 
   // Make it connected.
   boost::make_connected(graph);
@@ -236,9 +213,10 @@ void PlanarGraph::Write() {
   // Make it biconnected.
   Embedding embedding;
   bool is_planar = ComputePlanarEmbedding(graph, embedding);
-  std::cout << "is_planar = " << is_planar << std::endl;
-  if (!is_planar)
+  if (!is_planar) {
+    output_ = "Graph is not planar.\n";
     return;
+  }
 
   boost::make_biconnected_planar(graph, embedding.data());
   InitializeEdgeIndex(graph);
@@ -254,13 +232,10 @@ void PlanarGraph::Write() {
   boost::planar_canonical_ordering(graph, embedding.data(),
                                    std::back_inserter(ordering));
 
-  std::cout << "Num vertices = " << num_vertices << std::endl;
+  //std::cout << "Num vertices = " << num_vertices << std::endl;
   std::vector<size_t> inverse_ordering(num_vertices);
   for(int i = 0; i<inverse_ordering.size(); ++i) {
     inverse_ordering[ordering[i]] = i;
-  }
-  for(auto i : ordering) {
-    std::cout << "ordering = " << i << std::endl;
   }
 
   StraightLineDrawing straight_line_drawing(num_vertices);
@@ -270,12 +245,6 @@ void PlanarGraph::Write() {
                                              ordering.begin(), ordering.end(),
                                              straight_line_drawing.data());
 
-  Print(graph);
-  graph = initial_graph;
-
-  // Compute {down,up}_children
-  std::vector<std::vector<int>> down_children(num_vertices);
-  std::vector<std::vector<int>> up_children(num_vertices);
   auto compare_with = [&](int i) {
     return [&, i](int a, int b) {
       int a_dx = straight_line_drawing[a].x - straight_line_drawing[i].x;
@@ -285,34 +254,32 @@ void PlanarGraph::Write() {
       return a_dx * b_dy - b_dx * a_dy < 0;
     };
   };
+
+  // Compute children.
+  std::vector<std::vector<int>> children(num_vertices);
   for (int i = 0; i < num_vertices; ++i) {
-    auto& down = down_children[i];
-    auto& up = up_children[i];
+    auto& down = children[i];
     auto adjacent = boost::adjacent_vertices(i, graph);
     for (auto j = adjacent.first; j != adjacent.second; ++j) {
       if (inverse_ordering[i] < inverse_ordering[*j]) {
         down.push_back(*j);
-      } else {
-        up.push_back(*j);
       }
     }
     std::sort(down.begin(), down.end(), compare_with(i));
-    std::sort(up.begin(), up.end(), compare_with(i));
   }
 
   // Compute Y.
   std::vector<size_t> y(num_vertices, 0);
   for (size_t i : ordering) {
-    auto adjacent = boost::adjacent_vertices(i, graph);
-    for (auto j = adjacent.first; j != adjacent.second; ++j) {
-      if (inverse_ordering[i] < inverse_ordering[*j]) {
-        y[*j] = std::max(y[*j], y[i] + 1);
+    for(size_t j : children[i]) {
+      if (inverse_ordering[i] < inverse_ordering[j]) {
+        y[j] = std::max(y[j], y[i] + 1);
       }
     }
   }
 
-  std::vector<DrawnVertex> drawn_vertices(boost::num_vertices(graph));
-  std::vector<bool> is_drawn(boost::num_vertices(graph), false);
+  std::vector<DrawnVertex> drawn_vertices(num_vertices);
+  std::vector<bool> is_drawn(num_vertices, false);
   std::vector<int> x(y.size(),-1);
 
   std::function<void(int)> refresh_x = [&](int y) {
@@ -347,7 +314,6 @@ void PlanarGraph::Write() {
       }
     }
     output_ += screen.ToString();
-    output_ += "------\n";
   };
 
   std::function<void(int)> DrawNode = [&](int i) -> void {
@@ -357,7 +323,7 @@ void PlanarGraph::Write() {
     int child_left = -1;
     int child_right = -1; 
     // Draw our childrens.
-    for (auto j : down_children[i]) {
+    for (auto j : children[i]) {
       DrawNode(j);
 
       auto& child = drawn_vertices[j];
@@ -366,6 +332,12 @@ void PlanarGraph::Write() {
       edge.vertex_down = j;
       edge.y_up = y[i] + 1;
       edge.y_down = y[j] - 1;
+
+      // There are no real edge between those two vertex. in this case, do not
+      // draw anything.
+      if (arrow_style[i][j] == ArrowStyle::NONE) {
+        continue;
+      }
 
       // Make the child bigger if we need to.
       child.right = std::max(child.right, x[y[j]-1]+3);
@@ -386,7 +358,6 @@ void PlanarGraph::Write() {
         child_left = edge.x - 1;
       }
       child_right = edge.x + 1;
-
     }
 
     // Draw ourself.
@@ -401,10 +372,12 @@ void PlanarGraph::Write() {
     // Mark ourself as drawn.
     is_drawn[i] = true;
   };
+
   for (int i : ordering) {
     if (y[i] == 0) {
       DrawNode(i);
     }
   }
+
   Draw();
 }

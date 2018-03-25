@@ -66,10 +66,9 @@ class PlanarGraph : public Translator {
   void ReadEdges(PlanarGraphParser::EdgesContext* edges);
   int ReadNode(PlanarGraphParser::NodeContext* node);
   Arrow ReadArrow(PlanarGraphParser::ArrowContext* arrow);
+
   void Write();
-  std::wstring ArrowToString(Arrow arrow);
-  std::vector<std::vector<Edge>> ConnectedComponent(
-      const std::vector<Edge>& vertex);
+  void ComputeArrowStyle();
   //----------------------------------------------------------------------------
 };
 
