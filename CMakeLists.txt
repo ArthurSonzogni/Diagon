@@ -58,7 +58,11 @@ function(ANTLR source)
 endfunction()
 
 # Build the ANTLR runtime.
-add_subdirectory(${CMAKE_SOURCE_DIR}/tools/antlr/cpp_runtime/ EXCLUDE_FROM_ALL)
+add_subdirectory(
+  ${CMAKE_SOURCE_DIR}/tools/antlr/cpp_runtime/
+  ${CMAKE_CURRENT_BINARY_DIR}/antlr
+  EXCLUDE_FROM_ALL
+)
 include_directories(${CMAKE_SOURCE_DIR}/tools/antlr/cpp_runtime/runtime/src)
 
 #-------------------------------------------------------------------------------
