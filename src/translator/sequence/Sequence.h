@@ -14,8 +14,8 @@ class Screen;
 class Sequence : public Translator {
  public:
   virtual ~Sequence() = default;
-  void Process(const std::string& input) override;
-  std::string Output() override;
+  std::string operator()(const std::string& input,
+                         const std::string& options) override;
 
  public: // Not really public.
   struct Dependency {
@@ -66,6 +66,8 @@ class Sequence : public Translator {
   std::map<std::wstring, int> actor_index;
   std::map<int, int> message_index;
 
+  bool ascii_only_;
+
   // 1) Parse.
   void ComputeInternalRepresentation(const std::string& input);
   void AddCommand(SequenceParser::CommandContext* command);
@@ -87,7 +89,7 @@ class Sequence : public Translator {
   void LayoutComputeMessagesPositions();
 
   // 4)
-  void Draw();
+  std::string Draw();
   std::string output_;
 };
 

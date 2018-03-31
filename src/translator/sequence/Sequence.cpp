@@ -21,11 +21,15 @@ bool Sequence::Dependency::operator<(const Sequence::Dependency& other) const {
   return to < other.to;
 }
 
-void Sequence::Process(const std::string& input) {
+std::string Sequence::operator()(const std::string& input,
+                                 const std::string& options_string) {
+  auto options = SerializeOption(options_string);
+  ascii_only_ = (options["ascii_only"] == "true");
+
   ComputeInternalRepresentation(input);
   UniformizeInternalRepresentation();
   Layout();
-  Draw();
+  return Draw();
 }
 
 void Sequence::ComputeInternalRepresentation(const std::string& input) {
@@ -690,7 +694,7 @@ void Sequence::Message::Draw(Screen& screen) {
   }
 }
 
-void Sequence::Draw() {
+std::string Sequence::Draw() {
   // Estimate output dimension.
   int width = actors.back().right;
   int height = 0;
@@ -710,43 +714,7 @@ void Sequence::Draw() {
     message.Draw(screen);
   }
 
-  output_ = screen.ToString();
-
-  //std::wstringstream ss;
-  //for (auto& actor : actors) {
-    //ss << "Actor " << actor.name << '\n';
-    //for (auto& dependency : actor.dependencies) {
-      //ss << " * " << dependency.from << "<" << dependency.to << '\n';
-    //}
-    //ss << " - left = " << actor.left << '\n';
-    //ss << " - center = " << actor.center << '\n';
-    //ss << " - right = " << actor.right << '\n';
-    //ss << '\n';
-  //}
-
-  //for (auto& message : messages) {
-    //ss << "Message " << '\n';
-    //ss << "  From " << message.from << '\n';
-    //ss << "  To   " << message.to << '\n';
-    //ss << "  Id   " << message.id << '\n';
-    //for (auto& i : message.messages) {
-      //ss << "    " << i << '\n';
-    //}
-    //ss << '\n';
-  //}
-
-  //for (auto& it : message_index) {
-    //ss << "(" << it.first << "," << it.second << ")\n";
-  //}
-  //for (auto& it : actor_index) {
-    //ss << "(" << it.first << "," << it.second << ")\n";
-  //}
-
-  //ss << " width = " << width << " height = " << height << "\n";
-
-  //output_ += '\n' + to_string(ss.str());
-}
-
-std::string Sequence::Output() {
-  return output_;
+  if (ascii_only_)
+    screen.ASCIIfy(0);
+  return screen.ToString();
 }

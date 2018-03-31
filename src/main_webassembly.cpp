@@ -17,12 +17,10 @@ void replaceAll(std::string& str,
 
 extern "C" {
 
-void translate(const char* translator_name, const char* input) {
+void translate(const char* translator_name, const char* input, const char* options) {
   std::string translator_string = translator_name;
   auto translator = TranslatorFromName(translator_name);
-
-  translator->Process(input);
-  std::string command = translator->Output();
+  std::string command = (*translator)(input, options);
   replaceAll(command, "\n", "\\n");
   replaceAll(command, "\"", "\\\"");
   command = "output.value=\"" + command + "\";";

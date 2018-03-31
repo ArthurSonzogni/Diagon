@@ -56,31 +56,57 @@ std::string Screen::ToString() {
   return ss.str();
 }
 
-void Screen::DrawHorizontalLine(int left, int right, int y) {
+void Screen::DrawHorizontalLine(int left, int right, int y, wchar_t c) {
   for (int x = left; x <= right; ++x) {
-    lines_[y][x] = U'─';
+    lines_[y][x] = c;
   }
 }
 
-void Screen::DrawVerticalLine(int top, int bottom, int x) {
+void Screen::DrawVerticalLine(int top, int bottom, int x, wchar_t c) {
   for (int y = top; y <= bottom; ++y) {
     lines_[y][x] = U'│';
   }
 }
 
-void Screen::ASCIIfy() {
-  for(auto& line : lines_) {
-    for(auto& c : line) {
-      switch(c) {
-        case U'─': c = '-'; break;
-        case U'│': c = '|'; break;
-        case U'┐': c = '.'; break;
-        case U'┘': c = '`'; break;
-        case U'┌': c = '.'; break;
-        case U'└': c = '\''; break;
-        case U'┬': c = '-'; break;
-        case U'┴': c = '-'; break;
+void Screen::ASCIIfy(int style) {
+
+  if (style == 0) {
+    for(auto& line : lines_) {
+      for(auto& c : line) {
+        switch(c) {
+          case U'─': c = '-'; break;
+          case U'│': c = '|'; break;
+          case U'┐': c = '.'; break;
+          case U'┘': c = '\''; break;
+          case U'┌': c = '.'; break;
+          case U'└': c = '\''; break;
+          case U'┬': c = '-'; break;
+          case U'┴': c = '-'; break;
+          case U'△': c = '^'; break;
+          case U'▽': c = 'V'; break;
+        }
       }
     }
+    return;
+  }
+
+  if (style == 1) {
+    for(auto& line : lines_) {
+      for(auto& c : line) {
+        switch(c) {
+          case U'─': c = '-'; break;
+          case U'│': c = '|'; break;
+          case U'┐': c = '.'; break;
+          case U'┘': c = '\''; break;
+          case U'┌': c = '.'; break;
+          case U'└': c = '\''; break;
+          case U'┬': c = '.'; break;
+          case U'┴': c = '\''; break;
+          case U'△': c = '^'; break;
+          case U'▽': c = 'V'; break;
+        }
+      }
+    }
+    return;
   }
 }

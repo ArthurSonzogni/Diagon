@@ -23,19 +23,19 @@ int main(int, const char**) {
 
       std::string input_string((std::istreambuf_iterator<char>(input)),
                                std::istreambuf_iterator<char>());
-      std::string output_string((std::istreambuf_iterator<char>(output)),
+      std::string output_expected((std::istreambuf_iterator<char>(output)),
                                 std::istreambuf_iterator<char>());
 
-      translator->Process(input_string);
+      std::string output_computed = (*translator)(input_string, "");
 
-      if (translator->Output() == output_string) {
+      if (output_computed == output_expected) {
         std::cout << "  [PASS] " << test << std::endl;
       } else {
         std::cout << "  [FAIL] " << test << std::endl;
         std::cout << "---[Output]------------------" << std::endl;
-        std::cout << translator->Output() << std::endl;
+        std::cout << output_computed << std::endl;
         std::cout << "---[Expected]----------------" << std::endl;
-        std::cout << output_string << std::endl;
+        std::cout << output_expected << std::endl;
         std::cout << "---------------------" << std::endl;
       }
     }

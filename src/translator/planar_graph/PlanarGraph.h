@@ -20,11 +20,12 @@ struct Box {
 class PlanarGraph : public Translator {
  public:
   virtual ~PlanarGraph() = default;
-  void Process(const std::string& input) override;
-  std::string Output() override { return output_; }
+  std::string operator()(const std::string& input,
+                         const std::string& options) override;
 
   //----------------------------------------------------------------------------
  private:
+  bool ascii_only_;
   std::string output_;
 
   std::map<std::wstring, int> name_to_id;

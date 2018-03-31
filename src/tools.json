@@ -2,6 +2,14 @@
   {
     "tool": "Sequence",
     "description": "Sequence diagram",
+    "options": [
+      {
+        "type":"checkbox",
+        "default":false,
+        "label":"ASCII-only",
+        "name":"ascii_only"
+      }
+    ],
     "examples": [
       {
         "title": "------------------------",
@@ -62,6 +70,14 @@
   {
     "tool": "PlanarGraph",
     "description": "Planar graph",
+    "options": [
+      {
+        "type":"checkbox",
+        "default":false,
+        "label":"ASCII-only",
+        "name":"ascii_only"
+      }
+    ],
     "examples": [
       {
         "title": "------------------------",
@@ -180,8 +196,22 @@
     ]
   },
   {
-    "tool": "LineNumberUnicode",
-    "description": "Line number unicode",
+    "tool": "Frame",
+    "description": "Frame/border/line_number",
+    "options": [
+      {
+        "type":"checkbox",
+        "default":true,
+        "label":"Line number",
+        "name":"line_number"
+      },
+      {
+        "type":"checkbox",
+        "default":false,
+        "label":"ASCII-only",
+        "name":"ascii_only"
+      }
+    ],
     "examples": [
       {
         "title": "------------------------",
@@ -189,29 +219,6 @@
       },
       {
         "title":"1-Hello world",
-        "content": [
-          "#include <iostream>",
-          "using namespace std;",
-          "",
-          "int main() ",
-          "{",
-            "    cout << \"Hello, World!\";",
-            "    return 0;",
-            "}"
-        ]
-      }
-    ]
-  },
-  {
-    "tool": "LineNumberASCII",
-    "description": "Line number ASCII",
-    "examples": [
-      {
-        "title": "------------------------",
-        "empty": true
-      },
-      {
-        "title":"Hello world",
         "content": [
           "#include <iostream>",
           "using namespace std;",

@@ -12,7 +12,7 @@
       <!--Header-->
       <div id="landing_page_content" class="flex">
         <h1>Diagon</h1>
-        <h2><b>Diag</b>ram <b>On</b>line</h2>
+        <h2><b>Diag</b>ram</h2>
         <p>Interactive text→text tools collection.</p>
         <a href="#code_area" id="begin_button">Begin</a>
       </div>
@@ -32,19 +32,25 @@
       <div class="container vertical fill_space">
 
         <!--1 Menu bar-->
-        <div id="menu_bar">
-          <div id="menu_bar_submenu">
+        <div id="menu_bar" class="container horizontal">
+          <!--A Tool selection-->
+          <div class="menu_bar_submenu">
             <label for="tools">Tool:</label>
             <select type="text" id="tools">
               <option>Chargement...</option>
             </select>
           </div>
 
-          <div id="menu_bar_submenu">
+          <!--B Example selection-->
+          <div class="menu_bar_submenu">
             <label for="examples">Example:</label>
             <select type="text" id="examples">
               <option>Chargement...</option>
             </select>
+          </div>
+
+          <!--C Options selection selection-->
+          <div class="menu_bar_submenu container horizontal" id="options">
           </div>
         </div>
 
@@ -71,6 +77,7 @@
 
 let tools = document.getElementById('tools');
 let examples = document.getElementById('examples');
+let options = document.getElementById('options');
 let input = document.getElementById('input');
 let output = document.getElementById('output');
 let errors = document.getElementById('errors');
@@ -101,6 +108,55 @@ function UpdateExamples() {
   }
 }
 
+function UpdateOptions() {
+  // Clear.
+  while(options.firstChild) {
+    options.removeChild(options.firstChild);
+  }
+
+  let index = tools.value;
+  let tool = tools_data[index];
+  for(let i in tool.options) {
+    let option = tool.options[i];
+
+    let option_box = document.createElement('p');
+    option_box.className = "option";
+
+    let label = document.createElement('label');
+    label.innerText = option.label + ":";
+    option_box.appendChild(label);
+
+    if (option.type = "checkbox") {
+      let checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.data = option.name;
+      checkbox.checked = option.default;
+      checkbox.addEventListener("change", UpdateOutput);
+      option_box.appendChild(checkbox);
+    }
+
+    options.appendChild(option_box);
+  }
+}
+
+function GetOptions() {
+  let output = "";
+  let index = tools.value;
+  let tool = tools_data[index];
+  for(let i in tool.options) {
+    let option = tool.options[i];
+    let name;
+    let value;
+    if (option.type = "checkbox") {
+      name = options.childNodes[i].childNodes[1].data;
+      value = options.childNodes[i].childNodes[1].checked;
+    }
+    output += name + "\n";
+    output += value + "\n";
+  }
+  return output;
+}
+
 function UpdateInput() {
   let tool_index = tools.value;
   let example_index = examples.value;
@@ -121,13 +177,14 @@ function UpdateOutput() {
   errors.value = '';
   console.log("tool", tools_data[tools.value].tool, input.value);
   console.log(translate);
-  translate(tools_data[tools.value].tool, input.value);
+  translate(tools_data[tools.value].tool, input.value, GetOptions());
 }
 
 function OnRuntimeInitialized() {
   tools.addEventListener("input", UpdateExamples);
-  examples.addEventListener("input", UpdateInput);
   tools.addEventListener("input", UpdateOutput);
+  tools.addEventListener("input", UpdateOptions);
+  examples.addEventListener("input", UpdateInput);
   input.addEventListener('input', UpdateOutput);
 
   fetch("tools.json")
@@ -136,9 +193,10 @@ function OnRuntimeInitialized() {
     tools_data = data;
     UpdateTools();
     UpdateExamples()
+    UpdateOptions();
     UpdateInput();
     UpdateOutput();
-    translate = Module.cwrap('translate', 'void', ['string','string']);
+    translate = Module.cwrap('translate', 'void', ['string','string', 'string']);
   })
 }
 

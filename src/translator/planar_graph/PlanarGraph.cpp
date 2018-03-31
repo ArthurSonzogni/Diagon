@@ -78,9 +78,14 @@ struct PlanarGraph::DrawnVertex {
   std::vector<DrawnEdge> edges;
 };
 
-void PlanarGraph::Process(const std::string& input) {
+std::string PlanarGraph::operator()(const std::string& input,
+                                    const std::string& options_string) {
+  auto options = SerializeOption(options_string);
+  ascii_only_ = (options["ascii_only"] == "true");
+  
   Read(input);
   Write();
+  return output_;
 }
 
 void PlanarGraph::Read(const std::string& input) {
@@ -313,6 +318,9 @@ void PlanarGraph::Write() {
         edge.Draw(screen, *this);
       }
     }
+
+    if (ascii_only_)
+      screen.ASCIIfy(1);
     output_ += screen.ToString();
   };
 
@@ -379,5 +387,5 @@ void PlanarGraph::Write() {
     }
   }
 
-  Draw();
+  return Draw();
 }

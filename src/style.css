@@ -116,7 +116,7 @@ textarea {
   border:1px solid gray;
 }
 
-#menu_bar_submenu {
+.menu_bar_submenu {
   padding:12px;
   display:inline-block;
   border-right: 1px solid gray;
@@ -125,4 +125,11 @@ textarea {
 select {
   font:inherit;
   size:50px;
+}
+
+.option {
+  margin:0px;
+  padding:0px;
+  padding-right:3px;
+  padding-left:3px;
 }

@@ -8,8 +8,7 @@ int main(int, const char**) {
   }
 
   auto sequence = SequenceTranslator();
-  sequence->Process(input);
-  std::cout << sequence->Output() << std::endl;
+  std::cout << (*sequence)(input, "") << std::endl;
 
   return 0;
 }

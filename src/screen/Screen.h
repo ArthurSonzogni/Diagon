@@ -14,9 +14,9 @@ class Screen {
   void DrawText(int x, int y, const std::wstring& text);
   void DrawBox(int x, int y, int w, int h);
   void DrawBoxedText(int x, int y, const std::wstring& text);
-  void DrawHorizontalLine(int left, int right, int y);
-  void DrawVerticalLine(int top, int bottom, int x);
-  void ASCIIfy();
+  void DrawHorizontalLine(int left, int right, int y, wchar_t c = U'─');
+  void DrawVerticalLine(int top, int bottom, int x, wchar_t c = U'│');
+  void ASCIIfy(int style = 0);
   std::string ToString();
 
  private:
