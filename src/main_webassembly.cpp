@@ -21,8 +21,9 @@ void translate(const char* translator_name, const char* input, const char* optio
   std::string translator_string = translator_name;
   auto translator = TranslatorFromName(translator_name);
   std::string command = (*translator)(input, options);
-  replaceAll(command, "\n", "\\n");
+  replaceAll(command, "\\", "\\\\");
   replaceAll(command, "\"", "\\\"");
+  replaceAll(command, "\n", "\\n");
   command = "output.value=\"" + command + "\";";
   emscripten_run_script(command.c_str());
 }

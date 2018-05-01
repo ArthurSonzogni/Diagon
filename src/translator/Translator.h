@@ -14,9 +14,12 @@ class Translator {
       const std::string& options);
 };
 
-std::unique_ptr<Translator> SequenceTranslator();
 std::unique_ptr<Translator> FrameTranslator();
 std::unique_ptr<Translator> PlanarGraphTranslator();
+std::unique_ptr<Translator> SequenceTranslator();
+std::unique_ptr<Translator> TableTranslator();
+std::unique_ptr<Translator> TreeTranslator();
+
 std::unique_ptr<Translator> TranslatorFromName(const std::string name);
 
 #endif /* end of include guard: TRANSLATOR_TRANSLATOR */

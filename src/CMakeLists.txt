@@ -28,6 +28,8 @@ add_subdirectory(screen)
 add_subdirectory(translator/frame)
 add_subdirectory(translator/planar_graph)
 add_subdirectory(translator/sequence)
+add_subdirectory(translator/table)
+add_subdirectory(translator/tree)
 
 if (Web)
 
@@ -73,6 +75,8 @@ if (Web)
     translator_frame
     translator_planar_graph
     translator_sequence
+    translator_table
+    translator_tree
     screen
     antlr4_static
   )
@@ -87,6 +91,8 @@ else()
     translator_frame
     translator_planar_graph
     translator_sequence
+    translator_table
+    translator_tree
     screen
     antlr4_static
   )
@@ -99,6 +105,8 @@ else()
     translator_frame
     translator_planar_graph
     translator_sequence
+    translator_table
+    translator_tree
     antlr4_static
     screen
     stdc++fs

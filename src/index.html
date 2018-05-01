@@ -57,7 +57,7 @@
         <!--2 Input / Output -->
         <div class="container horizontal flex">
           <div class="gutter"></div>
-          <textarea id="input" class="flex" placeholder='input, for instance  (1+2)*(3-4)/5'></textarea>
+          <textarea id="input" class="flex" placeholder='input'></textarea>
           <div class="gutter"></div>
           <textarea id="output" class = "flex" placeholder='output' readonly></textarea>
           <div class="gutter"></div>
@@ -123,16 +123,27 @@ function UpdateOptions() {
     option_box.className = "option";
 
     let label = document.createElement('label');
-    label.innerText = option.label + ":";
+    label.innerText = option.label + " : ";
     option_box.appendChild(label);
 
-    if (option.type = "checkbox") {
+    if (option.type == "checkbox") {
       let checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.data = option.name;
       checkbox.checked = option.default;
       checkbox.addEventListener("change", UpdateOutput);
       option_box.appendChild(checkbox);
+    }
+
+    if (option.type == "combobox") {
+      let select = document.createElement('select');
+      select.data = option.name
+      select.type = "text";
+      for(let i in option.values) {
+        select.options[i] = new Option(option.values[i]);
+      }
+      select.addEventListener("change", UpdateOutput);
+      option_box.appendChild(select);
     }
 
     options.appendChild(option_box);
@@ -147,13 +158,18 @@ function GetOptions() {
     let option = tool.options[i];
     let name;
     let value;
-    if (option.type = "checkbox") {
+    if (option.type == "checkbox") {
       name = options.childNodes[i].childNodes[1].data;
       value = options.childNodes[i].childNodes[1].checked;
+    }
+    if (option.type == "combobox") {
+      name = options.childNodes[i].childNodes[1].data;
+      value = options.childNodes[i].childNodes[1].value;
     }
     output += name + "\n";
     output += value + "\n";
   }
+  console.log(output);
   return output;
 }
 

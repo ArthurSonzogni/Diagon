@@ -8,8 +8,12 @@ std::unique_ptr<Translator> TranslatorFromName(const std::string name) {
     return SequenceTranslator();
   if (name == "Frame")
     return FrameTranslator();
+  if (name == "Table")
+    return TableTranslator();
   if (name == "PlanarGraph")
     return PlanarGraphTranslator();
+  if (name == "Tree")
+    return TreeTranslator();
   return nullptr;
 }
 

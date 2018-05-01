@@ -66,7 +66,6 @@
       }
     ]
   },
-
   {
     "tool": "PlanarGraph",
     "description": "Planar graph",
@@ -196,8 +195,52 @@
     ]
   },
   {
+    "tool": "Tree",
+    "description": "Tree",
+    "options": [
+      {
+        "type":"combobox",
+        "default":true,
+        "label":"Style",
+        "name":"style",
+        "values": [
+          "unicode 1",
+          "unicode 2",
+          "ASCII 1",
+          "ASCII 2",
+          "ASCII 3",
+          "unicode right top",
+          "unicode right center",
+          "unicode right bottom"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "title": "------------------------",
+        "empty": true
+      },
+      {
+        "title":"1 - Simple",
+        "content": [
+          "Linux",
+          "  Android",
+          "  Debian",
+          "    Ubuntu",
+          "      Lubuntu",
+          "      Kubuntu",
+          "      Xubuntu",
+          "      Xubuntu",
+          "    Mint",
+          "  Centos",
+          "  Fedora"
+        ]
+      }
+    ]
+  },
+  {
     "tool": "Frame",
-    "description": "Frame/border/line_number",
+    "description": "Frame",
     "options": [
       {
         "type":"checkbox",
@@ -228,6 +271,52 @@
             "    cout << \"Hello, World!\";",
             "    return 0;",
             "}"
+        ]
+      }
+    ]
+  },
+  {
+    "tool": "Table",
+    "description": "Table",
+    "options": [
+      {
+        "type":"combobox",
+        "default":true,
+        "label":"Style",
+        "name":"style",
+        "values": [
+          "unicode",
+          "unicode rounded",
+          "unicode bold",
+          "unicode double",
+          "unicode with bold header",
+          "unicode with double header",
+          "unicode cells",
+          "unicode cells 2",
+          "ascii",
+          "ascii rounded",
+          "ascii with header 1",
+          "ascii with header 2",
+          "ascii light header",
+          "ascii light header/separator",
+          "ascii light header/separator/border",
+          "ascii light separator/border",
+          "ascii light border",
+          "conceptual"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "title": "------------------------",
+        "empty": true
+      },
+      {
+        "title":"1-simple",
+        "content": [
+          "Column 1,Column 2,Column 3",
+          "C++,Web,Assembly",
+          "Javascript,CSS,HTML"
         ]
       }
     ]
