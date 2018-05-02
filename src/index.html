@@ -4,6 +4,10 @@
     <meta charset="utf-8">
     <title>Diagon</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="./light_style.css" id="theme_style">
+
+    <link rel="preload" href="./dark_style.css" as="style">
+
   </head>
   <body>
     <!--First page-->
@@ -15,6 +19,7 @@
         <h2><b>Diag</b>ram</h2>
         <p>Interactive text→text tools collection.</p>
         <a href="#code_area" id="begin_button">Begin</a>
+
       </div>
 
       <!--Version number-->
@@ -24,6 +29,11 @@
           <div class="flex"></div>
           <div id="version">Version @git_version@</div>
         </div>
+      </div>
+
+      <!-- Theme -->
+      <div id="style_button">
+        Dark theme
       </div>
     </div>
 
@@ -82,9 +92,20 @@ let input = document.getElementById('input');
 let output = document.getElementById('output');
 let errors = document.getElementById('errors');
 let tools_data = [];
+let style_button = document.getElementById("style_button");
+let theme_style = document.getElementById("theme_style");
+
+style_button.addEventListener("click", function() {
+  if (style_button.innerText == "Dark theme") {
+    theme_style.href = "./dark_style.css";
+    style_button.innerText = "Light theme";
+  } else {
+    theme_style.href = "./light_style.css";
+    style_button.innerText = "Dark theme";
+  }
+});
 
 errors.value = ''; 
-
 function ClearSelectBox(select_box) {
   while(select_box.options.length > 0)
     select_box.options[0] = null;

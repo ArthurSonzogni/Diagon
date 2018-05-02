@@ -1,0 +1,51 @@
+body {
+  color: white;
+}
+
+#input, #output, #errors, #menu_bar {
+  background-color:black;
+  color:white;
+  border:0px solid;
+}
+
+#landing_page {
+  background-color:black;
+}
+
+#begin_button {
+  color: #000;
+  color:white;
+  border:1vmin white solid;
+}
+
+#begin_button:hover {
+  background: red;
+}
+
+#code_area {
+  background-color:#222;
+}
+
+#menu_bar {
+  margin-bottom: 1vmin;
+}
+
+.menu_bar_submenu {
+  border-right: 1px solid #999;
+}
+
+#style_button {
+  background-color:white;
+  color:black;
+}
+
+select {
+  color:white;
+  background-color: #222;
+}
+
+option {
+  color:white;
+  background-color: #222;
+}
+

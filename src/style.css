@@ -46,12 +46,9 @@ textarea {
 #input, #output, #errors {
   display:block;
   padding:10px;
-  background-color:#FFF;
-  border:solid 1px black;
 }
 
 #landing_page {
-  background-color:white;
   position:relative
 }
 
@@ -94,32 +91,18 @@ textarea {
 #begin_button {
   border-radius: 16px;
   font-family: Arial;
-  color: #ffffff;
   font-size: 60px;
   padding: 12px 12px 12px 12px;
   text-decoration: none;
-  color:black;
-  border:1vmin black solid;
 }
 
 #begin_button:hover {
-  background: #3cb0fd;
   text-decoration: none;
-}
-
-#code_area {
-  background-color:#888;
-}
-
-#menu_bar {
-  background-color:#EEE;
-  border:1px solid gray;
 }
 
 .menu_bar_submenu {
   padding:12px;
   display:inline-block;
-  border-right: 1px solid gray;
 }
 
 select {
@@ -132,4 +115,37 @@ select {
   padding:0px;
   padding-right:3px;
   padding-left:3px;
+}
+
+#style_button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size:2vmin;
+  font-weight:lighter;
+  margin:1vmin;
+  padding:1vmin;
+  border-radius: 0.5vmin;
+  opacity:0.8;
+}
+
+#style_button:hover {
+  opacity: 1;
+  cursor:pointer;
+}
+
+select {
+  border: 0;
+  padding: 7px;
+}
+
+option {
+  border: 0;
+  padding: 7px;
+  margin: 7px;
+}
+
+input {
+  padding: 7px;
+  margin: 7px;
 }

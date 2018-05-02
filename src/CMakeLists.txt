@@ -58,6 +58,16 @@ if (Web)
     COPYONLY)
 
   configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/light_style.css
+    ${CMAKE_CURRENT_BINARY_DIR}/light_style.css
+    COPYONLY)
+
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/dark_style.css
+    ${CMAKE_CURRENT_BINARY_DIR}/dark_style.css
+    COPYONLY)
+
+  configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/tools.json
     ${CMAKE_CURRENT_BINARY_DIR}/tools.json
     COPYONLY)
