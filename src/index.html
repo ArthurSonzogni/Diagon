@@ -2,6 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
     <title>Diagon</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" type="text/css" href="./light_style.css" id="theme_style">
@@ -19,7 +21,6 @@
         <h2><b>Diag</b>ram</h2>
         <p>Interactive text→text tools collection.</p>
         <a href="#code_area" id="begin_button">Begin</a>
-
       </div>
 
       <!--Version number-->
@@ -27,7 +28,7 @@
         <div class="flex"></div>
         <div class="container horizontal">
           <div class="flex"></div>
-          <div id="version">Version @git_version@</div>
+          <div id="version">Version 27</div>
         </div>
       </div>
 
@@ -42,7 +43,7 @@
       <div class="container vertical fill_space">
 
         <!--1 Menu bar-->
-        <div id="menu_bar" class="container horizontal">
+        <div id="menu_bar" class="container horizontal y-scrollable">
           <!--A Tool selection-->
           <div class="menu_bar_submenu">
             <label for="tools">Tool:</label>
