@@ -47,30 +47,15 @@ if (Web)
   string(APPEND CMAKE_CXX_FLAGS " -s EXPORTED_FUNCTIONS='[\"_translate\"]'")
   string(APPEND CMAKE_CXX_FLAGS " -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\",\" cwrap\"]'")
 
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/index.html
-    ${CMAKE_CURRENT_BINARY_DIR}/index.html
+  file(
+    COPY ${CMAKE_CURRENT_SOURCE_DIR}/http/
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
   )
 
   configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/style.css
-    ${CMAKE_CURRENT_BINARY_DIR}/style.css
-    COPYONLY)
-
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/light_style.css
-    ${CMAKE_CURRENT_BINARY_DIR}/light_style.css
-    COPYONLY)
-
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/dark_style.css
-    ${CMAKE_CURRENT_BINARY_DIR}/dark_style.css
-    COPYONLY)
-
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/tools.json
-    ${CMAKE_CURRENT_BINARY_DIR}/tools.json
-    COPYONLY)
+    ${CMAKE_CURRENT_SOURCE_DIR}/http/index.html
+    ${CMAKE_CURRENT_BINARY_DIR}/index.html
+  )
 
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/../tools/webserver/run_web_server.sh

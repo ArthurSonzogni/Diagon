@@ -33,7 +33,6 @@ std::string Sequence::operator()(const std::string& input,
 }
 
 void Sequence::ComputeInternalRepresentation(const std::string& input) {
-  //std::cout << "input = " << std::endl << input << std::endl;
   antlr4::ANTLRInputStream input_stream(input);
 
   // Lexer.
@@ -41,16 +40,11 @@ void Sequence::ComputeInternalRepresentation(const std::string& input) {
   antlr4::CommonTokenStream tokens(&lexer);
   tokens.fill();
 
-  for (auto token : tokens.getTokens()) {
-    //std::cout << token->toString() << std::endl;
-  }
-
   // Parser.
   SequenceParser parser(&tokens);
 
   // Print the tree.
   auto program = parser.program();
-  //std::cout << program->toStringTree(&parser) << std::endl << std::endl;
 
   for (SequenceParser::CommandContext* command : program->command()) {
     AddCommand(command);
@@ -276,10 +270,6 @@ void Sequence::LayoutComputeActorsPositions() {
   }
 
   for (auto& message : messages) {
-    //std::cout << "from = " << to_string(message.from) << " to "
-              //<< to_string(message.to) << std::endl;
-    //std::cout << "from = " << actor_index[message.from] << " to "
-              //<< actor_index[message.to] << std::endl;
     ActorSpace space{actor_index[message.from],  //
                      actor_index[message.to],    //
                      message.width + 1};         //
@@ -287,14 +277,6 @@ void Sequence::LayoutComputeActorsPositions() {
       std::swap(space.a, space.b);
     spaces.push_back(space);
   }
-
-  //std::cout << "spaces.size()  = " << spaces.size() << std::endl;
-  //for (auto& it : spaces) {
-    //std::cout << " * " << it.a;
-    //std::cout << " , " << it.b;
-    //std::cout << " , " << it.space;
-    //std::cout << std::endl;
-  //}
 
   actors[0].center = actors[0].name.size() / 2 + 1;
 
@@ -309,7 +291,7 @@ void Sequence::LayoutComputeActorsPositions() {
       }
     }
     if (i++ > 500) {
-      std::cout << "Something goes wrong!" << std::endl;
+      std::cout << "Something went wrong!" << std::endl;
       break;
     }
   }
@@ -438,8 +420,6 @@ std::vector<std::set<int>> Cut(const MessageDependencies& message_dependencies,
         });
   }
 
-  //std::cout << "independants.size() = " << independants.size() << std::endl;
-
   for (auto& dependant : independants) {
     // Find cycles.
     std::vector<MessageSetWithWeight> cycles;
@@ -479,7 +459,6 @@ std::vector<std::set<int>> Cut(const MessageDependencies& message_dependencies,
       sort(cycles.begin(), cycles.end());
     }
 
-    //std::cout << "cycles.size() = " << cycles.size() << std::endl;
     for (auto& it : cycles)
       output.push_back(std::move(it.messages));
   }

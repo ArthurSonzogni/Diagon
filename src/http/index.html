@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
     <title>Diagon</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="stylesheet" type="text/css" href="./light_style.css" id="theme_style">
+    <link rel="stylesheet" type="text/css" href="./style/style.css">
+    <link rel="stylesheet" type="text/css" href="./style/light_style.css" id="theme_style">
 
-    <link rel="preload" href="./dark_style.css" as="style">
+    <link rel="preload" href="./style/dark_style.css" as="style">
 
   </head>
   <body>
@@ -28,7 +28,7 @@
         <div class="flex"></div>
         <div class="container horizontal">
           <div class="flex"></div>
-          <div id="version">Version 27</div>
+          <div id="version">Version @git_version@</div>
         </div>
       </div>
 
@@ -98,10 +98,10 @@ let theme_style = document.getElementById("theme_style");
 
 style_button.addEventListener("click", function() {
   if (style_button.innerText == "Dark theme") {
-    theme_style.href = "./dark_style.css";
+    theme_style.href = "./style/dark_style.css";
     style_button.innerText = "Light theme";
   } else {
-    theme_style.href = "./light_style.css";
+    theme_style.href = "./style/light_style.css";
     style_button.innerText = "Dark theme";
   }
 });

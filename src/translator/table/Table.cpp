@@ -405,9 +405,6 @@ class Table : public Translator {
       line.resize(row_count);
     }
 
-   
-    std::cout << int(L"┌"[0]) << std::endl;
-
     // Compute row_width;
     std::vector<int> row_width(row_count, 0);
     for (const auto& line : data) {
@@ -429,7 +426,6 @@ class Table : public Translator {
                  style.height[2] * (line_count - 2) + style.height[3] + line_count;
 
     Screen screen(width, height);
-    std::cerr << "width = " << width << " height = " << height << std::endl;
 
     // Draw table.
     int Y = 0;

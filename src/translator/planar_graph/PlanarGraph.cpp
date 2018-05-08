@@ -237,7 +237,6 @@ void PlanarGraph::Write() {
   boost::planar_canonical_ordering(graph, embedding.data(),
                                    std::back_inserter(ordering));
 
-  //std::cout << "Num vertices = " << num_vertices << std::endl;
   std::vector<size_t> inverse_ordering(num_vertices);
   for(int i = 0; i<inverse_ordering.size(); ++i) {
     inverse_ordering[ordering[i]] = i;
