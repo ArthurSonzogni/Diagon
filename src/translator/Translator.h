@@ -15,6 +15,7 @@ class Translator {
 };
 
 std::unique_ptr<Translator> FrameTranslator();
+std::unique_ptr<Translator> MathTranslator();
 std::unique_ptr<Translator> PlanarGraphTranslator();
 std::unique_ptr<Translator> SequenceTranslator();
 std::unique_ptr<Translator> TableTranslator();

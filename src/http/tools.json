@@ -320,5 +320,108 @@
         ]
       }
     ]
+  },
+  {
+    "tool": "Math",
+    "description": "Mathematical expression",
+    "options": [
+      {
+        "type":"checkbox",
+        "default":false,
+        "label":"ASCII-only",
+        "name":"ascii_only"
+      },
+      {
+        "type":"checkbox",
+        "default":true,
+        "label":"Prefer math symbols",
+        "name":"transform_math_letters"
+      }
+    ],
+    "examples": [
+      {
+        "title": "------------------------",
+        "empty": true
+      },
+      {
+        "title":"1-fraction",
+        "content": [
+          "f(x) = 1 + x / (1 + x)"
+        ]
+      },
+      {
+        "title":"2-square-root",
+        "content": [
+          "f(x) = sqrt(x+1/2)"
+        ]
+      },
+      {
+        "title":"3-power",
+        "content": [
+          "f(x) = 1 + x^2 + x^3 + x^(1+1/2)"
+        ]
+      },
+      {
+        "title":"4-Math-symbols",
+        "content": [
+          "Alpha",
+          "alpha",
+          "Digamma",
+          "digamma",
+          "Kappa",
+          "kappa",
+          "Omicron",
+          "omicron",
+          "Upsilon",
+          "upsilon",
+          "Beta",
+          "beta",
+          "Zeta",
+          "zeta",
+          "Lambda",
+          "lambda",
+          "Pi",
+          "pi",
+          "Phi",
+          "phi",
+          "Gamma",
+          "gamma",
+          "Eta",
+          "eta",
+          "Mu",
+          "mu",
+          "Rho",
+          "rho",
+          "Chi",
+          "chi",
+          "Delta",
+          "delta",
+          "Theta",
+          "theta",
+          "Nu",
+          "nu",
+          "Sigma",
+          "sigma",
+          "Psi",
+          "psi",
+          "Epsilon",
+          "epsilon",
+          "Iota",
+          "iota",
+          "Xi",
+          "xi",
+          "Tau",
+          "tau",
+          "Omega",
+          "omega"
+        ]
+      },
+      {
+        "title":"fun-continued-fraction",
+        "content": [
+          "psi = 1 + 1/(1+1/(1+1/(1+1/(1+...))))"
+        ]
+      }
+    ]
   }
 ]

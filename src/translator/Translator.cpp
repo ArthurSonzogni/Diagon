@@ -4,14 +4,16 @@
 #include <string>
 
 std::unique_ptr<Translator> TranslatorFromName(const std::string name) {
-  if (name == "Sequence")
-    return SequenceTranslator();
   if (name == "Frame")
     return FrameTranslator();
-  if (name == "Table")
-    return TableTranslator();
+  if (name == "Math")
+    return MathTranslator();
   if (name == "PlanarGraph")
     return PlanarGraphTranslator();
+  if (name == "Sequence")
+    return SequenceTranslator();
+  if (name == "Table")
+    return TableTranslator();
   if (name == "Tree")
     return TreeTranslator();
   return nullptr;

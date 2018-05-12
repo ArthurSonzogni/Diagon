@@ -26,6 +26,7 @@ configure_file(
 
 add_subdirectory(screen)
 add_subdirectory(translator/frame)
+add_subdirectory(translator/math)
 add_subdirectory(translator/planar_graph)
 add_subdirectory(translator/sequence)
 add_subdirectory(translator/table)
@@ -68,6 +69,7 @@ if (Web)
   )
   target_link_libraries(main.js
     translator_frame
+    translator_math
     translator_planar_graph
     translator_sequence
     translator_table
@@ -84,6 +86,7 @@ else()
   )
   target_link_libraries(main
     translator_frame
+    translator_math
     translator_planar_graph
     translator_sequence
     translator_table
@@ -98,6 +101,7 @@ else()
   )
   target_link_libraries(input_output_test
     translator_frame
+    translator_math
     translator_planar_graph
     translator_sequence
     translator_table
