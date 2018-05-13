@@ -220,9 +220,21 @@ Draw Parse(MathParser::ValueContext* context,
 }
 
 Draw Parse(MathParser::FunctionContext* context, Style* style) {
-  return ComposeHorizontal(
-      Parse(context->variable(), style),
-      WrapWithParenthesis(Parse(context->expression(), style), style), 1);
+  Draw content = Parse(context->expression(), style);
+  std::string function_name = context->variable()->VARIABLE()->getText();
+  if (function_name == "sqrt") {
+    Draw draw;
+    draw.Append(content, 1 + content.dim_y, 1);
+    draw.content.back().front() = style->sqrt_0;
+    for(int y = 0; y<draw.content.size(); ++y)
+      draw.content[draw.content.size()-1-y][1+y] = style->sqrt_1;
+    for(int x = draw.content.size(); x<draw.content[0].size(); ++x)
+      draw.content[0][x] = style->sqrt_2;
+    draw.center_y = content.center_y+1;
+    return draw;
+  }
+  return ComposeHorizontal(Parse(context->variable(), style),
+                           WrapWithParenthesis(content, style), 1);
 }
 
 Draw Parse(MathParser::SignedAtomContext* context,
@@ -298,6 +310,10 @@ std::string Math::operator()(const std::string& input,
     style.right_parenthesis_1 = U'\\';
     style.right_parenthesis_2 = U'|';
     style.right_parenthesis_3 = U'/';
+
+    style.sqrt_0 = U'\\';
+    style.sqrt_1 = U'/';
+    style.sqrt_2 = U'_';
   } else {
     style.divide = U'─';
     style.multiply = U'×';
@@ -312,6 +328,10 @@ std::string Math::operator()(const std::string& input,
     style.right_parenthesis_1 = U'⎞';
     style.right_parenthesis_2 = U'⎟';
     style.right_parenthesis_3 = U'⎠';
+
+    style.sqrt_0 = U'╲';
+    style.sqrt_1 = U'╱';
+    style.sqrt_2 = U'_';
   }
 
   if (options["transform_math_letters"] == "true") {
@@ -346,6 +366,7 @@ std::string Math::operator()(const std::string& input,
   //⎳
 
   //∑
+
 
   //
   antlr4::ANTLRInputStream input_stream(input);

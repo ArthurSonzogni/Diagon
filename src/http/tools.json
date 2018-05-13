@@ -352,7 +352,7 @@
       {
         "title":"2-square-root",
         "content": [
-          "f(x) = sqrt(x+1/2)"
+          "sqrt(1+sqrt(1+x/2))"
         ]
       },
       {

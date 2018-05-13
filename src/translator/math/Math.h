@@ -45,6 +45,11 @@ struct Style {
   wchar_t right_parenthesis_1;
   wchar_t right_parenthesis_2;
   wchar_t right_parenthesis_3;
+  wchar_t sqrt_0;
+  wchar_t sqrt_1;
+  wchar_t sqrt_2;
+  wchar_t sqrt_3;
+  wchar_t sqrt_4;
   std::map<std::wstring, std::wstring> variable_transform;
 };
 
