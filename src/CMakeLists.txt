@@ -48,6 +48,7 @@ if (Web)
   string(APPEND CMAKE_CXX_FLAGS " -s EXPORTED_FUNCTIONS='[\"_translate\"]'")
   string(APPEND CMAKE_CXX_FLAGS " -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\",\" cwrap\"]'")
 
+  message(STATUS "coucou")
   file(
     COPY ${CMAKE_CURRENT_SOURCE_DIR}/http/
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/

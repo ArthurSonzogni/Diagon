@@ -19,7 +19,7 @@ body {
 }
 
 #begin_button:hover {
-  background: red;
+  background: green;
 }
 
 #code_area {

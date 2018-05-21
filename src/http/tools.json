@@ -1,5 +1,120 @@
 [
   {
+    "tool": "Math",
+    "description": "Mathematical expression",
+    "options": [
+      {
+        "type":"checkbox",
+        "default":false,
+        "label":"ASCII-only",
+        "name":"ascii_only"
+      },
+      {
+        "type":"checkbox",
+        "default":true,
+        "label":"Prefer math symbols",
+        "name":"transform_math_letters"
+      }
+    ],
+    "examples": [
+      {
+        "title": "------------------------",
+        "empty": true
+      },
+      {
+        "title":"1-fraction",
+        "content": [
+          "f(x) = 1 + x / (1 + x)"
+        ]
+      },
+      {
+        "title":"2-square-root",
+        "content": [
+          "sqrt(1+sqrt(1+x/2))"
+        ]
+      },
+      {
+        "title":"3-power",
+        "content": [
+          "f(x) = 1 + x^2 + x^3 + x^(1+1/2)"
+        ]
+      },
+      {
+        "title":"4-summation",
+        "content": [
+          "sum(i^2,i=0,n) = n^3/2+n^2/2+n/6"
+        ]
+      },
+      {
+        "title":"5-integral",
+        "content": [
+          "int(x^2 * dx ,0,1) = n^3/3"
+        ]
+      },
+      {
+        "title":"6-Math-symbols",
+        "content": [
+          "Alpha",
+          "alpha",
+          "Digamma",
+          "digamma",
+          "Kappa",
+          "kappa",
+          "Omicron",
+          "omicron",
+          "Upsilon",
+          "upsilon",
+          "Beta",
+          "beta",
+          "Zeta",
+          "zeta",
+          "Lambda",
+          "lambda",
+          "Pi",
+          "pi",
+          "Phi",
+          "phi",
+          "Gamma",
+          "gamma",
+          "Eta",
+          "eta",
+          "Mu",
+          "mu",
+          "Rho",
+          "rho",
+          "Chi",
+          "chi",
+          "Delta",
+          "delta",
+          "Theta",
+          "theta",
+          "Nu",
+          "nu",
+          "Sigma",
+          "sigma",
+          "Psi",
+          "psi",
+          "Epsilon",
+          "epsilon",
+          "Iota",
+          "iota",
+          "Xi",
+          "xi",
+          "Tau",
+          "tau",
+          "Omega",
+          "omega"
+        ]
+      },
+      {
+        "title":"100-continued-fraction",
+        "content": [
+          "psi = 1 + 1/(1+1/(1+1/(1+1/(1+...))))"
+        ]
+      }
+    ]
+  },
+  {
     "tool": "Sequence",
     "description": "Sequence diagram",
     "options": [
@@ -62,134 +177,6 @@
           "",
           "Renderer: 1<2",
           "Browser: 2<1"
-        ]
-      }
-    ]
-  },
-  {
-    "tool": "PlanarGraph",
-    "description": "Planar graph",
-    "options": [
-      {
-        "type":"checkbox",
-        "default":false,
-        "label":"ASCII-only",
-        "name":"ascii_only"
-      }
-    ],
-    "examples": [
-      {
-        "title": "------------------------",
-        "empty": true
-      },
-      {
-        "title":"if then else loop",
-        "content": [
-          "if -> \"then A\" -> end",
-          "if -> \"then B\" -> end",
-          "end -> loop -> if"
-        ]
-      },
-      {
-        "title":"test",
-        "content": [
-          "A -- B",
-          "A -- C",
-          "A -- D -- G",
-          "B -- Z",
-          "C -- Z"
-        ]
-      },
-      {
-        "title": "Big graph",
-        "content": [
-          "a -- b",
-          "a -- c",
-          "a -- d",
-          "b -- c",
-          "b -- e",
-          "c -- e",
-          "c -- f",
-          "d -- f",
-          "d -- g",
-          "e -- h",
-          "f -- h",
-          "f -- i",
-          "f -- j",
-          "f -- g",
-          "g -- k",
-          "h -- o",
-          "h -- l",
-          "i -- l",
-          "i -- m",
-          "i -- j",
-          "j -- m",
-          "j -- n",
-          "j -- k",
-          "k -- n",
-          "k -- r",
-          "l -- o",
-          "l -- m",
-          "m -- o",
-          "m -- p",
-          "m -- n",
-          "n -- q",
-          "n -- r",
-          "o -- s",
-          "o -- p",
-          "p -- s",
-          "p -- t",
-          "p -- q",
-          "q -- t",
-          "q -- r",
-          "r -- t",
-          "s -- z",
-          "t -- z"
-        ]
-      },
-      {
-        "title": "Earth states",
-        "content": [
-          "Earth -> Europe",
-          "Earth -> Asia",
-          "Earth -> Africa",
-          "Earth -> \"North America\"",
-          "Earth -> \"South America\"",
-          "Earth -> Antarctica",
-          "",
-          "Europe -> France",
-          "Europe -> Italy",
-          "Europe -> Spain",
-          "Europe -> Germany",
-          "Europe -> \"United Kingdom\"",
-          "",
-          "Asia -> China",
-          "Asia -> Japan",
-          "Asia -> India",
-          "Asia -> Pakistan",
-          "",
-          "Africa -> Egypt",
-          "Africa -> Algeria",
-          "Africa -> Namibia",
-          "Africa -> \"South Africa\"",
-          "Africa -> Niger",
-          "Africa -> Congo",
-          "Africa -> Madagascar",
-          "",
-          "",
-          "\"North America\" -> \"United States\"",
-          "\"North America\" -> Canada",
-          "\"North America\" -> Mexico",
-          "",
-          "\"South America\" -> Brasil",
-          "\"South America\" -> Argentina",
-          "\"South America\" -> Bolivia",
-          "\"South America\" -> Chile",
-          "\"South America\" -> Ecuador",
-          "\"South America\" -> Guyana",
-          "\"South America\" -> Peru",
-          "",
-          "Antarctica -> ???"
         ]
       }
     ]
@@ -322,20 +309,14 @@
     ]
   },
   {
-    "tool": "Math",
-    "description": "Mathematical expression",
+    "tool": "PlanarGraph",
+    "description": "Planar graph",
     "options": [
       {
         "type":"checkbox",
         "default":false,
         "label":"ASCII-only",
         "name":"ascii_only"
-      },
-      {
-        "type":"checkbox",
-        "default":true,
-        "label":"Prefer math symbols",
-        "name":"transform_math_letters"
       }
     ],
     "examples": [
@@ -344,94 +325,113 @@
         "empty": true
       },
       {
-        "title":"1-fraction",
+        "title":"if then else loop",
         "content": [
-          "f(x) = 1 + x / (1 + x)"
+          "if -> \"then A\" -> end",
+          "if -> \"then B\" -> end",
+          "end -> loop -> if"
         ]
       },
       {
-        "title":"2-square-root",
+        "title":"test",
         "content": [
-          "sqrt(1+sqrt(1+x/2))"
+          "A -- B",
+          "A -- C",
+          "A -- D -- G",
+          "B -- Z",
+          "C -- Z"
         ]
       },
       {
-        "title":"3-power",
+        "title": "Big graph",
         "content": [
-          "f(x) = 1 + x^2 + x^3 + x^(1+1/2)"
+          "a -- b",
+          "a -- c",
+          "a -- d",
+          "b -- c",
+          "b -- e",
+          "c -- e",
+          "c -- f",
+          "d -- f",
+          "d -- g",
+          "e -- h",
+          "f -- h",
+          "f -- i",
+          "f -- j",
+          "f -- g",
+          "g -- k",
+          "h -- o",
+          "h -- l",
+          "i -- l",
+          "i -- m",
+          "i -- j",
+          "j -- m",
+          "j -- n",
+          "j -- k",
+          "k -- n",
+          "k -- r",
+          "l -- o",
+          "l -- m",
+          "m -- o",
+          "m -- p",
+          "m -- n",
+          "n -- q",
+          "n -- r",
+          "o -- s",
+          "o -- p",
+          "p -- s",
+          "p -- t",
+          "p -- q",
+          "q -- t",
+          "q -- r",
+          "r -- t",
+          "s -- z",
+          "t -- z"
         ]
       },
       {
-        "title":"4-summation",
+        "title": "Earth states",
         "content": [
-          "sum(i^2,i=0,n) = n^3/2+n^2/2+n/6"
-        ]
-      },
-      {
-        "title":"5-integral",
-        "content": [
-          "integral(x^2 * dx ,x=0,n) = n^3/3"
-        ]
-      },
-      {
-        "title":"4-Math-symbols",
-        "content": [
-          "Alpha",
-          "alpha",
-          "Digamma",
-          "digamma",
-          "Kappa",
-          "kappa",
-          "Omicron",
-          "omicron",
-          "Upsilon",
-          "upsilon",
-          "Beta",
-          "beta",
-          "Zeta",
-          "zeta",
-          "Lambda",
-          "lambda",
-          "Pi",
-          "pi",
-          "Phi",
-          "phi",
-          "Gamma",
-          "gamma",
-          "Eta",
-          "eta",
-          "Mu",
-          "mu",
-          "Rho",
-          "rho",
-          "Chi",
-          "chi",
-          "Delta",
-          "delta",
-          "Theta",
-          "theta",
-          "Nu",
-          "nu",
-          "Sigma",
-          "sigma",
-          "Psi",
-          "psi",
-          "Epsilon",
-          "epsilon",
-          "Iota",
-          "iota",
-          "Xi",
-          "xi",
-          "Tau",
-          "tau",
-          "Omega",
-          "omega"
-        ]
-      },
-      {
-        "title":"100-continued-fraction",
-        "content": [
-          "psi = 1 + 1/(1+1/(1+1/(1+1/(1+...))))"
+          "Earth -> Europe",
+          "Earth -> Asia",
+          "Earth -> Africa",
+          "Earth -> \"North America\"",
+          "Earth -> \"South America\"",
+          "Earth -> Antarctica",
+          "",
+          "Europe -> France",
+          "Europe -> Italy",
+          "Europe -> Spain",
+          "Europe -> Germany",
+          "Europe -> \"United Kingdom\"",
+          "",
+          "Asia -> China",
+          "Asia -> Japan",
+          "Asia -> India",
+          "Asia -> Pakistan",
+          "",
+          "Africa -> Egypt",
+          "Africa -> Algeria",
+          "Africa -> Namibia",
+          "Africa -> \"South Africa\"",
+          "Africa -> Niger",
+          "Africa -> Congo",
+          "Africa -> Madagascar",
+          "",
+          "",
+          "\"North America\" -> \"United States\"",
+          "\"North America\" -> Canada",
+          "\"North America\" -> Mexico",
+          "",
+          "\"South America\" -> Brasil",
+          "\"South America\" -> Argentina",
+          "\"South America\" -> Bolivia",
+          "\"South America\" -> Chile",
+          "\"South America\" -> Ecuador",
+          "\"South America\" -> Guyana",
+          "\"South America\" -> Peru",
+          "",
+          "Antarctica -> ???"
         ]
       }
     ]

@@ -436,7 +436,8 @@ std::string Math::operator()(const std::string& input,
     style.integral_min_height = 3;
   } else {
     style.divide = U'─';
-    style.multiply = U'×';
+    //style.multiply = U'×';
+    style.multiply = U'⋅';
     style.greater_or_equal = L"≥";
     style.lower_or_equal = L"≤";
 
