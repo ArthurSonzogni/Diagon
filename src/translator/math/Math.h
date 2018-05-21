@@ -37,24 +37,34 @@ struct Style {
   wchar_t multiply;
   std::wstring lower_or_equal;
   std::wstring greater_or_equal;
+
   wchar_t left_parenthesis_0;
   wchar_t left_parenthesis_1;
   wchar_t left_parenthesis_2;
   wchar_t left_parenthesis_3;
+
   wchar_t right_parenthesis_0;
   wchar_t right_parenthesis_1;
   wchar_t right_parenthesis_2;
   wchar_t right_parenthesis_3;
+
   wchar_t sqrt_0;
   wchar_t sqrt_1;
   wchar_t sqrt_2;
   wchar_t sqrt_3;
   wchar_t sqrt_4;
+
   std::map<std::wstring, std::wstring> variable_transform;
+
   wchar_t summation_top;
   wchar_t summation_bottom;
   wchar_t summation_diagonal_top;
   wchar_t summation_diagonal_bottom;
+
+  std::vector<wchar_t> integral_top;
+  std::vector<wchar_t> integral_middle;
+  std::vector<wchar_t> integral_bottom;
+  int integral_min_height;
 };
 
 Draw Parse(MathParser::MultilineEquationContext* context, Style* style);

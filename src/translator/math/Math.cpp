@@ -275,7 +275,7 @@ Draw ParseFunctionSum(MathParser::FunctionContext* context, Style* style) {
     }
   }
 
-  // Align top, sigma, and bottom on the right;
+  // Align top, sigma, and bottom on center.
   top.center_x = top.dim_x/2;
   sigma.center_x = sigma.dim_x/2;
   down.center_x = down.dim_x/2;
@@ -283,6 +283,41 @@ Draw ParseFunctionSum(MathParser::FunctionContext* context, Style* style) {
   Draw sum = ComposeVertical(ComposeVertical(top, sigma, 0), down, 0);
 
   sum.center_y = top.dim_y + sigma.dim_y-2;
+  content.center_y = content.dim_y-1;
+
+  return ComposeHorizontal(sum, content, 1);
+}
+
+Draw ParseFunctionIntegral(MathParser::FunctionContext* context, Style* style) {
+  int num_arguments = context->equation().size();
+  if (num_arguments > 3) {
+    std::cerr << "Integral function (int) only handle 1,2 or 3 arguments, "
+              << num_arguments << " provided" << std::endl;
+  }
+
+  Draw content = Parse(context->equation(0), style);
+  Draw down = context->equation(1) ? Parse(context->equation(1), style) : Draw();
+  Draw top = context->equation(2) ? Parse(context->equation(2), style) : Draw();
+
+  int integral_height = std::max(style->integral_min_height, content.dim_y);
+  int integral_width = style->integral_top.size();
+
+  Draw integral;
+  integral.Resize(integral_width, integral_height);
+
+  integral.content.front() = style->integral_top;
+  integral.content.back() = style->integral_bottom;
+  for(int y = 1; y<integral.content.size()-1; ++y)
+    integral.content[y] = style->integral_middle;
+
+  // Align top, integral, and bottom on center.
+  top.center_x = top.dim_x/2;
+  integral.center_x = integral.dim_x/2;
+  down.center_x = down.dim_x/2;
+
+  Draw sum = ComposeVertical(ComposeVertical(top, integral, 0), down, 0);
+
+  sum.center_y = top.dim_y + integral.dim_y-1;
   content.center_y = content.dim_y-1;
 
   return ComposeHorizontal(sum, content, 1);
@@ -303,8 +338,12 @@ Draw ParseFunctionCommon(MathParser::FunctionContext* context, Style* style) {
 
 Draw Parse(MathParser::FunctionContext* context, Style* style) {
   std::string function_name = context->variable()->VARIABLE()->getText();
-  if (function_name == "sqrt") return ParseFunctionSqrt(context, style);
-  if (function_name == "sum") return ParseFunctionSum(context, style);
+  if (function_name == "sqrt")
+    return ParseFunctionSqrt(context, style);
+  if (function_name == "sum")
+    return ParseFunctionSum(context, style);
+  if (function_name == "int")
+    return ParseFunctionIntegral(context, style);
   return ParseFunctionCommon(context, style);
 }
 
@@ -390,6 +429,11 @@ std::string Math::operator()(const std::string& input,
     style.summation_bottom = L'=';
     style.summation_diagonal_top = L'\\';
     style.summation_diagonal_bottom = L'/';
+
+    style.integral_top = {U' ', U'.', U'-'};
+    style.integral_middle = {U' ', U'|', U' '};
+    style.integral_bottom = {U'-', U'\'', U' '};
+    style.integral_min_height = 3;
   } else {
     style.divide = U'─';
     style.multiply = U'×';
@@ -413,6 +457,11 @@ std::string Math::operator()(const std::string& input,
     style.summation_bottom = L'‾';
     style.summation_diagonal_top = L'╲';
     style.summation_diagonal_bottom = L'╱';
+
+    style.integral_top = {U'⌠'};
+    style.integral_middle = {U'⎮'};
+    style.integral_bottom = {U'⌡'};
+    style.integral_min_height = 2;
   }
 
   if (options["transform_math_letters"] == "true") {

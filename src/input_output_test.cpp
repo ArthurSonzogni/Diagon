@@ -29,9 +29,7 @@ int main(int, const char**) {
       std::string input = ReadFile(test.path() / "input");
       std::string output = ReadFile(test.path() / "output");
 
-      std::cout << "test = " << test << std::endl;
       std::string output_computed = (*translator)(input, "");
-
 
       if (output_computed == output) {
         std::cout << "  [PASS] " << test << std::endl;
