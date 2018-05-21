@@ -362,6 +362,18 @@
         ]
       },
       {
+        "title":"4-summation",
+        "content": [
+          "sum(i^2,i=0,n) = n^3/2+n^2/2+n/6"
+        ]
+      },
+      {
+        "title":"5-integral",
+        "content": [
+          "integral(x^2 * dx ,x=0,n) = n^3/3"
+        ]
+      },
+      {
         "title":"4-Math-symbols",
         "content": [
           "Alpha",
@@ -417,7 +429,7 @@
         ]
       },
       {
-        "title":"fun-continued-fraction",
+        "title":"100-continued-fraction",
         "content": [
           "psi = 1 + 1/(1+1/(1+1/(1+1/(1+...))))"
         ]

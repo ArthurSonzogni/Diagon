@@ -219,22 +219,93 @@ Draw Parse(MathParser::ValueContext* context,
   }
 }
 
-Draw Parse(MathParser::FunctionContext* context, Style* style) {
-  Draw content = Parse(context->expression(), style);
-  std::string function_name = context->variable()->VARIABLE()->getText();
-  if (function_name == "sqrt") {
-    Draw draw;
-    draw.Append(content, 1 + content.dim_y, 1);
-    draw.content.back().front() = style->sqrt_0;
-    for(int y = 0; y<draw.content.size(); ++y)
-      draw.content[draw.content.size()-1-y][1+y] = style->sqrt_1;
-    for(int x = draw.content.size(); x<draw.content[0].size(); ++x)
-      draw.content[0][x] = style->sqrt_2;
-    draw.center_y = content.center_y+1;
-    return draw;
+
+Draw ParseFunctionSqrt(MathParser::FunctionContext* context, Style* style) {
+  int num_arguments = context->equation().size();
+  if (num_arguments != 1) {
+    std::cerr << "Square root function (sqrt) only handle one argument, "
+              << num_arguments << " provided" << std::endl;
+  }
+
+  Draw content = Parse(context->equation(0), style);
+  Draw draw;
+  draw.Append(content, 1 + content.dim_y, 2);
+  draw.content.back().front() = style->sqrt_0;
+  for (int y = 0; y < draw.content.size()-1; ++y)
+    draw.content[draw.content.size() - 1 - y][1 + y] = style->sqrt_1;
+  for (int x = draw.content.size(); x < draw.content[0].size(); ++x)
+    draw.content[0][x] = style->sqrt_2;
+  draw.center_x = draw.dim_x/2;
+  draw.center_y = content.center_y + 2;
+  return draw;
+}
+
+Draw ParseFunctionSum(MathParser::FunctionContext* context, Style* style) {
+  int num_arguments = context->equation().size();
+  if (num_arguments > 3) {
+    std::cerr << "Summation function (sum) only handle 1,2 or 3 arguments, "
+              << num_arguments << " provided" << std::endl;
+  }
+
+  Draw content = Parse(context->equation(0), style);
+  Draw down = context->equation(1) ? Parse(context->equation(1), style) : Draw();
+  Draw top = context->equation(2) ? Parse(context->equation(2), style) : Draw();
+
+  int sigma_height = std::max(4,(content.dim_y+1)/2*2+2);
+  int sigma_width = (sigma_height-2)/2 + 2;
+
+  Draw sigma;
+  sigma.Resize(sigma_width, sigma_height);
+
+  for(int x = 0; x<sigma.dim_x; ++x) {
+    sigma.content.front()[x] = style->summation_top;
+    sigma.content.back()[x] = style->summation_bottom;
+  }
+
+  {
+    int x = 0;
+    int y_1 = 1;
+    int y_2 = sigma.content.size()-2;
+    while(y_1<y_2) {
+      sigma.content[y_1][x] = style->summation_diagonal_top;
+      sigma.content[y_2][x] = style->summation_diagonal_bottom;
+      ++x;
+      ++y_1;
+      --y_2;
+    }
+  }
+
+  // Align top, sigma, and bottom on the right;
+  top.center_x = top.dim_x/2;
+  sigma.center_x = sigma.dim_x/2;
+  down.center_x = down.dim_x/2;
+
+  Draw sum = ComposeVertical(ComposeVertical(top, sigma, 0), down, 0);
+
+  sum.center_y = top.dim_y + sigma.dim_y-2;
+  content.center_y = content.dim_y-1;
+
+  return ComposeHorizontal(sum, content, 1);
+}
+
+Draw ParseFunctionCommon(MathParser::FunctionContext* context, Style* style) {
+  Draw content = Parse(context->equation(0), style);
+  for (int i = 1; i < context->equation().size(); ++i) {
+    int x = content.dim_x;
+    content =
+        ComposeHorizontal(content, Parse(context->equation(i), style), 2);
+    content.content[content.center_y][x] = U',';
   }
   return ComposeHorizontal(Parse(context->variable(), style),
-                           WrapWithParenthesis(content, style), 1);
+                           WrapWithParenthesis(content, style),
+                           content.dim_y == 1 ? 0 : 1);
+}
+
+Draw Parse(MathParser::FunctionContext* context, Style* style) {
+  std::string function_name = context->variable()->VARIABLE()->getText();
+  if (function_name == "sqrt") return ParseFunctionSqrt(context, style);
+  if (function_name == "sum") return ParseFunctionSum(context, style);
+  return ParseFunctionCommon(context, style);
 }
 
 Draw Parse(MathParser::SignedAtomContext* context,
@@ -314,6 +385,11 @@ std::string Math::operator()(const std::string& input,
     style.sqrt_0 = U'\\';
     style.sqrt_1 = U'/';
     style.sqrt_2 = U'_';
+
+    style.summation_top = L'=';
+    style.summation_bottom = L'=';
+    style.summation_diagonal_top = L'\\';
+    style.summation_diagonal_bottom = L'/';
   } else {
     style.divide = U'─';
     style.multiply = U'×';
@@ -332,6 +408,11 @@ std::string Math::operator()(const std::string& input,
     style.sqrt_0 = U'╲';
     style.sqrt_1 = U'╱';
     style.sqrt_2 = U'_';
+
+    style.summation_top = L'_';
+    style.summation_bottom = L'‾';
+    style.summation_diagonal_top = L'╲';
+    style.summation_diagonal_bottom = L'╱';
   }
 
   if (options["transform_math_letters"] == "true") {
@@ -354,19 +435,6 @@ std::string Math::operator()(const std::string& input,
         {L"xi", L"ξ"},      {L"Tau", L"Τ"},     {L"tau", L"τ"},
         {L"Omega", L"Ω"},   {L"omega", L"ω"}};
   }
-
-
-  //⌠
-  //⎮
-  //⌡
-
-  //⎲
-  //⧹
-  //⧸
-  //⎳
-
-  //∑
-
 
   //
   antlr4::ANTLRInputStream input_stream(input);

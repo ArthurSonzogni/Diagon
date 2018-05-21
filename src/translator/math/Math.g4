@@ -70,7 +70,7 @@ value
    ;
 
 function
-   : variable LPAREN expression RPAREN
+   : variable LPAREN equation (',' equation)* RPAREN
    ;
 
 signedAtom
@@ -207,3 +207,5 @@ EOL
 WS
    : [ \t] + -> skip
    ;
+
+// vim: filetype=antlr

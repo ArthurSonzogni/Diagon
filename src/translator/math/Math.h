@@ -51,6 +51,10 @@ struct Style {
   wchar_t sqrt_3;
   wchar_t sqrt_4;
   std::map<std::wstring, std::wstring> variable_transform;
+  wchar_t summation_top;
+  wchar_t summation_bottom;
+  wchar_t summation_diagonal_top;
+  wchar_t summation_diagonal_bottom;
 };
 
 Draw Parse(MathParser::MultilineEquationContext* context, Style* style);
