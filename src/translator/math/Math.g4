@@ -35,177 +35,55 @@
 
   Copyright (c) 2018 Arthur Sonzogni
   This file is a modified version taken from:
-  https://github.com/antlr/grammars-v4/blob/master/arithmetic/arithmetic.g4
+  https://github.com/antlr/grammars-v4e/blob/master/arithmetic/arithmetic.g4
 */
 
 grammar Math;
 
-multilineEquation
-  : equation (newlines equation)* EOL? EOF
-  ;
+multilineEquation : equation (newlines equation)* EOL? EOF ;
+newlines : EOL+;
+equation : expression (relop expression)* ;
+expression : term (addop term)* ;
+term : factor (mulop factor)* ;
+factor : value (POW value)* ;
+value : (PLUS | MINUS)? atom ;
+atom : scientific | variable | function | matrix | LPAREN expression RPAREN ;
+scientific : SCIENTIFIC_NUMBER ;
+function : variable LPAREN equation (',' equation)* RPAREN ;
+variable : VARIABLE ;
+matrix : LBRACKET matrixLine (';' matrixLine)* RBRACKET;
+matrixLine : expression ( ',' expression ) *;
+relop : EQ | GT | LT | GE | LE;
+addop : PLUS | MINUS ;
+mulop : TIMES | DIV ;
+VARIABLE : VALID_ID_START VALID_ID_CHAR* | '...' ;
 
-equation
-   : expression (relop expression)*
-   ;
+fragment VALID_ID_START : ('a' .. 'z') | ('A' .. 'Z') | '_' ;
+fragment VALID_ID_CHAR : VALID_ID_START | ('0' .. '9') ;
+SCIENTIFIC_NUMBER : NUMBER (E SIGN? NUMBER)? ;
 
-newlines
-   : EOL+
-   ;
+//The integer part gets its potential sign from the value rule
 
-expression
-   : term (addop term)*
-   ;
+fragment NUMBER : ('0' .. '9') + ('.' ('0' .. '9') +)?  ;
+fragment E : 'E' | 'e' ;
+fragment SIGN : ('+' | '-') ;
 
-term
-   : factor (mulop factor)*
-   ;
-
-factor
-   : value (POW value)*
-   ;
-
-value
-   : function
-   | signedAtom
-   ;
-
-function
-   : variable LPAREN equation (',' equation)* RPAREN
-   ;
-
-signedAtom
-   : (PLUS | MINUS)? atom
-   ;
-
-atom
-   : scientific
-   | variable
-   | LPAREN expression RPAREN
-   ;
-
-scientific
-   : SCIENTIFIC_NUMBER
-   ;
-
-variable
-   : VARIABLE
-   ;
-
-relop
-   : EQ
-   | GT EQ?
-   | LT EQ?
-   ;
-
-addop
-   : PLUS
-   | MINUS
-   ;
-
-mulop
-   : TIMES
-   | DIV
-   ;
-
-
-VARIABLE
-   : VALID_ID_START VALID_ID_CHAR*
-   | '...'
-   ;
-
-
-fragment VALID_ID_START
-   : ('a' .. 'z') | ('A' .. 'Z') | '_'
-   ;
-
-
-fragment VALID_ID_CHAR
-   : VALID_ID_START | ('0' .. '9')
-   ;
-
-
-SCIENTIFIC_NUMBER
-   : NUMBER (E SIGN? NUMBER)?
-   ;
-
-//The integer part gets its potential sign from the signedAtom rule
-
-fragment NUMBER
-   : ('0' .. '9') + ('.' ('0' .. '9') +)?
-   ;
-
-
-fragment E
-   : 'E' | 'e'
-   ;
-
-
-fragment SIGN
-   : ('+' | '-')
-   ;
-
-
-LPAREN
-   : '('
-   ;
-
-
-RPAREN
-   : ')'
-   ;
-
-
-PLUS
-   : '+'
-   ;
-
-
-MINUS
-   : '-'
-   ;
-
-
-TIMES
-   : '*'
-   ;
-
-
-DIV
-   : '/'
-   ;
-
-
-GT
-   : '>'
-   ;
-
-
-LT
-   : '<'
-   ;
-
-
-EQ
-   : '='
-   ;
-
-
-POINT
-   : '.'
-   ;
-
-
-POW
-   : '^'
-   ;
-
-EOL
-   : '\r\n'
-   | '\n'
-   ;
-
-WS
-   : [ \t] + -> skip
-   ;
+LPAREN : '(' ;
+RPAREN : ')' ;
+LBRACKET : '[' ;
+RBRACKET : ']' ;
+PLUS : '+' ;
+MINUS : '-' ;
+TIMES : '*' ;
+DIV : '/' ;
+GT : '>' ; 
+LT : '<' ; 
+GE : '>=' ; 
+LE : '<=' ; 
+EQ : '=' ; 
+POINT : '.' ; 
+POW : '^' ;
+EOL : '\r\n' | '\n' ;
+WS : [ \t] + -> skip ; 
 
 // vim: filetype=antlr

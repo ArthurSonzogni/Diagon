@@ -12,7 +12,7 @@
       {
         "type":"checkbox",
         "default":true,
-        "label":"Prefer math symbols",
+        "label":"Math symbols",
         "name":"transform_math_letters"
       }
     ],
@@ -52,7 +52,19 @@
         ]
       },
       {
-        "title":"6-Math-symbols",
+        "title":"6-vector",
+        "content": [
+          "[a;b] + [c;d] = [a+c; b+d]"
+        ]
+      },
+      {
+        "title":"7-matrix",
+        "content": [
+          "[1,2;3,4] * [x;y] = [1*x+2*y; 3*x+4*y]"
+        ]
+      },
+      {
+        "title":"8-Math-symbols",
         "content": [
           "Alpha",
           "alpha",
