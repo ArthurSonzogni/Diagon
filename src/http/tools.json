@@ -52,19 +52,37 @@
         ]
       },
       {
-        "title":"6-vector",
+        "title":"6-product",
+        "content": [
+          "mult(i^2,i=1,n) = (mult(i,i=1,n))^2",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "mult(1/2,1,100) = 7.8886091e-31"
+        ]
+      },
+      {
+        "title":"7-vector",
         "content": [
           "[a;b] + [c;d] = [a+c; b+d]"
         ]
       },
       {
-        "title":"7-matrix",
+        "title":"8-matrix",
         "content": [
           "[1,2;3,4] * [x;y] = [1*x+2*y; 3*x+4*y]"
         ]
       },
       {
-        "title":"8-Math-symbols",
+        "title":"9-factorial",
+        "content": [
+          "[n;k] = n! / (k! *(n-k)!)"
+        ]
+      },
+      {
+        "title":"10-Math-symbols",
         "content": [
           "Alpha",
           "alpha",

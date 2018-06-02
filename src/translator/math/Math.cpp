@@ -200,12 +200,24 @@ Draw Parse(MathParser::TermContext* context, Style* style) {
 Draw Parse(MathParser::FactorContext* context,
            Style* style,
            bool suppress_parenthesis) {
-  suppress_parenthesis &= (context->value().size() == 1);
-  Draw draw = Parse(context->value(0), style, suppress_parenthesis);
-  for (int i = 1; i < context->value().size(); ++i) {
-    draw = ComposeDiagonal(draw, Parse(context->value(i), style, false));
+  suppress_parenthesis &= (context->valueBang().size() == 1);
+  Draw draw = Parse(context->valueBang(0), style, suppress_parenthesis);
+  for (int i = 1; i < context->valueBang().size(); ++i) {
+    draw = ComposeDiagonal(draw, Parse(context->valueBang(i), style, false));
   }
   return draw;
+}
+
+Draw Parse(MathParser::ValueBangContext* context,
+           Style* style,
+           bool suppress_parenthesis) {
+  if (context->value()) {
+    return Parse(context->value(), style, suppress_parenthesis);
+  } else {
+    return ComposeHorizontal(
+        Parse(context->valueBang(), style, suppress_parenthesis), Draw(L"!"),
+        0);
+  }
 }
 
 Draw ParseFunctionSqrt(MathParser::FunctionContext* context, Style* style) {

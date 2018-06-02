@@ -80,6 +80,7 @@ Draw Parse(MathParser::TermContext*, Style*);
 Draw Parse(MathParser::FactorContext*, Style*, bool suppress_parenthesis);
 Draw Parse(MathParser::FunctionContext*, Style*);
 Draw Parse(MathParser::MatrixContext*, Style*);
+Draw Parse(MathParser::ValueBangContext* context, Style*, bool);
 Draw Parse(MathParser::ValueContext*, Style*, bool suppress_parenthesis);
 Draw Parse(MathParser::AtomContext*, Style*, bool suppress_parenthesis);
 Draw Parse(MathParser::ScientificContext*);

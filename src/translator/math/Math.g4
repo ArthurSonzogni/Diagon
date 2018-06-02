@@ -45,7 +45,8 @@ newlines : EOL+;
 equation : expression (relop expression)* ;
 expression : term (addop term)* ;
 term : factor (mulop factor)* ;
-factor : value (POW value)* ;
+factor : valueBang (POW valueBang)* ;
+valueBang: value | valueBang BANG;
 value : (PLUS | MINUS)? atom ;
 atom : scientific | variable | function | matrix | LPAREN expression RPAREN ;
 scientific : SCIENTIFIC_NUMBER ;
@@ -58,7 +59,7 @@ addop : PLUS | MINUS ;
 mulop : TIMES | DIV ;
 VARIABLE : VALID_ID_START VALID_ID_CHAR* | '...' ;
 
-fragment VALID_ID_START : ('a' .. 'z') | ('A' .. 'Z') | '_' | '!';
+fragment VALID_ID_START : ('a' .. 'z') | ('A' .. 'Z') | '_';
 fragment VALID_ID_CHAR : VALID_ID_START | ('0' .. '9') ;
 SCIENTIFIC_NUMBER : NUMBER (E SIGN? NUMBER)? ;
 
@@ -75,6 +76,7 @@ RBRACKET : ']' ;
 PLUS : '+' ;
 MINUS : '-' ;
 TIMES : '*' ;
+BANG: '!';
 DIV : '/' ;
 GT : '>' ; 
 LT : '<' ; 
