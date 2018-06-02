@@ -352,12 +352,13 @@ Output (Unicode)
 
 # Thanks
 
-This project has been possible thanks to these other projects
+This project has been possible thanks to these great projects
  * [ANTLR](http://www.antlr.org/)
+ * [Boost-graph](https://www.boost.org/doc/libs/1_66_0/libs/graph/doc/)
  * [CMake](https://cmake.org/)
  * [Emscripten](https://github.com/kripken/emscripten)
- * [LLVM](https://llvm.org/)
  * [Git](https://git-scm.com/)
+ * [LLVM](https://llvm.org/)
  * [NeoVim](https://neovim.io/)
  * [PlantUML](http://plantuml.com/)
  * [WebAssembly](https://webassembly.org/)
