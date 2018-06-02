@@ -1,12 +1,13 @@
 # Diagon
 
-[Web Application](https://arthursonzogni.com/Diagon/)
 
 Diagon is an interactive interpreter. It transforms markdown-style expression
 into an ascii-art representation.
 
 It is written in C++ and use WebAssembly, HTML and CSS to make a Web
 Application.
+
+### [https://arthursonzogni.com/Diagon/](https://arthursonzogni.com/Diagon/)
 
 **Table of content**
  * [Diagon](#diagon)
