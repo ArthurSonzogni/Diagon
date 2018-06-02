@@ -121,6 +121,30 @@ select {
   padding-left:3px;
 }
 
+#links {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+#links a {
+  display:block;
+  margin:1vmin;
+  padding:1vmin;
+  font-size:3vmin;
+  text-decoration:none;
+
+  margin-left:0;
+  background-color:black;
+  color:white;
+  border-radius: 0 0.5vmin 0.5vmin 0;
+  opacity:0.8;
+}
+
+#links a:hover {
+  opacity:1.0;
+}
+
 #style_button {
   position: absolute;
   right: 0;

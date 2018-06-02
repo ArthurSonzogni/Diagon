@@ -224,7 +224,7 @@ Draw ParseFunctionSqrt(MathParser::FunctionContext* context, Style* style) {
   for (int x = draw.content.size(); x < draw.content[0].size(); ++x)
     draw.content[0][x] = style->sqrt_2;
   draw.center_x = draw.dim_x/2;
-  draw.center_y = content.center_y + 2;
+  draw.center_y = content.center_y + 1;
   return draw;
 }
 

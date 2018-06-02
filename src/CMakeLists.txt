@@ -48,15 +48,29 @@ if (Web)
   string(APPEND CMAKE_CXX_FLAGS " -s EXPORTED_FUNCTIONS='[\"_translate\"]'")
   string(APPEND CMAKE_CXX_FLAGS " -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\",\" cwrap\"]'")
 
-  message(STATUS "coucou")
-  file(
-    COPY ${CMAKE_CURRENT_SOURCE_DIR}/http/
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/http/style/style.css
+    ${CMAKE_CURRENT_BINARY_DIR}/style/style.css
+  )
+
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/http/style/light_style.css
+    ${CMAKE_CURRENT_BINARY_DIR}/style/light_style.css
+  )
+
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/http/style/dark_style.css
+    ${CMAKE_CURRENT_BINARY_DIR}/style/dark_style.css
   )
 
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/http/index.html
     ${CMAKE_CURRENT_BINARY_DIR}/index.html
+  )
+
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/http/tools.json
+    ${CMAKE_CURRENT_BINARY_DIR}/tools.json
   )
 
   configure_file(

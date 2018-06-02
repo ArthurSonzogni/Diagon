@@ -35,7 +35,7 @@ body {
   border-right: 1px solid gray;
 }
 
-#style_button {
+#style_button, #links a {
   background-color:black;
   color:white;
 }
