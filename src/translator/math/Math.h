@@ -61,10 +61,15 @@ struct Style {
   wchar_t summation_diagonal_top;
   wchar_t summation_diagonal_bottom;
 
+  wchar_t mult_top;
+  wchar_t mult_bottom;
+  wchar_t mult_intersection;
+
   std::vector<wchar_t> integral_top;
   std::vector<wchar_t> integral_middle;
   std::vector<wchar_t> integral_bottom;
   int integral_min_height;
+
 };
 
 Draw Parse(MathParser::MultilineEquationContext* context, Style* style);

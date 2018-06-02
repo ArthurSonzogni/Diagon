@@ -275,6 +275,44 @@ Draw ParseFunctionSum(MathParser::FunctionContext* context, Style* style) {
   return ComposeHorizontal(sum, content, 1);
 }
 
+Draw ParseFunctionMult(MathParser::FunctionContext* context, Style* style) {
+  int num_arguments = context->equation().size();
+  if (num_arguments > 3) {
+    std::cerr << "Multiplication function (mult) only handle 1,2 or 3 arguments, "
+              << num_arguments << " provided" << std::endl;
+  }
+
+  Draw content = Parse(context->equation(0), style);
+  Draw down = context->equation(1) ? Parse(context->equation(1), style) : Draw();
+  Draw top = context->equation(2) ? Parse(context->equation(2), style) : Draw();
+
+  int mult_height = std::max(2, content.dim_y);
+  int mult_width = mult_height + 2;
+
+  Draw mult;
+  mult.Resize(mult_width, mult_height);
+  for(int x = 0; x<mult_width; ++x) {
+    mult.content[0][x] = style->mult_top;
+  }
+  for(int y = 1; y<mult_height; ++y) {
+    mult.content[y][1] = style->mult_bottom;
+    mult.content[y][mult_width-2] = style->mult_bottom;
+  }
+  mult.content[0][1] = style->mult_intersection;
+  mult.content[0][mult_width-2] = style->mult_intersection;
+
+  // Align top, mult, and bottom on center.
+  top.center_x = top.dim_x/2;
+  mult.center_x = mult.dim_x/2;
+  down.center_x = down.dim_x/2;
+
+  Draw ret = ComposeVertical(ComposeVertical(top, mult, 0), down, 0);
+  ret.center_y =
+      top.dim_y + mult.content.size() - content.dim_y + content.center_y;
+
+  return ComposeHorizontal(ret, content, 1);
+}
+
 Draw ParseFunctionIntegral(MathParser::FunctionContext* context, Style* style) {
   int num_arguments = context->equation().size();
   if (num_arguments > 3) {
@@ -330,6 +368,8 @@ Draw Parse(MathParser::FunctionContext* context, Style* style) {
     return ParseFunctionSum(context, style);
   if (function_name == "int")
     return ParseFunctionIntegral(context, style);
+  if (function_name == "mult")
+    return ParseFunctionMult(context, style);
   return ParseFunctionCommon(context, style);
 }
 
@@ -478,6 +518,10 @@ std::string Math::operator()(const std::string& input,
     style.summation_diagonal_top = L'\\';
     style.summation_diagonal_bottom = L'/';
 
+    style.mult_top = L'_';
+    style.mult_bottom = L'|';
+    style.mult_intersection = L'_';
+
     style.integral_top = {U' ', U'.', U'-'};
     style.integral_middle = {U' ', U'|', U' '};
     style.integral_bottom = {U'-', U'\'', U' '};
@@ -506,6 +550,10 @@ std::string Math::operator()(const std::string& input,
     style.summation_bottom = L'‾';
     style.summation_diagonal_top = L'╲';
     style.summation_diagonal_bottom = L'╱';
+
+    style.mult_top = L'━';
+    style.mult_bottom = L'┃';
+    style.mult_intersection = L'┳';
 
     style.integral_top = {U'⌠'};
     style.integral_middle = {U'⎮'};
