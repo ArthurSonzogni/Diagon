@@ -1,6 +1,6 @@
-#include "translator/Translator.h"
-#include <iostream>
 #include <emscripten.h>
+#include <iostream>
+#include "translator/Translator.h"
 
 void replaceAll(std::string& str,
                 const std::string& from,
@@ -15,9 +15,9 @@ void replaceAll(std::string& str,
   }
 }
 
-extern "C" {
-
-void translate(const char* translator_name, const char* input, const char* options) {
+extern "C" void translate(const char* translator_name,
+                          const char* input,
+                          const char* options) {
   std::string translator_string = translator_name;
   auto translator = TranslatorFromName(translator_name);
   std::string command = (*translator)(input, options);
@@ -26,7 +26,6 @@ void translate(const char* translator_name, const char* input, const char* optio
   replaceAll(command, "\n", "\\n");
   command = "output.value=\"" + command + "\";";
   emscripten_run_script(command.c_str());
-}
 }
 
 int main(int, const char**) {

@@ -46,7 +46,7 @@ if (Web)
   string(APPEND CMAKE_CXX_FLAGS " --closure 1")
   string(APPEND CMAKE_CXX_FLAGS " --no-heap-copy")
   string(APPEND CMAKE_CXX_FLAGS " -s EXPORTED_FUNCTIONS='[\"_translate\"]'")
-  string(APPEND CMAKE_CXX_FLAGS " -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\",\" cwrap\"]'")
+  string(APPEND CMAKE_CXX_FLAGS " -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\",\"cwrap\"]'")
 
   option(ADD_GOOGLE_ANALYTICS "Build the static library" ON)
   if (ADD_GOOGLE_ANALYTICS)
