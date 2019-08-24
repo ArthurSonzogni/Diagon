@@ -1,7 +1,12 @@
 cd "$(dirname "$0")"
 top=$(pwd)
 
-mkdir -p cpp_runtime
+if [ -d cpp_runtime ]
+then
+  exit
+fi
+
+mkdir cpp_runtime
 
 ## Download ANTLR and the CPP runtime
 curl http://www.antlr.org/download/antlr-4.7.1-complete.jar -Lo antlr.jar

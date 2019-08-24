@@ -20,6 +20,10 @@ message(" * Use Web : " ${Web})
 # ┌─────────────────────────────────────────────────┐
 # │ ANTLR                                           │
 # └─────────────────────────────────────────────────┘
+execute_process(
+  COMMAND bash download_and_patch.sh
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools/antlr
+)
 
 # Function
 #   ANTLR(<file.g4>)
