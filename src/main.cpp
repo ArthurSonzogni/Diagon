@@ -185,7 +185,7 @@ int Translate(TranslatorFactory translator_factory,
     if (!argument[space_position])
       return PrintError("Unexpected translator argument: " + argument);
 
-    std::string name = argument.substr(1, space_position - 1);
+    std::string name = argument.substr(2, space_position - 2);
     std::string value = argument.substr(space_position + 1, -1);
 
     if (name.size() == 0 || value.size() == 0)
