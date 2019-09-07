@@ -24,6 +24,13 @@ parts:
     source: .
     configflags:
       - -DCMAKE_BUILD_TYPE=Release
+    build-packages:
+      - "pkg-config"
+      - unzip
+      - curl
+      - uuid-dev
+      - openjdk-8-jdk
+      - libboost-graph-dev
 
 passthrough:
   title: Diagon
