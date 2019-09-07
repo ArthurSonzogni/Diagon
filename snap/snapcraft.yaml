@@ -20,6 +20,9 @@ parts:
   diagon:
     plugin: cmake
     source: .
+    build-packages:
+      - unzip
+      - curl
 
 passthrough:
   title: Diagon
