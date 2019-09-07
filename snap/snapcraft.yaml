@@ -20,6 +20,8 @@ parts:
   diagon:
     plugin: cmake
     source: .
+    configflags:
+      - -DCMAKE_BUILD_TYPE=Release
     build-packages:
       - unzip
       - curl
