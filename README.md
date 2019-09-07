@@ -350,6 +350,14 @@ Output (Unicode)
 └────┘           
 ~~~
 
+#### Universal Linux package:
+[![diagon](https://snapcraft.io/diagon/badge.svg)](https://snapcraft.io/diagon)  
+[![Snap Status](https://build.snapcraft.io/badge/ArthurSonzogni/Diagon.svg)](https://build.snapcraft.io/user/ArthurSonzogni/Diagon)  
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/diagon)  
+~~~bash
+sudo snap install diagon
+~~~
+
 # Thanks
 
 This project has been possible thanks to these great projects
