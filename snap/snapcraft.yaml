@@ -16,15 +16,14 @@ apps:
   diagon:
     command: diagon
 
+base: core18
+
 parts:
   diagon:
     plugin: cmake
     source: .
     configflags:
       - -DCMAKE_BUILD_TYPE=Release
-    build-packages:
-      - unzip
-      - curl
 
 passthrough:
   title: Diagon
