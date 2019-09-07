@@ -7,8 +7,8 @@
 class Frame : public Translator {
  public:
   virtual ~Frame() = default;
-  virtual std::string operator()(const std::string& input,
-                                 const std::string& options_string) {
+  std::string Translate(const std::string& input,
+                        const std::string& options_string) override {
     auto options = SerializeOption(options_string);
 
     bool ascii_only = false;
@@ -88,8 +88,51 @@ class Frame : public Translator {
 
     return screen.ToString();
   }
+  const char* Name() override;
+  const char* Description() override;
+  std::vector<OptionDescription> Options() override;
+  std::vector<Example> Examples() override;
 };
 
 std::unique_ptr<Translator> FrameTranslator() {
   return std::make_unique<Frame>();
+}
+
+const char* Frame::Name() {
+  return "Frame";
+}
+
+const char* Frame::Description() {
+  return "Draw a box around the input with (optional) line number";
+}
+
+std::vector<Translator::OptionDescription> Frame::Options() {
+  return {
+      {
+          "ascii_only",
+          "values: {false, true}\n"
+          "default: --ascii_only=false",
+      },
+      {
+          "line_number",
+          "values: {false, true}\n"
+          "default: --line_number=true",
+      },
+  };
+}
+
+std::vector<Translator::Example> Frame::Examples() {
+  return {
+      {"1-Hello world",
+
+       "#include <iostream>\n"
+       "using namespace std;\n"
+       "\n"
+       "int main() \n"
+       "{\n"
+       "    cout << \"Hello, World!\";\n"
+       "    return 0;\n"
+       "}"},
+
+  };
 }

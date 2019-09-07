@@ -1,1 +1,1 @@
-speed = sqrt((df/dx)^2 + (df/dy)^2
+speed = sqrt((df/dx)^2 + (df/dy)^2)

@@ -5,7 +5,7 @@
 #include <string>
 
 #include "environment.h"
-#include "translator/Translator.h"
+#include "translator/Factory.h"
 
 std::string ReadFile(std::experimental::filesystem::path path) {
   std::ifstream file(path);
@@ -15,21 +15,21 @@ std::string ReadFile(std::experimental::filesystem::path path) {
 }
 
 int main(int, const char**) {
+  auto translator_list = TranslatorList();
   int result = 0;
 
   std::string path = test_directory;
   std::cout << "test_directory = " << test_directory << std::endl;
   for (auto& dir : std::experimental::filesystem::directory_iterator(path)) {
     std::string type = dir.path().filename();
-    std::cout << "Testing " << type << std::endl;
     for (auto& test :
          std::experimental::filesystem::directory_iterator(dir.path())) {
-      auto translator = TranslatorFromName(type);
+      auto translator = translator_list[type]();
 
       std::string input = ReadFile(test.path() / "input");
       std::string output = ReadFile(test.path() / "output");
 
-      std::string output_computed = (*translator)(input, "");
+      std::string output_computed = translator->Translate(input, "");
 
       if (output_computed == output) {
         std::cout << "  [PASS] " << test << std::endl;

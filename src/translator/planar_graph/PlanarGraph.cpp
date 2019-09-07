@@ -78,8 +78,8 @@ struct PlanarGraph::DrawnVertex {
   std::vector<DrawnEdge> edges;
 };
 
-std::string PlanarGraph::operator()(const std::string& input,
-                                    const std::string& options_string) {
+std::string PlanarGraph::Translate(const std::string& input,
+                                   const std::string& options_string) {
   auto options = SerializeOption(options_string);
   ascii_only_ = (options["ascii_only"] == "true");
   
@@ -387,4 +387,41 @@ void PlanarGraph::Write() {
   }
 
   return Draw();
+}
+
+const char* PlanarGraph::Name() {
+  return "PlanarGraph";
+}
+
+const char* PlanarGraph::Description() {
+  return "Build a graph from node and edges";
+}
+
+std::vector<Translator::OptionDescription> PlanarGraph::Options() {
+  return {
+      {
+          "ascii_only",
+          "values: {false, true}\n"
+          "default: --ascii_only=false",
+      },
+  };
+}
+
+std::vector<Translator::Example> PlanarGraph::Examples() {
+  return {
+      {
+        "if then else loop",
+        "if -> \"then A\" -> end\n"
+        "if -> \"then B\" -> end\n"
+        "end -> loop -> if"
+      },
+      {
+        "test",
+        "A -- B\n"
+        "A -- C\n"
+        "A -- D -- G\n"
+        "B -- Z\n"
+        "C -- Z"
+      },
+  };
 }

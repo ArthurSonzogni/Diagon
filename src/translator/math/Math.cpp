@@ -4,6 +4,53 @@
 #include "translator/math/MathLexer.h"
 #include "translator/math/MathParser.h"
 
+const char* Math::Name() {
+  return "Math";
+}
+
+const char* Math::Description() {
+  return "Math description";
+}
+
+std::vector<Translator::OptionDescription> Math::Options() {
+  return {
+      {
+          "ascii_only",
+          "values: {false, true}\n"
+          "default: --ascii_only=false",
+      },
+      {
+          "transform_math_letters",
+          "values: {false, true}\n"
+          "default: --transform_math_letters=true",
+      },
+  };
+}
+
+std::vector<Translator::Example> Math::Examples() {
+  return {
+      {"1-fraction", "f(x) = 1 + x / (1 + x)"},
+      {"2-square-root", "sqrt(1+sqrt(1+x/2))"},
+      {"3-power", "f(x) = 1 + x^2 + x^3 + x^(1+1/2)"},
+      {"4-summation", "sum(i^2,i=0,n) = n^3/2+n^2/2+n/6"},
+      {"5-integral", "int(x^2 * dx ,0,1) = n^3/3"},
+      {"6-product",
+       "mult(i^2,i=1,n) = (mult(i,i=1,n))^2\n\n\n\nmult(1/2,1,100) = "
+       "7.8886091e-31"},
+      {"7-vector", "[a;b] + [c;d] = [a+c; b+d]"},
+      {"8-matrix", "[1,2;3,4] * [x;y] = [1*x+2*y; 3*x+4*y]"},
+      {"9-factorial", "[n;k] = n! / (k! *(n-k)!)"},
+      {"10-Math-symbols",
+       "Alpha + alpha + Digamma + digamma + Kappa + kappa + Omicron \n"
+       "omicron + Upsilon + upsilon + Beta + beta + Zeta + zeta + Lambda \n"
+       "lambda + Pi + pi + Phi + phi + Gamma + gamma + Eta + eta + Mu + mu \n"
+       "Rho + rho + Chi + chi + Delta + delta + Theta + theta + Nu + nu \n"
+       "Sigma + sigma + Psi + psi + Epsilon + epsilon + Iota + iota + Xi\n"
+       "xi + Tau + tau + Omega + omega"},
+      {"100-continued-fraction", "psi = 1 + 1/(1+1/(1+1/(1+1/(1+...))))"},
+  };
+}
+
 std::unique_ptr<Translator> MathTranslator() {
   return std::make_unique<Math>();
 }
@@ -503,8 +550,8 @@ std::string to_string(const Draw& draw) {
   return to_string(s);
 }
 
-std::string Math::operator()(const std::string& input,
-                             const std::string& options_string) {
+std::string Math::Translate(const std::string& input,
+                            const std::string& options_string) {
   auto options = SerializeOption(options_string);
   Style style;
   if (options["ascii_only"] == "true") {
@@ -573,7 +620,7 @@ std::string Math::operator()(const std::string& input,
     style.integral_min_height = 2;
   }
 
-  if (options["transform_math_letters"] == "true") {
+  if (options["transform_math_letters"] != "false") {
     style.variable_transform = {
         {L"Alpha", L"Α"},   {L"alpha", L"α"},   {L"Digamma", L"Ϝ"},
         {L"digamma", L"ϝ"}, {L"Kappa", L"Κ"},   {L"kappa", L"ϰ"},

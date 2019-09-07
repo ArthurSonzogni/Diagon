@@ -86,6 +86,8 @@ if (Web)
   add_executable(main.js
     main_webassembly.cpp
     translator/Translator.cpp
+    translator/Translator.h
+    translator/Factory.h
   )
   target_link_libraries(main.js
     translator_frame
@@ -100,11 +102,14 @@ if (Web)
 
 else()
 
-  add_executable(main
+  add_executable(diagon
     main.cpp
     translator/Translator.cpp
+    translator/Translator.h
+    translator/Factory.h
   )
-  target_link_libraries(main
+  find_package(Threads REQUIRED)
+  target_link_libraries(diagon
     translator_frame
     translator_math
     translator_planar_graph
@@ -113,12 +118,16 @@ else()
     translator_tree
     screen
     antlr4_static
+    -static-libstdc++
+    -static-libgcc
   )
+  install(TARGETS diagon RUNTIME DESTINATION "bin")
 
   add_executable(input_output_test
     translator/Translator.cpp
     input_output_test.cpp
   )
+
   target_link_libraries(input_output_test
     translator_frame
     translator_math

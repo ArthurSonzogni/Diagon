@@ -21,8 +21,8 @@ bool Sequence::Dependency::operator<(const Sequence::Dependency& other) const {
   return to < other.to;
 }
 
-std::string Sequence::operator()(const std::string& input,
-                                 const std::string& options_string) {
+std::string Sequence::Translate(const std::string& input,
+                                const std::string& options_string) {
   auto options = SerializeOption(options_string);
   ascii_only_ = (options["ascii_only"] == "true");
 
@@ -696,4 +696,56 @@ std::string Sequence::Draw() {
   if (ascii_only_)
     screen.ASCIIfy(0);
   return screen.ToString();
+}
+
+const char* Sequence::Name() {
+  return "Sequence";
+}
+
+const char* Sequence::Description() {
+  return "Draw sequence diagram";
+}
+
+std::vector<Translator::OptionDescription> Sequence::Options() {
+  return {
+      {
+          "ascii_only",
+          "values: {false, true}\n"
+          "default: --ascii_only=false",
+      },
+  };
+}
+
+std::vector<Translator::Example> Sequence::Examples() {
+  return {
+      {"1-basic",
+       "Alice -> Bob: Hello Bob!\n"
+       "Alice <- Bob: Hello Alice!"},
+      {"2-More actors",
+       "Renderer -> Browser: BeginNavigation()\n"
+       "Browser -> Network: URLRequest()\n"
+       "Browser <- Network: URLResponse()\n"
+       "Renderer <- Browser: CommitNavigation()\n"
+       "Renderer -> Browser: DidCommitNavigation()"},
+      {"3-Actors order",
+       "Actor 2 -> Actor 3: message 1\n"
+       "Actor 1 -> Actor 2: message 2\n"
+       "\n"
+       "Actor 1:\n"
+       "Actor 2:\n"
+       "Actor 3:"},
+      {"4-Message order",
+       "2) Actor 2 -> Actor 3: message 1\n"
+       "1) Actor 1 -> Actor 2: message 2\n"
+       "\n"
+       "Actor 1:\n"
+       "Actor 2: 1<2\n"
+       "Actor 3:"},
+      {"5-Message crossing",
+       "1) Renderer -> Browser: Message 1\n"
+       "2) Renderer <- Browser: Message 2\n"
+       "\n"
+       "Renderer: 1<2\n"
+       "Browser: 2<1"},
+  };
 }

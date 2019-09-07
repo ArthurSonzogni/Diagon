@@ -14,8 +14,13 @@ class Screen;
 class Math : public Translator {
  public:
   virtual ~Math() = default;
-  std::string operator()(const std::string& input,
-                         const std::string& options) override;
+  std::string Translate(const std::string& input,
+                        const std::string& options) override;
+
+  const char* Name() override;
+  const char* Description() override;
+  std::vector<OptionDescription> Options() override;
+  std::vector<Example> Examples() override;
 };
 
 struct Draw {

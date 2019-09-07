@@ -14,8 +14,8 @@ class Screen;
 class Sequence : public Translator {
  public:
   virtual ~Sequence() = default;
-  std::string operator()(const std::string& input,
-                         const std::string& options) override;
+  std::string Translate(const std::string& input,
+                        const std::string& options_string) override;
 
  public: // Not really public.
   struct Dependency {
@@ -91,6 +91,12 @@ class Sequence : public Translator {
   // 4)
   std::string Draw();
   std::string output_;
+
+  // ----------------------------------------------
+  const char* Name() override;
+  const char* Description() override;
+  std::vector<OptionDescription> Options() override;
+  std::vector<Example> Examples() override;
 };
 
 #endif /* end of include guard: TRANSLATOR_SEQUENCE_SEQUENCE_H */

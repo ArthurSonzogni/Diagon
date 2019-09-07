@@ -291,8 +291,8 @@ std::map<std::string, std::function<std::string(std::unique_ptr<Node>)>>
 class Tree : public Translator {
  public:
   virtual ~Tree() = default;
-  virtual std::string operator()(const std::string& input,
-                                 const std::string& options_string) {
+  std::string Translate(const std::string& input,
+                        const std::string& options_string) override {
     auto options = SerializeOption(options_string);
 
     // Style.
@@ -346,8 +346,56 @@ class Tree : public Translator {
       return print_function["unicode 2"](std::move(tree));
     }
   }
+  // ----------------------------------------------
+  const char* Name() override;
+  const char* Description() override;
+  std::vector<OptionDescription> Options() override;
+  std::vector<Example> Examples() override;
 };
 
 std::unique_ptr<Translator> TreeTranslator() {
   return std::make_unique<Tree>();
+}
+
+const char* Tree::Name() {
+  return "Tree";
+}
+
+const char* Tree::Description() {
+  return "Draw a tree";
+}
+
+std::vector<Translator::OptionDescription> Tree::Options() {
+  return {
+      {
+        "style",
+        "The style of the table.\n"
+        "Possible values:\n"
+        " - unicode 1\n"
+        " - unicode 2\n"
+        " - ASCII 1\n"
+        " - ASCII 2\n"
+        " - ASCII 3\n"
+        " - unicode right top\n"
+        " - unicode right center\n"
+        " - unicode right bottom"
+      }
+  };
+}
+
+std::vector<Translator::Example> Tree::Examples() {
+  return {
+      {"1 - Simple",
+       "Linux\n"
+       "  Android\n"
+       "  Debian\n"
+       "    Ubuntu\n"
+       "      Lubuntu\n"
+       "      Kubuntu\n"
+       "      Xubuntu\n"
+       "      Xubuntu\n"
+       "    Mint\n"
+       "  Centos\n"
+       "  Fedora"},
+  };
 }

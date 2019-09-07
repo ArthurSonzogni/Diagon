@@ -20,8 +20,8 @@ struct Box {
 class PlanarGraph : public Translator {
  public:
   virtual ~PlanarGraph() = default;
-  std::string operator()(const std::string& input,
-                         const std::string& options) override;
+  std::string Translate(const std::string& input,
+                        const std::string& options) override;
 
   //----------------------------------------------------------------------------
  private:
@@ -71,6 +71,11 @@ class PlanarGraph : public Translator {
   void Write();
   void ComputeArrowStyle();
   //----------------------------------------------------------------------------
+
+  const char* Name() override;
+  const char* Description() override;
+  std::vector<OptionDescription> Options() override;
+  std::vector<Example> Examples() override;
 };
 
 #endif /* end of include guard: TRANSLATOR_PLANAR_GRAPH_PLANAR_GRAPH_H */

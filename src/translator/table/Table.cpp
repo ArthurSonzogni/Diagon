@@ -363,13 +363,13 @@ namespace {
 class Table : public Translator {
  public:
   virtual ~Table() = default;
-  virtual std::string operator()(const std::string& input,
-                                 const std::string& options_string) {
+  std::string Translate(const std::string& input,
+                        const std::string& options_string) override {
     auto options = SerializeOption(options_string);
 
     // Style.
     std::string style_option = options["style"];
-    Style style = styles["ascii"];
+    Style style = styles["unicode"];
     if (styles.count(style_option)) {
       style = styles[style_option];
     }
@@ -558,8 +558,59 @@ class Table : public Translator {
 
     return screen.ToString();
   }
+
+  // ----------------------------------------------
+  const char* Name() override;
+  const char* Description() override;
+  std::vector<OptionDescription> Options() override;
+  std::vector<Example> Examples() override;
 };
 
 std::unique_ptr<Translator> TableTranslator() {
   return std::make_unique<Table>();
+}
+
+const char* Table::Name() {
+  return "Table";
+}
+
+const char* Table::Description() {
+  return "Draw table";
+}
+
+std::vector<Translator::OptionDescription> Table::Options() {
+  return {
+      {
+        "style",
+        "The style of the table.\n"
+        "Possible values:\n"
+        " - unicode\n"
+        " - unicode rounded\n"
+        " - unicode bold\n"
+        " - unicode double\n"
+        " - unicode with bold header\n"
+        " - unicode with double header\n"
+        " - unicode cells\n"
+        " - unicode cells 2\n"
+        " - ascii\n"
+        " - ascii rounded\n"
+        " - ascii with header 1\n"
+        " - ascii with header 2\n"
+        " - ascii light header\n"
+        " - ascii light header/separator\n"
+        " - ascii light header/separator/border\n"
+        " - ascii light separator/border\n"
+        " - ascii light border\n"
+        " - conceptual"
+      }
+  };
+}
+
+std::vector<Translator::Example> Table::Examples() {
+  return {
+      {"1-simple",
+       "Column 1,Column 2,Column 3\n"
+       "C++,Web,Assembly\n"
+       "Javascript,CSS,HTML"},
+  };
 }
