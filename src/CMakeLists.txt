@@ -83,13 +83,13 @@ if (Web)
     ${CMAKE_CURRENT_BINARY_DIR}/run_web_server.sh
     COPYONLY)
 
-  add_executable(main.js
+  add_executable(main
     main_webassembly.cpp
     translator/Translator.cpp
     translator/Translator.h
     translator/Factory.h
   )
-  target_link_libraries(main.js
+  target_link_libraries(main
     translator_frame
     translator_math
     translator_planar_graph
