@@ -9,7 +9,7 @@ description: |
   be used in script as a 'normal' application.
 grade: stable
 confinement: strict
-icon: "../favicon.png"
+icon: "./favicon.png"
 apps:
   diagon:
     command: diagon
