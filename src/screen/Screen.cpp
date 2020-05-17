@@ -21,7 +21,7 @@ std::wstring to_wstring(const std::string& s) {
 Screen::Screen(int width, int height)
     : width_(width),
       height_(height),
-      lines_(height, std::wstring(width, U' ')) {}
+      lines_(height_, std::wstring(width_, U' ')) {}
 
 void Screen::DrawPixel(int x, int y, wchar_t c) {
   lines_[y][x] = c;
