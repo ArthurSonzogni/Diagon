@@ -1,4 +1,9 @@
+// Copyright 2020 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.
+
 #include <iostream>
+
 #include "environment.h"
 #include "translator/Factory.h"
 
@@ -122,7 +127,8 @@ int PrintTranslatorHelp(TranslatorFactory factory) {
       std::cout << "     " << input;
 
       std::string output = factory()->Translate(it.input, "");
-      output = TranslatorList()["Frame"]()->Translate(output, "line_number\nfalse");
+      output =
+          TranslatorList()["Frame"]()->Translate(output, "line_number\nfalse");
       replaceAll(output, "\n", "\n     ");
       std::cout << " output" << std::endl;
       std::cout << "     " << output << std::endl;

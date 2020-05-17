@@ -1,8 +1,12 @@
-#include <sstream>
-#include <codecvt>
-#include <locale>
+// Copyright 2020 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.
 
 #include "screen/Screen.h"
+
+#include <codecvt>
+#include <locale>
+#include <sstream>
 
 std::string to_string(const std::wstring& s) {
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -50,7 +54,7 @@ void Screen::DrawBoxedText(int x, int y, const std::wstring& text) {
 
 std::string Screen::ToString() {
   std::stringstream ss;
-  for(int y = 0; y<height_; ++y) {
+  for (int y = 0; y < height_; ++y) {
     ss << to_string(lines_[y]) << '\n';
   }
   return ss.str();
@@ -68,8 +72,8 @@ void Screen::DrawVerticalLine(int top, int bottom, int x, wchar_t c) {
   }
 }
 
+// clang-format off
 void Screen::ASCIIfy(int style) {
-
   if (style == 0) {
     for(auto& line : lines_) {
       for(auto& c : line) {
@@ -110,3 +114,4 @@ void Screen::ASCIIfy(int style) {
     return;
   }
 }
+// clang-format on

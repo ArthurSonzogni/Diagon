@@ -1,3 +1,7 @@
+// Copyright 2020 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.
+
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -6,7 +10,7 @@
 #include "translator/Translator.h"
 
 namespace {
-  // clang-format off
+// clang-format off
   //---------------------
   // 
   //    0   1   1   2
@@ -408,14 +412,14 @@ class Table : public Translator {
     // Compute row_width;
     std::vector<int> row_width(row_count, 0);
     for (const auto& line : data) {
-      for(int i = 0; i<line.size(); ++i) {
+      for (int i = 0; i < line.size(); ++i) {
         row_width[i] = std::max(row_width[i], (int)line[i].size());
       }
     }
 
     // Compute sum_row_width;
     int row_width_global = 0;
-    for(const auto it : row_width) {
+    for (const auto it : row_width) {
       row_width_global += it;
     }
 
@@ -423,7 +427,8 @@ class Table : public Translator {
     int width = style.width[0] + style.width[1] * (row_count - 1) +
                 style.width[2] + row_width_global;
     int height = style.height[0] + style.height[1] +
-                 style.height[2] * (line_count - 2) + style.height[3] + line_count;
+                 style.height[2] * (line_count - 2) + style.height[3] +
+                 line_count;
 
     Screen screen(width, height);
 
@@ -433,7 +438,7 @@ class Table : public Translator {
       bool last_line = (y == line_count - 1);
       int X = 0;
 
-      const int cell_top = Y + style.height[std::min(2,y)];
+      const int cell_top = Y + style.height[std::min(2, y)];
       const int cell_bottom = cell_top + 1;
 
       for (int x = 0; x < data[y].size(); ++x) {
@@ -490,7 +495,7 @@ class Table : public Translator {
         }
 
         // Draw Left.
-        for(int yy = cell_top; yy < cell_bottom; ++yy) {
+        for (int yy = cell_top; yy < cell_bottom; ++yy) {
           screen.DrawText(X, yy, style.charset[left_char]);
         }
 
@@ -504,9 +509,9 @@ class Table : public Translator {
         // Draw Left/Top
         {
           int i = 0;
-          for(int yy = Y; yy<cell_top; ++yy) {
-            for(int xx = X; xx<cell_left; ++xx) {
-              screen.DrawPixel(xx,yy,style.charset[top_left_char][i]);
+          for (int yy = Y; yy < cell_top; ++yy) {
+            for (int xx = X; xx < cell_left; ++xx) {
+              screen.DrawPixel(xx, yy, style.charset[top_left_char][i]);
               ++i;
             }
           }
@@ -517,15 +522,14 @@ class Table : public Translator {
           int i = 0;
           for (int yy = Y; yy < cell_top; ++yy) {
             for (int xx = cell_right; xx < width; ++xx) {
-              screen.DrawPixel(xx,yy,style.charset[top_right_char][i]);
+              screen.DrawPixel(xx, yy, style.charset[top_right_char][i]);
               ++i;
             }
           }
         }
 
         // Draw Left/Bottom
-        if (last_line)
-        {
+        if (last_line) {
           int i = 0;
           for (int yy = cell_bottom; yy < height; ++yy) {
             for (int xx = X; xx < cell_left; ++xx) {
@@ -536,12 +540,11 @@ class Table : public Translator {
         }
 
         // Draw Right/Bottom
-        if (last_row && last_line)
-        {
+        if (last_row && last_line) {
           int i = 0;
-          for(int yy = cell_bottom; yy<height; ++yy) {
+          for (int yy = cell_bottom; yy < height; ++yy) {
             for (int xx = cell_right; xx < width; ++xx) {
-              screen.DrawPixel(xx,yy,style.charset[bottom_right_char][i]);
+              screen.DrawPixel(xx, yy, style.charset[bottom_right_char][i]);
               ++i;
             }
           }
@@ -581,28 +584,28 @@ const char* Table::Description() {
 std::vector<Translator::OptionDescription> Table::Options() {
   return {
       {
-        "style",
-        "The style of the table.\n"
-        "Possible values:\n"
-        " - unicode\n"
-        " - unicode rounded\n"
-        " - unicode bold\n"
-        " - unicode double\n"
-        " - unicode with bold header\n"
-        " - unicode with double header\n"
-        " - unicode cells\n"
-        " - unicode cells 2\n"
-        " - ascii\n"
-        " - ascii rounded\n"
-        " - ascii with header 1\n"
-        " - ascii with header 2\n"
-        " - ascii light header\n"
-        " - ascii light header/separator\n"
-        " - ascii light header/separator/border\n"
-        " - ascii light separator/border\n"
-        " - ascii light border\n"
-        " - conceptual"
-      }
+          "style",
+          "The style of the table.\n"
+          "Possible values:\n"
+          " - unicode\n"
+          " - unicode rounded\n"
+          " - unicode bold\n"
+          " - unicode double\n"
+          " - unicode with bold header\n"
+          " - unicode with double header\n"
+          " - unicode cells\n"
+          " - unicode cells 2\n"
+          " - ascii\n"
+          " - ascii rounded\n"
+          " - ascii with header 1\n"
+          " - ascii with header 2\n"
+          " - ascii light header\n"
+          " - ascii light header/separator\n"
+          " - ascii light header/separator/border\n"
+          " - ascii light separator/border\n"
+          " - ascii light border\n"
+          " - conceptual",
+      },
   };
 }
 

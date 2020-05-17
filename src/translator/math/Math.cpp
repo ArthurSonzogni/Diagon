@@ -1,3 +1,7 @@
+// Copyright 2020 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.
+
 #include "translator/math/Math.h"
 
 #include "screen/Screen.h"
@@ -173,20 +177,19 @@ Draw Parse(MathParser::MultilineEquationContext* context, Style* style) {
   Draw draw;
   for (int i = 0; i < context->equation().size(); ++i) {
     draw = ComposeVertical(draw, Parse(context->equation(i), style), 0);
-    if (i<context->newlines().size())
-    draw = ComposeVertical(draw, Parse(context->newlines(i)), 0);
+    if (i < context->newlines().size())
+      draw = ComposeVertical(draw, Parse(context->newlines(i)), 0);
   }
   return draw;
 }
 
 Draw Parse(MathParser::NewlinesContext* context) {
   Draw draw;
-  draw.Resize(0, context->EOL().size()-1);
+  draw.Resize(0, context->EOL().size() - 1);
   return draw;
 }
 
 Draw Parse(MathParser::EquationContext* context, Style* style) {
-
   Draw draw = Parse(context->expression(0), style);
   for (int i = 1; i < context->expression().size(); ++i) {
     auto op = context->relop(i - 1);
@@ -278,11 +281,11 @@ Draw ParseFunctionSqrt(MathParser::FunctionContext* context, Style* style) {
   Draw draw;
   draw.Append(content, 1 + content.dim_y, 1);
   draw.content.back().front() = style->sqrt_0;
-  for (int y = 0; y < draw.content.size()-1; ++y)
+  for (int y = 0; y < draw.content.size() - 1; ++y)
     draw.content[draw.content.size() - 1 - y][1 + y] = style->sqrt_1;
   for (int x = draw.content.size(); x < draw.content[0].size(); ++x)
     draw.content[0][x] = style->sqrt_2;
-  draw.center_x = draw.dim_x/2;
+  draw.center_x = draw.dim_x / 2;
   draw.center_y = content.center_y + 1;
   return draw;
 }
@@ -295,16 +298,17 @@ Draw ParseFunctionSum(MathParser::FunctionContext* context, Style* style) {
   }
 
   Draw content = Parse(context->equation(0), style);
-  Draw down = context->equation(1) ? Parse(context->equation(1), style) : Draw();
+  Draw down =
+      context->equation(1) ? Parse(context->equation(1), style) : Draw();
   Draw top = context->equation(2) ? Parse(context->equation(2), style) : Draw();
 
-  int sigma_height = std::max(4,(content.dim_y+1)/2*2+2);
-  int sigma_width = (sigma_height-2)/2 + 2;
+  int sigma_height = std::max(4, (content.dim_y + 1) / 2 * 2 + 2);
+  int sigma_width = (sigma_height - 2) / 2 + 2;
 
   Draw sigma;
   sigma.Resize(sigma_width, sigma_height);
 
-  for(int x = 0; x<sigma.dim_x; ++x) {
+  for (int x = 0; x < sigma.dim_x; ++x) {
     sigma.content.front()[x] = style->summation_top;
     sigma.content.back()[x] = style->summation_bottom;
   }
@@ -312,8 +316,8 @@ Draw ParseFunctionSum(MathParser::FunctionContext* context, Style* style) {
   {
     int x = 0;
     int y_1 = 1;
-    int y_2 = sigma.content.size()-2;
-    while(y_1<y_2) {
+    int y_2 = sigma.content.size() - 2;
+    while (y_1 < y_2) {
       sigma.content[y_1][x] = style->summation_diagonal_top;
       sigma.content[y_2][x] = style->summation_diagonal_bottom;
       ++x;
@@ -323,9 +327,9 @@ Draw ParseFunctionSum(MathParser::FunctionContext* context, Style* style) {
   }
 
   // Align top, sigma, and bottom on center.
-  top.center_x = top.dim_x/2;
-  sigma.center_x = sigma.dim_x/2;
-  down.center_x = down.dim_x/2;
+  top.center_x = top.dim_x / 2;
+  sigma.center_x = sigma.dim_x / 2;
+  down.center_x = down.dim_x / 2;
 
   Draw sum = ComposeVertical(ComposeVertical(top, sigma, 0), down, 0);
   sum.center_y =
@@ -337,12 +341,14 @@ Draw ParseFunctionSum(MathParser::FunctionContext* context, Style* style) {
 Draw ParseFunctionMult(MathParser::FunctionContext* context, Style* style) {
   int num_arguments = context->equation().size();
   if (num_arguments > 3) {
-    std::cerr << "Multiplication function (mult) only handle 1,2 or 3 arguments, "
-              << num_arguments << " provided" << std::endl;
+    std::cerr
+        << "Multiplication function (mult) only handle 1,2 or 3 arguments, "
+        << num_arguments << " provided" << std::endl;
   }
 
   Draw content = Parse(context->equation(0), style);
-  Draw down = context->equation(1) ? Parse(context->equation(1), style) : Draw();
+  Draw down =
+      context->equation(1) ? Parse(context->equation(1), style) : Draw();
   Draw top = context->equation(2) ? Parse(context->equation(2), style) : Draw();
 
   int mult_height = std::max(2, content.dim_y);
@@ -350,20 +356,20 @@ Draw ParseFunctionMult(MathParser::FunctionContext* context, Style* style) {
 
   Draw mult;
   mult.Resize(mult_width, mult_height);
-  for(int x = 0; x<mult_width; ++x) {
+  for (int x = 0; x < mult_width; ++x) {
     mult.content[0][x] = style->mult_top;
   }
-  for(int y = 1; y<mult_height; ++y) {
+  for (int y = 1; y < mult_height; ++y) {
     mult.content[y][1] = style->mult_bottom;
-    mult.content[y][mult_width-2] = style->mult_bottom;
+    mult.content[y][mult_width - 2] = style->mult_bottom;
   }
   mult.content[0][1] = style->mult_intersection;
-  mult.content[0][mult_width-2] = style->mult_intersection;
+  mult.content[0][mult_width - 2] = style->mult_intersection;
 
   // Align top, mult, and bottom on center.
-  top.center_x = top.dim_x/2;
-  mult.center_x = mult.dim_x/2;
-  down.center_x = down.dim_x/2;
+  top.center_x = top.dim_x / 2;
+  mult.center_x = mult.dim_x / 2;
+  down.center_x = down.dim_x / 2;
 
   Draw ret = ComposeVertical(ComposeVertical(top, mult, 0), down, 0);
   ret.center_y =
@@ -380,7 +386,8 @@ Draw ParseFunctionIntegral(MathParser::FunctionContext* context, Style* style) {
   }
 
   Draw content = Parse(context->equation(0), style);
-  Draw down = context->equation(1) ? Parse(context->equation(1), style) : Draw();
+  Draw down =
+      context->equation(1) ? Parse(context->equation(1), style) : Draw();
   Draw top = context->equation(2) ? Parse(context->equation(2), style) : Draw();
 
   int integral_height = std::max(style->integral_min_height, content.dim_y);
@@ -391,17 +398,17 @@ Draw ParseFunctionIntegral(MathParser::FunctionContext* context, Style* style) {
 
   integral.content.front() = style->integral_top;
   integral.content.back() = style->integral_bottom;
-  for(int y = 1; y<integral.content.size()-1; ++y)
+  for (int y = 1; y < integral.content.size() - 1; ++y)
     integral.content[y] = style->integral_middle;
 
   // Align top, integral, and bottom on center.
-  top.center_x = top.dim_x/2;
-  integral.center_x = integral.dim_x/2;
-  down.center_x = down.dim_x/2;
+  top.center_x = top.dim_x / 2;
+  integral.center_x = integral.dim_x / 2;
+  down.center_x = down.dim_x / 2;
 
   Draw sum = ComposeVertical(ComposeVertical(top, integral, 0), down, 0);
-  sum.center_y = top.dim_y + integral.content.size() - content.dim_y +
-                 content.center_y;
+  sum.center_y =
+      top.dim_y + integral.content.size() - content.dim_y + content.center_y;
 
   return ComposeHorizontal(sum, content, 1);
 }
@@ -410,8 +417,7 @@ Draw ParseFunctionCommon(MathParser::FunctionContext* context, Style* style) {
   Draw content = Parse(context->equation(0), style);
   for (int i = 1; i < context->equation().size(); ++i) {
     int x = content.dim_x;
-    content =
-        ComposeHorizontal(content, Parse(context->equation(i), style), 2);
+    content = ComposeHorizontal(content, Parse(context->equation(i), style), 2);
     content.content[content.center_y][x] = U',';
   }
   return ComposeHorizontal(Parse(context->variable(), style),
@@ -467,7 +473,7 @@ Draw Parse(MathParser::AtomContext* context,
   if (context->function()) {
     return Parse(context->function(), style);
   }
-  
+
   if (context->matrix()) {
     return Parse(context->matrix(), style);
   }
@@ -491,9 +497,9 @@ Draw Parse(MathParser::ScientificContext* context) {
 Draw Parse(MathParser::MatrixContext* context, Style* style) {
   // 1) Get matrix content.
   std::vector<std::vector<Draw>> content;
-  for(const auto& line : context->matrixLine()) {
+  for (const auto& line : context->matrixLine()) {
     std::vector<Draw> line_content;
-    for(const auto& content : line->expression()) {
+    for (const auto& content : line->expression()) {
       line_content.emplace_back(Parse(content, style));
     }
     content.push_back(std::move(line_content));
@@ -502,9 +508,9 @@ Draw Parse(MathParser::MatrixContext* context, Style* style) {
   // 2) Sanitize
   size_t height = content.size();
   size_t width = 0;
-  for(const auto& it : content)
+  for (const auto& it : content)
     width = std::max(width, it.size());
-  for(auto& it : content)
+  for (auto& it : content)
     it.resize(width);
 
   // 3) Compute element sizes.
@@ -518,25 +524,25 @@ Draw Parse(MathParser::MatrixContext* context, Style* style) {
   }
   std::vector<int> y_top(height, 0);
   std::vector<int> x_left(width, 0);
-  for(int i = 1; i<height; ++i) {
-    y_top[i] = y_top[i-1] + y_size[i-1] + 1;
+  for (int i = 1; i < height; ++i) {
+    y_top[i] = y_top[i - 1] + y_size[i - 1] + 1;
   }
-  for(int i = 1; i<width; ++i) {
-    x_left[i] = x_left[i-1] + x_size[i-1] + 1;
+  for (int i = 1; i < width; ++i) {
+    x_left[i] = x_left[i - 1] + x_size[i - 1] + 1;
   }
 
   // 4) Draw
   Draw draw;
-  for(int y = 0; y<height; ++y) {
-    for(int x = 0; x<width; ++x) {
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
       auto& c = content[y][x];
-      draw.Append(std::move(c), x_left[x], y_top[y] + y_size[y]-c.dim_y);
+      draw.Append(std::move(c), x_left[x], y_top[y] + y_size[y] - c.dim_y);
     }
   }
 
   draw.center_x = draw.dim_x / 2;
   draw.center_y = draw.dim_y / 2;
-  return WrapWithParenthesis(draw,style);
+  return WrapWithParenthesis(draw, style);
 }
 
 std::string to_string(const Draw& draw) {
@@ -587,7 +593,7 @@ std::string Math::Translate(const std::string& input,
     style.integral_min_height = 3;
   } else {
     style.divide = U'─';
-    //style.multiply = U'×';
+    // style.multiply = U'×';
     style.multiply = U'⋅';
     style.greater_or_equal = L"≥";
     style.lower_or_equal = L"≤";

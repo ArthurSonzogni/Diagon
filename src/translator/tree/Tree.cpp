@@ -1,3 +1,7 @@
+// Copyright 2020 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.
+
 #include <functional>
 #include <iostream>
 #include <sstream>
@@ -27,22 +31,21 @@ std::string PrintUnicode1(std::unique_ptr<Node> tree) {
     for (int i = 0; i < node->children.size(); ++i) {
       auto& child = node->children[i];
       if (i != node->children.size() - 1) {
-        output <<             prefix + " ├─" << to_string(child->content) << std::endl;
+        output << prefix + " ├─" << to_string(child->content) << std::endl;
         print_children(child, prefix + " │ ");
       } else {
-        output <<             prefix + " └─" << to_string(child->content) << std::endl;
+        output << prefix + " └─" << to_string(child->content) << std::endl;
         print_children(child, prefix + "   ");
       }
     }
   };
 
-  for(auto& it : tree->children) {
+  for (auto& it : tree->children) {
     output << to_string(it->content) << std::endl;
     print_children(it, "");
   }
   return output.str();
 }
-
 
 std::string PrintUnicode2(std::unique_ptr<Node> tree) {
   std::stringstream output;
@@ -51,16 +54,16 @@ std::string PrintUnicode2(std::unique_ptr<Node> tree) {
     for (int i = 0; i < node->children.size(); ++i) {
       auto& child = node->children[i];
       if (i != node->children.size() - 1) {
-        output <<             prefix + " ├──" << to_string(child->content) << std::endl;
+        output << prefix + " ├──" << to_string(child->content) << std::endl;
         print_children(child, prefix + " │  ");
       } else {
-        output <<             prefix + " └──" << to_string(child->content) << std::endl;
+        output << prefix + " └──" << to_string(child->content) << std::endl;
         print_children(child, prefix + "    ");
       }
     }
   };
 
-  for(auto& it : tree->children) {
+  for (auto& it : tree->children) {
     output << to_string(it->content) << std::endl;
     print_children(it, "");
   }
@@ -74,16 +77,16 @@ std::string PrintASCII1(std::unique_ptr<Node> tree) {
     for (int i = 0; i < node->children.size(); ++i) {
       auto& child = node->children[i];
       if (i != node->children.size() - 1) {
-        output <<             prefix + " +-" << to_string(child->content) << std::endl;
+        output << prefix + " +-" << to_string(child->content) << std::endl;
         print_children(child, prefix + " |  ");
       } else {
-        output <<             prefix + " `-" << to_string(child->content) << std::endl;
+        output << prefix + " `-" << to_string(child->content) << std::endl;
         print_children(child, prefix + "    ");
       }
     }
   };
 
-  for(auto& it : tree->children) {
+  for (auto& it : tree->children) {
     output << to_string(it->content) << std::endl;
     print_children(it, "");
   }
@@ -97,16 +100,16 @@ std::string PrintASCII2(std::unique_ptr<Node> tree) {
     for (int i = 0; i < node->children.size(); ++i) {
       auto& child = node->children[i];
       if (i != node->children.size() - 1) {
-        output <<             prefix + " +--" << to_string(child->content) << std::endl;
+        output << prefix + " +--" << to_string(child->content) << std::endl;
         print_children(child, prefix + " |  ");
       } else {
-        output <<             prefix + " `--" << to_string(child->content) << std::endl;
+        output << prefix + " `--" << to_string(child->content) << std::endl;
         print_children(child, prefix + "    ");
       }
     }
   };
 
-  for(auto& it : tree->children) {
+  for (auto& it : tree->children) {
     output << to_string(it->content) << std::endl;
     print_children(it, "");
   }
@@ -120,16 +123,16 @@ std::string PrintASCII3(std::unique_ptr<Node> tree) {
     for (int i = 0; i < node->children.size(); ++i) {
       auto& child = node->children[i];
       if (i != node->children.size() - 1) {
-        output <<             prefix + " |--" << to_string(child->content) << std::endl;
+        output << prefix + " |--" << to_string(child->content) << std::endl;
         print_children(child, prefix + " |  ");
       } else {
-        output <<             prefix + " `--" << to_string(child->content) << std::endl;
+        output << prefix + " `--" << to_string(child->content) << std::endl;
         print_children(child, prefix + "    ");
       }
     }
   };
 
-  for(auto& it : tree->children) {
+  for (auto& it : tree->children) {
     output << to_string(it->content) << std::endl;
     print_children(it, "");
   }
@@ -180,7 +183,7 @@ DisplayTree MergeDisplayTree(std::wstring content,
       break;
   };
 
-  for(int i = 0; i<content.size(); ++i) {
+  for (int i = 0; i < content.size(); ++i) {
     ret.content[ret.entrance][i] = content[i];
   }
 
@@ -196,7 +199,7 @@ DisplayTree MergeDisplayTree(std::wstring content,
   }
 
   int y = 0;
-  for(auto& child : children) {
+  for (auto& child : children) {
     int start = y;
 
     // Draw Child vertical connector.
@@ -228,6 +231,7 @@ DisplayTree MergeDisplayTree(std::wstring content,
   ret.content[ret.entrance][content.size() + 0] = U'─';
   // Refine connector on parent entrance points.
   auto& connector = ret.content[ret.entrance][content.size() + 1];
+  // clang-format off
   switch (connector) {
     case U'─': connector = U'─'; break;
     case U'┌': connector = U'┬'; break;
@@ -235,6 +239,7 @@ DisplayTree MergeDisplayTree(std::wstring content,
     case U'└': connector = U'┴'; break;
     case U'│': connector = U'┤'; break;
   }
+  // clang-format on
 
   return ret;
 }
@@ -249,7 +254,7 @@ DisplayTree MakeDisplayTree(Node* tree, Align align) {
 std::string PrintUnicodeRightTop(std::unique_ptr<Node> tree) {
   DisplayTree display = MakeDisplayTree(tree.get(), Align::Top);
   std::stringstream output;
-  for(auto& line : display.content) {
+  for (auto& line : display.content) {
     output << to_string(line) << std::endl;
   }
   return output.str();
@@ -258,7 +263,7 @@ std::string PrintUnicodeRightTop(std::unique_ptr<Node> tree) {
 std::string PrintUnicodeRightCenter(std::unique_ptr<Node> tree) {
   DisplayTree display = MakeDisplayTree(tree.get(), Align::Center);
   std::stringstream output;
-  for(auto& line : display.content) {
+  for (auto& line : display.content) {
     output << to_string(line) << std::endl;
   }
   return output.str();
@@ -267,7 +272,7 @@ std::string PrintUnicodeRightCenter(std::unique_ptr<Node> tree) {
 std::string PrintUnicodeRightBottom(std::unique_ptr<Node> tree) {
   DisplayTree display = MakeDisplayTree(tree.get(), Align::Bottom);
   std::stringstream output;
-  for(auto& line : display.content) {
+  for (auto& line : display.content) {
     output << to_string(line) << std::endl;
   }
   return output.str();
@@ -285,7 +290,7 @@ std::map<std::string, std::function<std::string(std::unique_ptr<Node>)>>
         {"unicode right bottom", PrintUnicodeRightBottom},
 };
 
-} // namespace
+}  // namespace
 
 class Tree : public Translator {
  public:
@@ -316,15 +321,14 @@ class Tree : public Translator {
 
     if (lines.size() == 0)
       return "";
-    
+
     // Build the tree.
     auto tree = std::make_unique<Node>();
-    for(int i = 0; i<lines.size(); ++i) {
+    for (int i = 0; i < lines.size(); ++i) {
       auto child = std::make_unique<Node>();
       lines[i].tree = child.get();
       child->content = lines[i].content;
-      for (int j = i - 1; ; --j) {
-
+      for (int j = i - 1;; --j) {
         if (j == -1) {
           child->parent = tree.get();
           child->parent->children.push_back(std::move(child));
@@ -365,21 +369,17 @@ const char* Tree::Description() {
 }
 
 std::vector<Translator::OptionDescription> Tree::Options() {
-  return {
-      {
-        "style",
-        "The style of the table.\n"
-        "Possible values:\n"
-        " - unicode 1\n"
-        " - unicode 2\n"
-        " - ASCII 1\n"
-        " - ASCII 2\n"
-        " - ASCII 3\n"
-        " - unicode right top\n"
-        " - unicode right center\n"
-        " - unicode right bottom"
-      }
-  };
+  return {{"style",
+           "The style of the table.\n"
+           "Possible values:\n"
+           " - unicode 1\n"
+           " - unicode 2\n"
+           " - ASCII 1\n"
+           " - ASCII 2\n"
+           " - ASCII 3\n"
+           " - unicode right top\n"
+           " - unicode right center\n"
+           " - unicode right bottom"}};
 }
 
 std::vector<Translator::Example> Tree::Examples() {

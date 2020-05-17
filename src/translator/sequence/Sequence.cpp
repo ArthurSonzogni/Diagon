@@ -1,9 +1,13 @@
+// Copyright 2020 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.
+
 #include "translator/sequence/Sequence.h"
 
+#include <functional>
 #include <queue>
 #include <set>
 #include <sstream>
-#include <functional>
 
 #include "screen/Screen.h"
 #include "translator/sequence/SequenceLexer.h"
@@ -82,7 +86,8 @@ void Sequence::UniformizeMessageID() {
     for (auto& message : messages) {
       if (message.id != -1) {
         if (used.count(message.id)) {
-          std::cout << "Found two messages with the same id: " << message.id << std::endl;
+          std::cout << "Found two messages with the same id: " << message.id
+                    << std::endl;
           message.id = -1;
         } else {
           used.insert(message.id);
@@ -224,16 +229,16 @@ int Sequence::GetNumber(SequenceParser::NumberContext* number) {
   return std::stoi(number->Number()->getSymbol()->getText());
 }
 
-//std::vector<std::wstring> Sequence::GetMessage(
-    //SequenceParser::MessageContext* message) {
-  //std::vector<std::wstring> messages;
+// std::vector<std::wstring> Sequence::GetMessage(
+// SequenceParser::MessageContext* message) {
+// std::vector<std::wstring> messages;
 
-    //messages.push_back(to_wstring(message->text()->getText()));
-  ////for (auto text : message->text()) {
-    ////messages.push_back(to_wstring(text->getText()));
-  ////}
+// messages.push_back(to_wstring(message->text()->getText()));
+////for (auto text : message->text()) {
+////messages.push_back(to_wstring(text->getText()));
+////}
 
-  //return messages;
+// return messages;
 //}
 
 void Sequence::Layout() {
@@ -297,7 +302,7 @@ void Sequence::LayoutComputeActorsPositions() {
   }
 
   for (auto& actor : actors) {
-    actor.left = actor.center - actor.name.size() / 2 - actor.name.size()%2;
+    actor.left = actor.center - actor.name.size() / 2 - actor.name.size() % 2;
     actor.right = actor.left + actor.name.size() + 2;
   }
 }
@@ -517,7 +522,7 @@ std::vector<Node> FindTopologicalOrder(const Graph& graph) {
   return nodes;
 }
 
-}  // namespace Graph
+}  // namespace graph
 
 void Sequence::LayoutComputeMessagesPositions() {
   // Build graph
@@ -610,9 +615,8 @@ void Sequence::LayoutComputeMessagesPositions() {
 
       if (started_message.count(node.message) == 0) {
         started_message.insert(node.message);
-        if (i + 1 < 0 ||
-            topological_order[i + 1].message !=
-                topological_order[i + 0].message) {
+        if (i + 1 < 0 || topological_order[i + 1].message !=
+                             topological_order[i + 0].message) {
           message.line_top = y;
           message.is_separated = true;
           y += 1;
@@ -625,9 +629,10 @@ void Sequence::LayoutComputeMessagesPositions() {
   }
 
   // Sort message by y.
-  std::sort(messages.begin(), messages.end(), [](const Message& a, const Message& b) {
-    return a.line_bottom > b.line_bottom;
-  });
+  std::sort(messages.begin(), messages.end(),
+            [](const Message& a, const Message& b) {
+              return a.line_bottom > b.line_bottom;
+            });
 }
 
 void Sequence::Actor::Draw(Screen& screen, int height) {
@@ -686,7 +691,7 @@ std::string Sequence::Draw() {
   for (auto& actor : actors)
     actor.Draw(screen, height);
 
-  for(auto message : messages)
+  for (auto message : messages)
     message.Draw(screen);
 
   if (ascii_only_)

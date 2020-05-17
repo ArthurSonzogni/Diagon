@@ -1,21 +1,26 @@
+// Copyright 2020 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.
+
+#include "translator/planar_graph/PlanarGraph.h"
+
 #include <iostream>
 #include <queue>
 #include <sstream>
 
 #include "screen/Screen.h"
-#include "translator/planar_graph/PlanarGraph.h"
 #include "translator/planar_graph/PlanarGraphLexer.h"
 #include "translator/planar_graph/PlanarGraphParser.h"
 
 // With emscripten, you may need to execute in the src directory.
 // # ln -s /usr/include/boost/ boost
-#include <boost/graph/make_biconnected_planar.hpp>
-#include <boost/graph/make_connected.hpp>
-#include <boost/graph/make_maximal_planar.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/boyer_myrvold_planar_test.hpp>
 #include <boost/graph/chrobak_payne_drawing.hpp>
 #include <boost/graph/graph_traits.hpp>
+#include <boost/graph/make_biconnected_planar.hpp>
+#include <boost/graph/make_connected.hpp>
+#include <boost/graph/make_maximal_planar.hpp>
 #include <boost/graph/planar_canonical_ordering.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/property_map/property_map.hpp>
@@ -47,7 +52,6 @@ struct PlanarGraph::DrawnEdge {
   int y_up;
   int y_down;
   void Draw(Screen& screen, PlanarGraph& graph) {
-
     int top = 3 * y_up - 1;
     int bottom = 3 * y_down + 3;
 
@@ -82,7 +86,7 @@ std::string PlanarGraph::Translate(const std::string& input,
                                    const std::string& options_string) {
   auto options = SerializeOption(options_string);
   ascii_only_ = (options["ascii_only"] == "true");
-  
+
   Read(input);
   Write();
   return output_;
@@ -174,8 +178,8 @@ bool ComputePlanarEmbedding(const Graph& graph, Embedding& embedding) {
 
 void PlanarGraph::ComputeArrowStyle() {
   // Compute ArrowStyle
-  for(auto& v : vertex) {
-    switch(v.arrow) {
+  for (auto& v : vertex) {
+    switch (v.arrow) {
       case Arrow::RIGHT:
         arrow_style[v.from][v.to] = ArrowStyle::ARROW;
         arrow_style[v.to][v.from] = ArrowStyle::LINE;
@@ -238,15 +242,15 @@ void PlanarGraph::Write() {
                                    std::back_inserter(ordering));
 
   std::vector<size_t> inverse_ordering(num_vertices);
-  for(int i = 0; i<inverse_ordering.size(); ++i) {
+  for (int i = 0; i < inverse_ordering.size(); ++i) {
     inverse_ordering[ordering[i]] = i;
   }
 
   StraightLineDrawing straight_line_drawing(num_vertices);
 
   // Compute the straight line drawing
-  boost::chrobak_payne_straight_line_drawing(graph, embedding,
-                                             ordering.begin(), ordering.end(),
+  boost::chrobak_payne_straight_line_drawing(graph, embedding, ordering.begin(),
+                                             ordering.end(),
                                              straight_line_drawing.data());
 
   auto compare_with = [&](int i) {
@@ -275,7 +279,7 @@ void PlanarGraph::Write() {
   // Compute Y.
   std::vector<size_t> y(num_vertices, 0);
   for (size_t i : ordering) {
-    for(size_t j : children[i]) {
+    for (size_t j : children[i]) {
       if (inverse_ordering[i] < inverse_ordering[j]) {
         y[j] = std::max(y[j], y[i] + 1);
       }
@@ -284,7 +288,7 @@ void PlanarGraph::Write() {
 
   std::vector<DrawnVertex> drawn_vertices(num_vertices);
   std::vector<bool> is_drawn(num_vertices, false);
-  std::vector<int> x(y.size(),-1);
+  std::vector<int> x(y.size(), -1);
 
   std::function<void(int)> refresh_x = [&](int y) {
     int i = y + 1;
@@ -328,7 +332,7 @@ void PlanarGraph::Write() {
       return;
     DrawnVertex& vertex = drawn_vertices[i];
     int child_left = -1;
-    int child_right = -1; 
+    int child_right = -1;
     // Draw our childrens.
     for (auto j : children[i]) {
       DrawNode(j);
@@ -347,7 +351,7 @@ void PlanarGraph::Write() {
       }
 
       // Make the child bigger if we need to.
-      child.right = std::max(child.right, x[y[j]-1]+3);
+      child.right = std::max(child.right, x[y[j] - 1] + 3);
       x[y[j]] = child.right;
       refresh_x(y[j]);
 
@@ -358,8 +362,8 @@ void PlanarGraph::Write() {
       }
       vertex.edges.push_back(edge);
 
-      x[y[i]+1] = std::max(x[y[i]+1], edge.x);
-      refresh_x(y[i]+1);
+      x[y[i] + 1] = std::max(x[y[i] + 1], edge.x);
+      refresh_x(y[i] + 1);
 
       if (child_left == -1) {
         child_left = edge.x - 1;
@@ -410,18 +414,18 @@ std::vector<Translator::OptionDescription> PlanarGraph::Options() {
 std::vector<Translator::Example> PlanarGraph::Examples() {
   return {
       {
-        "if then else loop",
-        "if -> \"then A\" -> end\n"
-        "if -> \"then B\" -> end\n"
-        "end -> loop -> if"
+          "if then else loop",
+          "if -> \"then A\" -> end\n"
+          "if -> \"then B\" -> end\n"
+          "end -> loop -> if",
       },
       {
-        "test",
-        "A -- B\n"
-        "A -- C\n"
-        "A -- D -- G\n"
-        "B -- Z\n"
-        "C -- Z"
+          "test",
+          "A -- B\n"
+          "A -- C\n"
+          "A -- D -- G\n"
+          "B -- Z\n"
+          "C -- Z",
       },
   };
 }
