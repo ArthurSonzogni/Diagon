@@ -110,7 +110,6 @@ else()
     translator/Factory.h
   )
   target_add_warning(diagon)
-  find_package(Threads REQUIRED)
   target_link_libraries(diagon
     translator_frame
     translator_math

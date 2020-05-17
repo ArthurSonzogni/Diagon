@@ -11,11 +11,13 @@ if(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
 else()
   set(Web false)
 endif()
-message(" * Build type : " ${CMAKE_BUILD_TYPE})
-message(" * C compiler: ${CMAKE_C_COMPILER}")
-message(" * C++ compiler: ${CMAKE_CXX_COMPILER}")
-message(" * System: " ${CMAKE_SYSTEM_NAME} )
-message(" * Use Web : " ${Web})
+message("┌── Diagon  configuration ───────────────────────")
+message("│ - Build type : " ${CMAKE_BUILD_TYPE})
+message("│ - C compiler: ${CMAKE_C_COMPILER}")
+message("│ - C++ compiler: ${CMAKE_CXX_COMPILER}")
+message("│ - System: " ${CMAKE_SYSTEM_NAME} )
+message("│ - Use Web : " ${Web})
+message("└────────────────────────────────────────────────")
 
 # ┌─────────────────────────────────────────────────┐
 # │ ANTLR                                           │
