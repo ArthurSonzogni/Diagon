@@ -61,6 +61,20 @@ function(ANTLR source)
   )
 endfunction()
 
+function(target_add_warning target)
+  if (MSVC)
+    target_compile_options(${target} PRIVATE "/wd4244")
+    target_compile_options(${target} PRIVATE "/wd4267")
+    target_compile_options(${target} PRIVATE "/wd4996")
+    target_compile_options(${target} PRIVATE "/wd4305")
+  else()
+    target_compile_options(${target} PRIVATE "-Wall")
+    target_compile_options(${target} PRIVATE "-Werror")
+    target_compile_options(${target} PRIVATE "-Wno-sign-compare")
+    target_compile_options(${target} PRIVATE "-Wno-attributes")
+  endif()
+endfunction()
+
 # Build the ANTLR runtime.
 add_subdirectory(
   ${CMAKE_SOURCE_DIR}/tools/antlr/cpp_runtime/

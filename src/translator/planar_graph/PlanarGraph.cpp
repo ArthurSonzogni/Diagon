@@ -288,7 +288,7 @@ void PlanarGraph::Write() {
 
   std::function<void(int)> refresh_x = [&](int y) {
     int i = y + 1;
-    while (x[i] < x[y] && i < x.size()) {
+    while (i < x.size() && x[i] < x[y]) {
       x[i] = x[y];
       ++i;
     };

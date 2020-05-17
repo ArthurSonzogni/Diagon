@@ -608,7 +608,6 @@ void Sequence::LayoutComputeMessagesPositions() {
       const graph::Node& node = topological_order[i];
       auto& message = messages[message_index[node.message]];
 
-      bool is_separated = true;
       if (started_message.count(node.message) == 0) {
         started_message.insert(node.message);
         if (i + 1 < 0 ||
@@ -684,14 +683,11 @@ std::string Sequence::Draw() {
 
   Screen screen(width, height);
 
-  int x = 0;
-  for (auto& actor : actors) {
+  for (auto& actor : actors)
     actor.Draw(screen, height);
-  }
 
-  for(auto message : messages) {
+  for(auto message : messages)
     message.Draw(screen);
-  }
 
   if (ascii_only_)
     screen.ASCIIfy(0);

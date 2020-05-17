@@ -89,6 +89,7 @@ if (Web)
     translator/Translator.h
     translator/Factory.h
   )
+  target_add_warning(main)
   target_link_libraries(main
     translator_frame
     translator_math
@@ -108,6 +109,7 @@ else()
     translator/Translator.h
     translator/Factory.h
   )
+  target_add_warning(diagon)
   find_package(Threads REQUIRED)
   target_link_libraries(diagon
     translator_frame

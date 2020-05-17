@@ -201,6 +201,7 @@ DisplayTree MergeDisplayTree(std::wstring content,
 
     // Draw Child vertical connector.
     for (auto& line : child.content) {
+      (void)line;
       if (y >= first_entrance && y <= last_entrance) {
         ret.content[y][content.size() + 1] = U'│';
       }
@@ -240,10 +241,8 @@ DisplayTree MergeDisplayTree(std::wstring content,
 
 DisplayTree MakeDisplayTree(Node* tree, Align align) {
   std::vector<DisplayTree> children_tree;
-  int i = 0;
-  for (auto& child : tree->children) {
+  for (auto& child : tree->children)
     children_tree.push_back(MakeDisplayTree(child.get(), align));
-  }
   return MergeDisplayTree(tree->content, std::move(children_tree), align);
 }
 

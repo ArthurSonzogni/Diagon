@@ -19,3 +19,7 @@ add_library(translator_planar_graph STATIC
   PlanarGraphParser.cpp
   PlanarGraph.cpp
 )
+if (MSVC)
+else()
+  target_compile_options(translator_planar_graph PRIVATE "-Wno-attributes")
+endif()

@@ -81,11 +81,12 @@ int PrintVersion() {
   std::cout << "version: " << git_version << std::endl;
   std::cout << "Written by Arthur Sonzogni" << std::endl;
   std::cout << "License MIT" << std::endl;
+  return EXIT_SUCCESS;
 }
 
 int PrintError(std::string error) {
   std::cout << error << std::endl;
-  return EXIT_SUCCESS;
+  return EXIT_FAILURE;
 }
 
 int PrintTranslatorHelp(TranslatorFactory factory) {
@@ -127,6 +128,8 @@ int PrintTranslatorHelp(TranslatorFactory factory) {
       std::cout << "     " << output << std::endl;
     }
   }
+
+  return EXIT_SUCCESS;
 }
 
 int Translate(TranslatorFactory translator_factory,
@@ -203,6 +206,7 @@ int Translate(TranslatorFactory translator_factory,
   auto translator = translator_factory();
   std::string output = translator->Translate(input, option_list);
   std::cout << output << std::endl;
+  return EXIT_SUCCESS;
 }
 
 int PrintTranslatorNotFound(const std::string& translator) {

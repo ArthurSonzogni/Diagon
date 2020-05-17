@@ -5,3 +5,4 @@ add_library(translator_math STATIC
   MathParser.cpp
   Math.cpp
 )
+#target_add_warning(translator_math)
