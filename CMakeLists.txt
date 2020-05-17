@@ -1,8 +1,6 @@
 cmake_minimum_required (VERSION 2.9)
 project(Diagon)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 # ┌─────────────────────────────────────────────────┐
 # │ Print Information about the compilation system  │
 # └─────────────────────────────────────────────────┘
@@ -63,7 +61,8 @@ function(ANTLR source)
   )
 endfunction()
 
-function(target_add_warning target)
+function(target_set_common target)
+  set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)
   if (MSVC)
     target_compile_options(${target} PRIVATE "/wd4244")
     target_compile_options(${target} PRIVATE "/wd4267")

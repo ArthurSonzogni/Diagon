@@ -5,4 +5,4 @@ add_library(translator_sequence STATIC
   SequenceParser.cpp
   Sequence.cpp
 )
-target_add_warning(translator_sequence)
+target_set_common(translator_sequence)

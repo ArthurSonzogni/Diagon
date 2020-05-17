@@ -2,7 +2,7 @@
 // Use of this source code is governed by the MIT license that can be found in
 // the LICENSE file.
 
-#include <experimental/filesystem>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -11,7 +11,7 @@
 #include "environment.h"
 #include "translator/Factory.h"
 
-std::string ReadFile(std::experimental::filesystem::path path) {
+std::string ReadFile(std::filesystem::path path) {
   std::ifstream file(path);
   std::stringstream ss;
   ss << file.rdbuf();
@@ -24,10 +24,10 @@ int main(int, const char**) {
 
   std::string path = test_directory;
   std::cout << "test_directory = " << test_directory << std::endl;
-  for (auto& dir : std::experimental::filesystem::directory_iterator(path)) {
+  for (auto& dir : std::filesystem::directory_iterator(path)) {
     std::string type = dir.path().filename();
     for (auto& test :
-         std::experimental::filesystem::directory_iterator(dir.path())) {
+         std::filesystem::directory_iterator(dir.path())) {
       auto translator = translator_list[type]();
 
       std::string input = ReadFile(test.path() / "input");

@@ -89,7 +89,7 @@ if (Web)
     translator/Translator.h
     translator/Factory.h
   )
-  target_add_warning(main)
+  target_set_common(main)
   target_link_libraries(main
     translator_frame
     translator_math
@@ -109,7 +109,7 @@ else()
     translator/Translator.h
     translator/Factory.h
   )
-  target_add_warning(diagon)
+  target_set_common(diagon)
   target_link_libraries(diagon
     translator_frame
     translator_math

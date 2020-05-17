@@ -1,4 +1,4 @@
 add_library(translator_tree STATIC
   Tree.cpp
 )
-target_add_warning(translator_tree)
+target_set_common(translator_tree)
