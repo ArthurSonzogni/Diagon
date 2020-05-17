@@ -128,7 +128,7 @@ else()
     translator/Translator.cpp
     input_output_test.cpp
   )
-
+  target_set_common(input_output_test)
   target_link_libraries(input_output_test
     translator_frame
     translator_math
