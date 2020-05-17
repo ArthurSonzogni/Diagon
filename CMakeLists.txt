@@ -63,7 +63,9 @@ endfunction()
 
 function(target_set_common target)
   set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)
-  if (MSVC)
+  if (Web)
+    # Nothing
+  elseif (MSVC)
     target_compile_options(${target} PRIVATE "/wd4244")
     target_compile_options(${target} PRIVATE "/wd4267")
     target_compile_options(${target} PRIVATE "/wd4996")
@@ -77,11 +79,13 @@ function(target_set_common target)
 endfunction()
 
 # Build the ANTLR runtime.
+set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(
   ${CMAKE_SOURCE_DIR}/tools/antlr/cpp_runtime/
   ${CMAKE_CURRENT_BINARY_DIR}/antlr
   EXCLUDE_FROM_ALL
 )
+set_property(TARGET antlr4_static PROPERTY CXX_STANDARD 17)
 include_directories(${CMAKE_SOURCE_DIR}/tools/antlr/cpp_runtime/runtime/src)
 
 #-------------------------------------------------------------------------------
