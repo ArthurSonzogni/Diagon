@@ -196,7 +196,8 @@ html, body {
 /* Application area */
 
 textarea {
-  font-family: monospace, monospace
+  font-family: monospace, monospace;
+  font-size: 1em;
   border: none;
   background-color: transparent;
   resize: none;
