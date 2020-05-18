@@ -1,5 +1,3 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto+Mono);
-
 div {
   margin: 0px;
   padding: 0px;
@@ -198,7 +196,7 @@ html, body {
 /* Application area */
 
 textarea {
-  font-family: 'Roboto Mono', monospace;
+  font-family: monospace, monospace
   border: none;
   background-color: transparent;
   resize: none;
