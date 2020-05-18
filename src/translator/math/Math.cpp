@@ -36,15 +36,16 @@ std::vector<Translator::Example> Math::Examples() {
       {"1-fraction", "f(x) = 1 + x / (1 + x)"},
       {"2-square-root", "sqrt(1+sqrt(1+x/2))"},
       {"3-power", "f(x) = 1 + x^2 + x^3 + x^(1+1/2)"},
-      {"4-summation", "sum(i^2,i=0,n) = n^3/2+n^2/2+n/6"},
-      {"5-integral", "int(x^2 * dx ,0,1) = n^3/3"},
-      {"6-product",
+      {"4-subscript", "S_n = u_1 + u_2 + ... + u_n"},
+      {"5-summation", "sum(i^2,i=0,n) = n^3/2+n^2/2+n/6"},
+      {"6-integral", "int(x^2 * dx ,0,1) = n^3/3"},
+      {"7-product",
        "mult(i^2,i=1,n) = (mult(i,i=1,n))^2\n\n\n\nmult(1/2,1,100) = "
        "7.8886091e-31"},
-      {"7-vector", "[a;b] + [c;d] = [a+c; b+d]"},
-      {"8-matrix", "[1,2;3,4] * [x;y] = [1*x+2*y; 3*x+4*y]"},
-      {"9-factorial", "[n;k] = n! / (k! *(n-k)!)"},
-      {"10-Math-symbols",
+      {"8-vector", "[a;b] + [c;d] = [a+c; b+d]"},
+      {"9-matrix", "[1,2;3,4] * [x;y] = [1*x+2*y; 3*x+4*y]"},
+      {"10-factorial", "[n;k] = n! / (k! *(n-k)!)"},
+      {"11-Math-symbols",
        "Alpha + alpha + Digamma + digamma + Kappa + kappa + Omicron \n"
        "omicron + Upsilon + upsilon + Beta + beta + Zeta + zeta + Lambda \n"
        "lambda + Pi + pi + Phi + phi + Gamma + gamma + Eta + eta + Mu + mu \n"
@@ -86,8 +87,7 @@ void Draw::Resize(int new_dim_x, int new_dim_y) {
   dim_x = new_dim_x;
   dim_y = new_dim_y;
 
-  content.resize(dim_y);
-  for (auto& line : content) {
+  content.resize(dim_y); for (auto& line : content) {
     line.resize(dim_x, L' ');
   }
 }
@@ -118,13 +118,24 @@ Draw ComposeVertical(const Draw& top, const Draw& down, int spaces) {
   return composition;
 }
 
-Draw ComposeDiagonal(const Draw& A, const Draw& B) {
+Draw ComposeDiagonalUp(const Draw& A, const Draw& B) {
   Draw composition;
   composition.Append(A, 0, B.dim_y);
   composition.Append(B, A.dim_x, 0);
 
   composition.center_x = composition.dim_x / 2;
   composition.center_y = A.center_y + B.dim_y;
+
+  return composition;
+}
+
+Draw ComposeDiagonalDown(const Draw& A, const Draw& B) {
+  Draw composition;
+  composition.Append(A, 0, 0);
+  composition.Append(B, A.dim_x, A.dim_y);
+
+  composition.center_x = composition.dim_x / 2;
+  composition.center_y = A.center_y;
 
   return composition;
 }
@@ -253,7 +264,9 @@ Draw Parse(MathParser::FactorContext* context,
   suppress_parenthesis &= (context->valueBang().size() == 1);
   Draw draw = Parse(context->valueBang(0), style, suppress_parenthesis);
   for (int i = 1; i < context->valueBang().size(); ++i) {
-    draw = ComposeDiagonal(draw, Parse(context->valueBang(i), style, false));
+    auto* compose =
+        context->powop(i - 1)->POW() ? ComposeDiagonalUp : ComposeDiagonalDown;
+    draw = compose(draw, Parse(context->valueBang(i), style, false));
   }
   return draw;
 }

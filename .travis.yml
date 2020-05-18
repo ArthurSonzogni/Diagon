@@ -8,8 +8,6 @@ script:
   - cd build
   - cmake ..
   - cmake --build .
-  - cat ./CMakeFiles/CMakeOutput.log
-  - cat ./CMakeFiles/CMakeError.log
 
 notifications:
   email: false
