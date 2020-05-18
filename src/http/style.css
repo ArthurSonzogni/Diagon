@@ -11,6 +11,7 @@ div {
   --begin-button-hover: #3cb0ff;
   --code-area-bg-color: #AAA;
   --select-bg-color: #EEE;
+  --transition-time: 0s;
 }
 
 [data-theme="dark"] {
@@ -24,6 +25,7 @@ div {
 /* Global */
 
 html {
+  transition: color var(--transition-time), background-color var(--transition-time);
   color: var(--fg-color);
   background-color: var(--bg-color);
   font-family: Arial;
@@ -104,6 +106,15 @@ html, body {
   font-size:20vmin;
   margin:0;
   padding:0;
+  transition: text-shadow 1s ease-in-out 1s;
+}
+
+#landing_page_content h1:hover {
+  text-shadow:
+            +0px   0px   15px   var(--bg-color),
+            +0px   -15px   20px   rgba(255,0,0,0.5),
+           -15px   +10px   20px   rgba(0,255,0,0.5),
+           +10px   +15px   20px   rgba(0,0,255,0.5);
 }
 
 #landing_page_content h2 {
@@ -265,10 +276,14 @@ option {
 #begin_button {
   border:1vmin var(--fg-color) solid;
   color: var(--fg-color);
+  transition: border-radius 1s ease-in-out 1s, padding 1s ease-in-out 1s;
+  padding: 10px;
 }
 
 #begin_button:hover {
   background-color: var(--begin-button-hover);
+  border-radius: 9vmin;
+  padding:25px;
 }
 
 #code_area {

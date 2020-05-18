@@ -328,6 +328,11 @@ if (window.matchMedia) {
     .addEventListener('change', e => setTheme(e.matches));
 }
 
+setTimeout(() => {
+  let style = document.documentElement.style;
+  style.setProperty("--transition-time", "0.5s");
+}, 500);
+
 </script>
 <script src="main.js"></script>
 </html>
