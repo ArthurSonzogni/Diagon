@@ -2,7 +2,8 @@
 // Use of this source code is governed by the MIT license that can be found in
 // the LICENSE file.
 
-#include <filesystem>
+#include "filesystem.hpp"
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -26,8 +27,7 @@ int main(int, const char**) {
   std::cout << "test_directory = " << test_directory << std::endl;
   for (auto& dir : std::filesystem::directory_iterator(path)) {
     std::string type = dir.path().filename();
-    for (auto& test :
-         std::filesystem::directory_iterator(dir.path())) {
+    for (auto& test : std::filesystem::directory_iterator(dir.path())) {
       auto translator = translator_list[type]();
 
       std::string input = ReadFile(test.path() / "input");
