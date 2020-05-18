@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-
     @google-analytics@
+    <title>Diagon: ASCII art diagram generator</title>
 
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-    <title>Diagon: ASCII art diagram generator</title>
     <meta name="description" content="Generate beautiful ASCII art diagrams.
     Diagon is a collection of interactive generators. Math formulas, sequences diagrams, graph,
     border, ... This is written in C++, available online with WebAssembly.">
-
     <meta name="og:title" property="og:title" content="Diagon: ASCII art diagram generators">
     <meta name="robots" content="index, follow">
 
     <link rel="canonical" href="https://arthursonzogni.com/Diagon/" />
-
     <link rel="stylesheet" type="text/css" href="./style.css">
+
+    <link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+    <link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+    <link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+    <link rel=manifest href=/manifest.json>
+    <meta name=theme-color content="#FFFFFF">
+
+    <meta name=viewport content="width=device-width,initial-scale=1">
 
   </head>
   <body>
@@ -83,22 +86,35 @@
         <!--2 Input / Output -->
         <div class="container device-orientation flex">
           <div class="gutter"></div>
-          <textarea id="input" class="flex" placeholder='input'></textarea>
+          <textarea
+            aria-label="input"
+            id="input"
+            class="flex"
+            placeholder='input'
+            ></textarea>
           <div class="gutter"></div>
-          <textarea id="output" class = "flex" placeholder='output' readonly></textarea>
+          <textarea
+            aria-label="output"
+            id="output"
+            class = "flex"
+            placeholder='output'
+            readonly
+          ></textarea>
           <div class="gutter"></div>
         </div>
 
         <div class="gutter"></div>
 
         <!--3 Errors-->
-        <textarea id="errors" placeholder='errors' readonly rows=3 ></textarea>
+        <textarea
+          aria-label="Errors"
+          id="errors"
+          placeholder='errors'
+          readonly
+          rows=3 ></textarea>
 
       </div>
     </div>
-
-  </body>
-
 <script>
 
 let tools = document.getElementById('tools');
@@ -135,6 +151,7 @@ function UpdateExamples() {
   }
 }
 
+let nextInstance = 0;
 function UpdateOptions() {
   // Clear.
   while(options.firstChild) {
@@ -149,12 +166,17 @@ function UpdateOptions() {
     let option_box = document.createElement('p');
     option_box.className = "option";
 
+    let instance = "instance-" + nextInstance;
+    nextInstance++;
+
     let label = document.createElement('label');
     label.innerText = option.label + " : ";
+    label.htmlFor = instance;
     option_box.appendChild(label);
 
     if (option.type == "checkbox") {
       let checkbox = document.createElement("input");
+      checkbox.id = instance;
       checkbox.type = "checkbox";
       checkbox.data = option.name;
       checkbox.checked = option.default;
@@ -164,6 +186,7 @@ function UpdateOptions() {
 
     if (option.type == "combobox") {
       let select = document.createElement('select');
+      select.id = instance;
       select.data = option.name
       select.type = "text";
       for(let i in option.values) {
