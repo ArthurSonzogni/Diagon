@@ -40,19 +40,25 @@
         ]
       },
       {
-        "title":"4-summation",
+        "title":"4-subscript",
+        "content": [
+          "S_n = u_1 + u_2 + ... + u_n"
+        ]
+      },
+      {
+        "title":"5-summation",
         "content": [
           "sum(i^2,i=0,n) = n^3/2+n^2/2+n/6"
         ]
       },
       {
-        "title":"5-integral",
+        "title":"6-integral",
         "content": [
           "int(x^2 * dx ,0,1) = n^3/3"
         ]
       },
       {
-        "title":"6-product",
+        "title":"7-product",
         "content": [
           "mult(i^2,i=1,n) = (mult(i,i=1,n))^2",
           "",
@@ -64,25 +70,25 @@
         ]
       },
       {
-        "title":"7-vector",
+        "title":"8-vector",
         "content": [
           "[a;b] + [c;d] = [a+c; b+d]"
         ]
       },
       {
-        "title":"8-matrix",
+        "title":"9-matrix",
         "content": [
           "[1,2;3,4] * [x;y] = [1*x+2*y; 3*x+4*y]"
         ]
       },
       {
-        "title":"9-factorial",
+        "title":"10-factorial",
         "content": [
           "[n;k] = n! / (k! *(n-k)!)"
         ]
       },
       {
-        "title":"10-Math-symbols",
+        "title":"11-Math-symbols",
         "content": [
           "Alpha",
           "alpha",
