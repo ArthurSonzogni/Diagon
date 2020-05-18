@@ -17,10 +17,7 @@
 
     <link rel="canonical" href="https://arthursonzogni.com/Diagon/" />
 
-    <link rel="stylesheet" type="text/css" href="./style/style.css">
-    <link rel="stylesheet" type="text/css" href="./style/light_style.css" id="theme_style">
-
-    <link rel="preload" href="./style/dark_style.css" as="style">
+    <link rel="stylesheet" type="text/css" href="./style.css">
 
   </head>
   <body>
@@ -84,7 +81,7 @@
         </div>
 
         <!--2 Input / Output -->
-        <div class="container horizontal flex">
+        <div class="container device-orientation flex">
           <div class="gutter"></div>
           <textarea id="input" class="flex" placeholder='input'></textarea>
           <div class="gutter"></div>
@@ -95,7 +92,7 @@
         <div class="gutter"></div>
 
         <!--3 Errors-->
-        <textarea id="errors" placeholder='errors' readonly rows=8 ></textarea>
+        <textarea id="errors" placeholder='errors' readonly rows=3 ></textarea>
 
       </div>
     </div>
@@ -113,16 +110,6 @@ let errors = document.getElementById('errors');
 let tools_data = [];
 let style_button = document.getElementById("style_button");
 let theme_style = document.getElementById("theme_style");
-
-style_button.addEventListener("click", function() {
-  if (style_button.innerText == "Dark theme") {
-    theme_style.href = "./style/dark_style.css";
-    style_button.innerText = "Light theme";
-  } else {
-    theme_style.href = "./style/light_style.css";
-    style_button.innerText = "Dark theme";
-  }
-});
 
 errors.value = ''; 
 function ClearSelectBox(select_box) {
@@ -270,6 +257,53 @@ window.Module = {
   canvas: undefined,
   onRuntimeInitialized: OnRuntimeInitialized,
 };
+
+// Theme ---
+
+function getColorScheme() {
+  if(localStorage.getItem("theme"))
+    return localStorage.getItem("theme");
+
+  if(!window.matchMedia)
+    return "light";
+  
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches)
+    return "dark";
+  else
+    return "light";
+}
+
+//determines if the user has a set theme
+function setColorScheme(scheme){
+  document.documentElement.setAttribute("data-theme", scheme);
+}
+
+let scheme = getColorScheme();
+setColorScheme(scheme);
+if (scheme == "dark")
+  style_button.innerText = "Light theme";
+else
+  style_button.innerText = "Dark theme";
+
+style_button.addEventListener("click", function() {
+  setTheme(style_button.innerText == "Dark theme");
+});
+
+function setTheme(is_dark) {
+  if (is_dark) {
+    localStorage.setItem('theme', 'dark');
+    style_button.innerText = "Light theme";
+  } else {
+    localStorage.setItem('theme', 'light');
+    style_button.innerText = "Dark theme";
+  }
+  setColorScheme(getColorScheme());
+};
+
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', e => setTheme(e.matches));
+}
 
 </script>
 <script src="main.js"></script>

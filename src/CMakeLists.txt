@@ -52,22 +52,11 @@ if (Web)
   if (ADD_GOOGLE_ANALYTICS)
     file(READ ${CMAKE_CURRENT_SOURCE_DIR}/http/google-analytics.html google-analytics)
   endif(ADD_GOOGLE_ANALYTICS)
-
+  
   configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/http/style/style.css
-    ${CMAKE_CURRENT_BINARY_DIR}/style/style.css
+    ${CMAKE_CURRENT_SOURCE_DIR}/http/style.css
+    ${CMAKE_CURRENT_BINARY_DIR}/style.css
   )
-
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/http/style/light_style.css
-    ${CMAKE_CURRENT_BINARY_DIR}/style/light_style.css
-  )
-
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/http/style/dark_style.css
-    ${CMAKE_CURRENT_BINARY_DIR}/style/dark_style.css
-  )
-
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/http/index.html
     ${CMAKE_CURRENT_BINARY_DIR}/index.html
