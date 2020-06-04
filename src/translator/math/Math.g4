@@ -48,7 +48,14 @@ term : factor (mulop factor)* ;
 factor : valueBang (powop valueBang)* ;
 valueBang: value | valueBang BANG;
 value : (PLUS | MINUS)? atom ;
-atom : STRING | scientific | variable | function | matrix | LPAREN expression RPAREN ;
+atom : STRING
+     | scientific
+     | variable
+     | function
+     | matrix
+     | LBRACE expression RBRACE
+     | LPAREN expression RPAREN
+     ;
 scientific : SCIENTIFIC_NUMBER ;
 function : variable LPAREN equation (',' equation)* RPAREN ;
 variable : VARIABLE ;
@@ -73,6 +80,8 @@ fragment SIGN : ('+' | '-') ;
 
 LPAREN : '(' ;
 RPAREN : ')' ;
+LBRACE: '{' ;
+RBRACE : '}' ;
 LBRACKET : '[' ;
 RBRACKET : ']' ;
 PLUS : '+' ;
