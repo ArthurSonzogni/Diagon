@@ -48,7 +48,7 @@ term : factor (mulop factor)* ;
 factor : valueBang (powop valueBang)* ;
 valueBang: value | valueBang BANG;
 value : (PLUS | MINUS)? atom ;
-atom : scientific | variable | function | matrix | LPAREN expression RPAREN ;
+atom : STRING | scientific | variable | function | matrix | LPAREN expression RPAREN ;
 scientific : SCIENTIFIC_NUMBER ;
 function : variable LPAREN equation (',' equation)* RPAREN ;
 variable : VARIABLE ;
@@ -60,6 +60,7 @@ mulop : TIMES | DIV ;
 powop : POW | SUBSCRIPT ;
 VARIABLE : VALID_ID_START VALID_ID_CHAR* | '...' ;
 
+STRING: '"' ~('"') * '"' ;
 fragment VALID_ID_START : ('a' .. 'z') | ('A' .. 'Z') ;
 fragment VALID_ID_CHAR : VALID_ID_START | ('0' .. '9') ;
 SCIENTIFIC_NUMBER : NUMBER (E SIGN? NUMBER)? ;

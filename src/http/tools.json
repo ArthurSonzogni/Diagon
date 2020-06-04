@@ -88,7 +88,14 @@
         ]
       },
       {
-        "title":"11-Math-symbols",
+        "title":"11-quoted-string",
+        "content": [
+          "\"x_n\"",
+          "x_n"
+        ]
+      },
+      {
+        "title":"12-Math-symbols",
         "content": [
           "Alpha",
           "alpha",
