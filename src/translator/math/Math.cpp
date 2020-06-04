@@ -494,10 +494,6 @@ Draw Parse(MathParser::AtomContext* context,
     }
   }
 
-  if (context->scientific()) {
-    return Parse(context->scientific());
-  }
-
   if (context->function()) {
     return Parse(context->function(), style);
   }
@@ -520,10 +516,6 @@ Draw Parse(MathParser::VariableContext* context, Style* style) {
     label = style->variable_transform.at(label);
   }
   return Draw(label);
-}
-
-Draw Parse(MathParser::ScientificContext* context) {
-  return Draw(to_wstring(context->SCIENTIFIC_NUMBER()->getText()));
 }
 
 Draw Parse(MathParser::MatrixContext* context, Style* style) {
