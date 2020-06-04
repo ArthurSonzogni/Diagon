@@ -88,7 +88,6 @@ Draw Parse(MathParser::MatrixContext*, Style*);
 Draw Parse(MathParser::ValueBangContext* context, Style*, bool);
 Draw Parse(MathParser::ValueContext*, Style*, bool suppress_parenthesis);
 Draw Parse(MathParser::AtomContext*, Style*, bool suppress_parenthesis);
-Draw Parse(MathParser::ScientificContext*);
 Draw Parse(MathParser::VariableContext*, Style* style);
 Draw ComposeHorizontal(const Draw& left, const Draw& right, int spaces);
 Draw ComposeVertical(const Draw& top, const Draw& down, int spaces);
