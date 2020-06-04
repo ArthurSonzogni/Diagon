@@ -45,7 +45,10 @@ std::vector<Translator::Example> Math::Examples() {
       {"8-vector", "[a;b] + [c;d] = [a+c; b+d]"},
       {"9-matrix", "[1,2;3,4] * [x;y] = [1*x+2*y; 3*x+4*y]"},
       {"10-factorial", "[n;k] = n! / (k! *(n-k)!)"},
-      {"11-Math-symbols",
+      {"11-quoted-string",
+       "\"x_n\"\n"
+       " x_n\n" },
+      {"12-Math-symbols",
        "Alpha + alpha + Digamma + digamma + Kappa + kappa + Omicron \n"
        "omicron + Upsilon + upsilon + Beta + beta + Zeta + zeta + Lambda \n"
        "lambda + Pi + pi + Phi + phi + Gamma + gamma + Eta + eta + Mu + mu \n"
@@ -463,6 +466,12 @@ Draw Parse(MathParser::ValueContext* context,
   return atom;
 }
 
+Draw ParseString(antlr4::tree::TerminalNode* node) {
+  std::wstring  s = to_wstring(node->getText());
+  s = s.substr(1, s.length() - 2); // Remove quotes.
+  return Draw(s);
+}
+
 Draw Parse(MathParser::AtomContext* context,
            Style* style,
            bool suppress_parenthesis) {
@@ -489,6 +498,10 @@ Draw Parse(MathParser::AtomContext* context,
 
   if (context->matrix()) {
     return Parse(context->matrix(), style);
+  }
+
+  if (context->STRING()) {
+    return ParseString(context->STRING());
   }
 
   // XXX
