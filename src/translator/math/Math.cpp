@@ -47,8 +47,14 @@ std::vector<Translator::Example> Math::Examples() {
       {"10-factorial", "[n;k] = n! / (k! *(n-k)!)"},
       {"11-quoted-string",
        "\"x_n\"\n"
-       " x_n\n" },
-      {"12-Math-symbols",
+       " x_n\n"},
+      {"12-braces-vs-parenthesis",
+       "A_(1+2)\n"
+       "\n"
+       "A_{1+2}\n"
+       "\n"
+       "A^{1+2}\n"},
+      {"13-Math-symbols",
        "Alpha + alpha + Digamma + digamma + Kappa + kappa + Omicron \n"
        "omicron + Upsilon + upsilon + Beta + beta + Zeta + zeta + Lambda \n"
        "lambda + Pi + pi + Phi + phi + Gamma + gamma + Eta + eta + Mu + mu \n"
@@ -481,7 +487,7 @@ Draw Parse(MathParser::AtomContext* context,
 
   if (context->expression()) {
     Draw draw = Parse(context->expression(), style);
-    if (suppress_parenthesis) {
+    if (suppress_parenthesis || context->RBRACE()) {
       return draw;
     } else {
       return WrapWithParenthesis(draw, style);

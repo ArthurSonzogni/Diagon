@@ -95,7 +95,20 @@
         ]
       },
       {
-        "title":"12-Math-symbols",
+        "title":"12-braces-vs-parenthesis",
+        "content": [
+          "A_(1+2)",
+          "",
+          "A_{1+2}",
+          "",
+          "A^(1+2)",
+          "",
+          "A^{1+2}"}
+        ]
+      },
+      {"12-quoted-string",
+      {
+        "title":"13-Math-symbols",
         "content": [
           "Alpha",
           "alpha",
