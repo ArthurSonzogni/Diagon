@@ -103,10 +103,9 @@
           "",
           "A^(1+2)",
           "",
-          "A^{1+2}"}
+          "A^{1+2}"
         ]
       },
-      {"12-quoted-string",
       {
         "title":"13-Math-symbols",
         "content": [
