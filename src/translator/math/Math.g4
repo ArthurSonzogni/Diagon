@@ -82,13 +82,12 @@ LT : '<' ;
 GE : '>=' ; 
 LE : '<=' ; 
 EQ : '=' ; 
-POINT : '.' ; 
 POW : '^' ;
 SUBSCRIPT: '_' ;
 EOL : '\r\n' | '\n' ;
 WS : [ \t] + -> skip ; 
 
-fragment CHAR : ~([!+-<>=_^(){}[\] \t\r\n"*]) | [0123456789];
+fragment CHAR : ~[!+-<>=_^(){}[\] \t\r\n"*] | [.0123456789];
 VARIABLE: CHAR+;
 
 // vim: filetype=antlr
