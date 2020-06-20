@@ -91,3 +91,34 @@ include_directories(${CMAKE_SOURCE_DIR}/tools/antlr/cpp_runtime/runtime/src)
 #-------------------------------------------------------------------------------
 
 add_subdirectory(src)
+
+#-------------------------------------------------------------------------------
+
+execute_process(
+  COMMAND 
+    git rev-list --count HEAD
+  WORKING_DIRECTORY
+    ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE
+    git_version
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_NAME "diagon")
+set(CPACK_PACKAGE_VENDOR "Arthur Sonzogni")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Arthur Sonzogni")
+set(CPACK_PACKAGE_VERSION_MAJOR ${git_version})
+set(CPACK_PACKAGE_VERSION_MINOR "")
+set(CPACK_PACKAGE_VERSION_PATCH "")
+set(CPACK_DEBIAN_PACKAGE_VERSION ${git_version})
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://arthursonzogni.com/Diagon/")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "
+  Generate beautiful ASCII art diagrams.
+  Diagon is a collection of interactive generators. Math formulas, sequences diagrams, graph,
+  border, ... This is written in C++, available online with WebAssembly.
+")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS " ")
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://arthursonzogni.com/Diagon/")
+
+include(CPack)

@@ -1,5 +1,5 @@
 name: diagon
-version: '1.0'
+adopt-info: diagon
 summary: Ascii art generators from markdown-style expression.
 description: |
   Diagon is an interactive interpreter. It transforms markdown-style expression
@@ -27,6 +27,10 @@ parts:
     - uuid-dev
     - openjdk-8-jdk
     - libboost-graph-dev
+    override-build: |
+      snapcraftctl build
+      snapcraftctl set-version "$(git rev-list --count HEAD)"
+
 passthrough:
   title: Diagon
   license: MIT
