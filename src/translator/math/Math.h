@@ -95,4 +95,17 @@ Draw ComposeDiagonal(const Draw& A, const Draw& B);
 Draw WrapWithParenthesis(const Draw& element, Style* style);
 std::string to_string(const Draw& draw);
 
+std::wstring ParseLatex(MathParser::MultilineEquationContext* context, Style*);
+std::wstring ParseLatex(MathParser::NewlinesContext*, Style*);
+std::wstring ParseLatex(MathParser::EquationContext*, Style*);
+std::wstring ParseLatex(MathParser::ExpressionContext*, Style*);
+std::wstring ParseLatex(MathParser::TermContext*, Style*);
+std::wstring ParseLatex(MathParser::FactorContext*, Style*);
+std::wstring ParseLatex(MathParser::FunctionContext*, Style*);
+std::wstring ParseLatex(MathParser::MatrixContext*, Style*);
+std::wstring ParseLatex(MathParser::ValueBangContext* context, Style*);
+std::wstring ParseLatex(MathParser::ValueContext*, Style*);
+std::wstring ParseLatex(MathParser::AtomContext*, Style*);
+std::wstring ParseLatex(MathParser::VariableContext*, Style*);
+
 #endif /* end of include guard: TRANSLATOR_MATH_H */

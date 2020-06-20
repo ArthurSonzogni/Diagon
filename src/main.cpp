@@ -69,8 +69,9 @@ COOKBOOK:
     * stdin       : diagon Math
 
   Providing options:
-    diagon Math -ascii-only=false -- 1 + 1/2
-    diagon Math -ascii-only=true  -- 1 + 1/2
+    diagon Math -style=Unicode -- 1 + 1/2
+    diagon Math -style=Ascii   -- 1 + 1/2
+    diagon Math -style=Latex   -- 1 + 1/2
   
 WEBSITE:
   This tool can also be used as a WebAssembly application on the website:

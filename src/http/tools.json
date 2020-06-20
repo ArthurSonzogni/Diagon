@@ -4,10 +4,15 @@
     "description": "Mathematical expression",
     "options": [
       {
-        "type":"checkbox",
-        "default":false,
-        "label":"ASCII-only",
-        "name":"ascii_only"
+        "type":"combobox",
+        "default":true,
+        "label":"Style",
+        "name":"style",
+        "values": [
+          "Unicode",
+          "ASCII",
+          "Latex"
+        ]
       },
       {
         "type":"checkbox",

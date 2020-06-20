@@ -19,9 +19,9 @@ const char* Math::Description() {
 std::vector<Translator::OptionDescription> Math::Options() {
   return {
       {
-          "ascii_only",
-          "values: {false, true}\n"
-          "default: --ascii_only=false",
+          "style",
+          "values: {Unicode, ASCII, Latex}\n"
+          "default: --style=Unicode",
       },
       {
           "transform_math_letters",
@@ -96,7 +96,8 @@ void Draw::Resize(int new_dim_x, int new_dim_y) {
   dim_x = new_dim_x;
   dim_y = new_dim_y;
 
-  content.resize(dim_y); for (auto& line : content) {
+  content.resize(dim_y);
+  for (auto& line : content) {
     line.resize(dim_x, L' ');
   }
 }
@@ -203,10 +204,30 @@ Draw Parse(MathParser::MultilineEquationContext* context, Style* style) {
   return draw;
 }
 
+std::wstring ParseLatex(MathParser::MultilineEquationContext* context, Style* style) {
+  std::wstring out;
+  for (int i = 0; i < context->equation().size(); ++i) {
+    out += ParseLatex(context->equation(i), style);
+    if (i < context->newlines().size())
+      out += ParseLatex(context->newlines(i), style);
+  }
+  return out;
+}
+
 Draw Parse(MathParser::NewlinesContext* context) {
   Draw draw;
   draw.Resize(0, context->EOL().size() - 1);
   return draw;
+}
+
+std::wstring ParseLatex(MathParser::NewlinesContext* context, Style* style) {
+  std::wstring out;
+  for (int i = 0; i < context->EOL().size(); ++i)
+    if (i == 0)
+      out += L" \\\\\n";
+    else
+      out += L"\\\\\n";
+  return out;
 }
 
 Draw Parse(MathParser::EquationContext* context, Style* style) {
@@ -234,6 +255,24 @@ Draw Parse(MathParser::EquationContext* context, Style* style) {
   return draw;
 }
 
+std::wstring ParseLatex(MathParser::EquationContext* context, Style* style) {
+  std::wstring out = ParseLatex(context->expression(0), style);
+  for (int i = 1; i < context->expression().size(); ++i) {
+    auto op = context->relop(i - 1);
+    std::wstring symbol;
+    // clang-format off
+         if (op->LT()) out += L" < ";
+    else if (op->GT()) out += L" > ";
+    else if (op->LE()) out += L" \\leq ";
+    else if (op->GE()) out += L" \\geq ";
+    else if (op->EQ()) out += L" = ";
+    // clang-format on
+
+    out += ParseLatex(context->expression(i), style);
+  }
+  return out;
+}
+
 Draw Parse(MathParser::ExpressionContext* context, Style* style) {
   Draw draw = Parse(context->term(0), style);
   for (int i = 1; i < context->term().size(); ++i) {
@@ -243,6 +282,15 @@ Draw Parse(MathParser::ExpressionContext* context, Style* style) {
         context->addop(i - 1)->PLUS() ? U'+' : U'-';
   }
   return draw;
+}
+
+std::wstring ParseLatex(MathParser::ExpressionContext* context, Style* style) {
+  std::wstring out = ParseLatex(context->term(0), style);
+  for (int i = 1; i < context->term().size(); ++i) {
+    out += context->addop(i - 1)->PLUS() ? L" + " : L" - ";
+    out += ParseLatex(context->term(i), style);
+  }
+  return out;
 }
 
 Draw Parse(MathParser::TermContext* context, Style* style) {
@@ -267,6 +315,19 @@ Draw Parse(MathParser::TermContext* context, Style* style) {
   return draw;
 }
 
+std::wstring ParseLatex(MathParser::TermContext* context, Style* style) {
+  std::wstring out = ParseLatex(context->factor(0), style);
+  for (int i = 1; i < context->factor().size(); ++i) {
+    if (context->mulop(i - 1)->DIV()) {
+      out = L"\\frac{" + out + L"}{" + ParseLatex(context->factor(i), style) +
+            L"}";
+    } else {
+      out += L" \\times " + ParseLatex(context->factor(i), style);
+    }
+  }
+  return out;
+}
+
 Draw Parse(MathParser::FactorContext* context,
            Style* style,
            bool suppress_parenthesis) {
@@ -280,24 +341,45 @@ Draw Parse(MathParser::FactorContext* context,
   return draw;
 }
 
+std::wstring ParseLatex(MathParser::FactorContext* context, Style* style) {
+  std::wstring out = ParseLatex(context->valueBang(0), style);
+  for (int i = 1; i < context->valueBang().size(); ++i) {
+    out += context->powop(i - 1)->POW() ? L"^" : L"_";
+    out += ParseLatex(context->valueBang(i), style);
+  }
+  return out;
+}
+
 Draw Parse(MathParser::ValueBangContext* context,
            Style* style,
            bool suppress_parenthesis) {
-  if (context->value()) {
+  if (context->value())
     return Parse(context->value(), style, suppress_parenthesis);
-  } else {
-    return ComposeHorizontal(
-        Parse(context->valueBang(), style, suppress_parenthesis), Draw(L"!"),
-        0);
-  }
+
+  return ComposeHorizontal(
+      Parse(context->valueBang(), style, suppress_parenthesis), Draw(L"!"), 0);
 }
 
-Draw ParseFunctionSqrt(MathParser::FunctionContext* context, Style* style) {
+std::wstring ParseLatex(MathParser::ValueBangContext* context, Style* style) {
+  if (context->value())
+    return ParseLatex(context->value(), style);
+  else
+    return ParseLatex(context->valueBang(), style) + L"!";
+}
+
+bool CheckFunctionSqrt(MathParser::FunctionContext* context) {
   int num_arguments = context->equation().size();
   if (num_arguments != 1) {
     std::cerr << "Square root function (sqrt) only handle one argument, "
               << num_arguments << " provided" << std::endl;
+    return false;
   }
+  return true;
+}
+
+Draw ParseFunctionSqrt(MathParser::FunctionContext* context, Style* style) {
+  if (!CheckFunctionSqrt(context))
+    return Draw(L"(error)");
 
   Draw content = Parse(context->equation(0), style);
   Draw draw;
@@ -312,12 +394,26 @@ Draw ParseFunctionSqrt(MathParser::FunctionContext* context, Style* style) {
   return draw;
 }
 
-Draw ParseFunctionSum(MathParser::FunctionContext* context, Style* style) {
+std::wstring ParseFunctionSqrtLatex(MathParser::FunctionContext* context, Style* style) {
+  if (!CheckFunctionSqrt(context))
+    return L"(error)";
+
+  return L"\\sqrt{" + ParseLatex(context->equation(0), style) + L"}";
+}
+
+bool CheckFunctionSum(MathParser::FunctionContext* context) {
   int num_arguments = context->equation().size();
   if (num_arguments > 3) {
     std::cerr << "Summation function (sum) only handle 1,2 or 3 arguments, "
               << num_arguments << " provided" << std::endl;
+    return false;
   }
+  return true;
+}
+
+Draw ParseFunctionSum(MathParser::FunctionContext* context, Style* style) {
+  if (!CheckFunctionSum(context))
+    return Draw(L"(error)");
 
   Draw content = Parse(context->equation(0), style);
   Draw down =
@@ -360,13 +456,32 @@ Draw ParseFunctionSum(MathParser::FunctionContext* context, Style* style) {
   return ComposeHorizontal(sum, content, 1);
 }
 
-Draw ParseFunctionMult(MathParser::FunctionContext* context, Style* style) {
+std::wstring ParseFunctionSumLatex(MathParser::FunctionContext* context, Style* style) {
+  if (!CheckFunctionSum(context))
+    return L"(error)";
+
+  std::wstring out = L"\\sum";
+  if (context->equation(1))
+    out += L"_{" + ParseLatex(context->equation(1), style) + L"}";
+  if (context->equation(2))
+    out += L"^{" + ParseLatex(context->equation(2), style) + L"}";
+  return out + L" " +  ParseLatex(context->equation(0), style);
+}
+
+bool CheckFunctionMult(MathParser::FunctionContext* context) {
   int num_arguments = context->equation().size();
   if (num_arguments > 3) {
     std::cerr
         << "Multiplication function (mult) only handle 1,2 or 3 arguments, "
         << num_arguments << " provided" << std::endl;
+    return false;
   }
+  return true;
+}
+
+Draw ParseFunctionMult(MathParser::FunctionContext* context, Style* style) {
+  if (!CheckFunctionMult(context))
+    return Draw(L"(error)");
 
   Draw content = Parse(context->equation(0), style);
   Draw down =
@@ -400,12 +515,32 @@ Draw ParseFunctionMult(MathParser::FunctionContext* context, Style* style) {
   return ComposeHorizontal(ret, content, 1);
 }
 
-Draw ParseFunctionIntegral(MathParser::FunctionContext* context, Style* style) {
+std::wstring ParseFunctionMultLatex(MathParser::FunctionContext* context, Style* style) {
+  if (!CheckFunctionMult(context))
+    return L"(error)";
+
+  std::wstring out = L"\\prod";
+  if (context->equation(1))
+    out += L"_{" + ParseLatex(context->equation(1), style) + L"}";
+  if (context->equation(2))
+    out += L"^{" + ParseLatex(context->equation(2), style) + L"}";
+  return out + L" " +  ParseLatex(context->equation(0), style);
+}
+
+bool CheckFunctionIntegral(MathParser::FunctionContext* context) {
   int num_arguments = context->equation().size();
   if (num_arguments > 3) {
     std::cerr << "Integral function (int) only handle 1,2 or 3 arguments, "
               << num_arguments << " provided" << std::endl;
+    return false;
   }
+
+  return true;
+}
+
+Draw ParseFunctionIntegral(MathParser::FunctionContext* context, Style* style) {
+  if (!CheckFunctionIntegral(context))
+    return Draw(L"(error)");
 
   Draw content = Parse(context->equation(0), style);
   Draw down =
@@ -435,6 +570,19 @@ Draw ParseFunctionIntegral(MathParser::FunctionContext* context, Style* style) {
   return ComposeHorizontal(sum, content, 1);
 }
 
+std::wstring ParseFunctionIntegralLatex(MathParser::FunctionContext* context,
+                                       Style* style) {
+  if (!CheckFunctionIntegral(context))
+    return L"(error)";
+
+  std::wstring out = L"\\int";
+  if (context->equation(1))
+    out += L"_{" + ParseLatex(context->equation(1), style) + L"}";
+  if (context->equation(2))
+    out += L"^{" + ParseLatex(context->equation(2), style) + L"}";
+  return out + L" " +  ParseLatex(context->equation(0), style);
+}
+
 Draw ParseFunctionCommon(MathParser::FunctionContext* context, Style* style) {
   Draw content = Parse(context->equation(0), style);
   for (int i = 1; i < context->equation().size(); ++i) {
@@ -445,6 +593,14 @@ Draw ParseFunctionCommon(MathParser::FunctionContext* context, Style* style) {
   return ComposeHorizontal(Parse(context->variable(), style),
                            WrapWithParenthesis(content, style),
                            content.dim_y == 1 ? 0 : 1);
+}
+
+std::wstring ParseFunctionCommonLatex(MathParser::FunctionContext* context,
+                                     Style* style) {
+  std::wstring content = ParseLatex(context->equation(0), style);
+  for (int i = 1; i < context->equation().size(); ++i)
+    content += L"," + ParseLatex(context->equation(0), style);
+  return L"\\" + ParseLatex(context->variable(), style) + L"{" + content + L"}";
 }
 
 Draw Parse(MathParser::FunctionContext* context, Style* style) {
@@ -460,6 +616,19 @@ Draw Parse(MathParser::FunctionContext* context, Style* style) {
   return ParseFunctionCommon(context, style);
 }
 
+std::wstring ParseLatex(MathParser::FunctionContext* context, Style* style) {
+  std::string function_name = context->variable()->VARIABLE()->getText();
+  if (function_name == "sqrt")
+    return ParseFunctionSqrtLatex(context, style);
+  if (function_name == "sum")
+    return ParseFunctionSumLatex(context, style);
+  if (function_name == "int")
+    return ParseFunctionIntegralLatex(context, style);
+  if (function_name == "mult")
+    return ParseFunctionMultLatex(context, style);
+  return ParseFunctionCommonLatex(context, style);
+}
+
 Draw Parse(MathParser::ValueContext* context,
            Style* style,
            bool suppress_parenthesis) {
@@ -472,18 +641,30 @@ Draw Parse(MathParser::ValueContext* context,
   return atom;
 }
 
+std::wstring ParseLatex(MathParser::ValueContext* context, Style* style) {
+  std::wstring atom = ParseLatex(context->atom(), style);
+  if (context->MINUS())
+    return L"-" + atom;
+  if (context->PLUS())
+    return L"+" + atom;
+  return atom;
+}
+
 Draw ParseString(antlr4::tree::TerminalNode* node) {
-  std::wstring  s = to_wstring(node->getText());
-  s = s.substr(1, s.length() - 2); // Remove quotes.
+  std::wstring s = to_wstring(node->getText());
+  s = s.substr(1, s.length() - 2);  // Remove quotes.
   return Draw(s);
+}
+
+std::wstring ParseStringLatex(antlr4::tree::TerminalNode* node) {
+  return to_wstring(node->getText());
 }
 
 Draw Parse(MathParser::AtomContext* context,
            Style* style,
            bool suppress_parenthesis) {
-  if (context->variable()) {
+  if (context->variable())
     return Parse(context->variable(), style);
-  }
 
   if (context->expression()) {
     Draw draw = Parse(context->expression(), style);
@@ -494,28 +675,50 @@ Draw Parse(MathParser::AtomContext* context,
     }
   }
 
-  if (context->function()) {
+  if (context->function())
     return Parse(context->function(), style);
-  }
 
-  if (context->matrix()) {
+  if (context->matrix())
     return Parse(context->matrix(), style);
-  }
 
-  if (context->STRING()) {
+  if (context->STRING())
     return ParseString(context->STRING());
-  }
 
   // XXX
   return Draw();
 }
 
+std::wstring ParseLatex(MathParser::AtomContext* context, Style* style) {
+  if (context->variable()) 
+    return ParseLatex(context->variable(), style);
+
+  if (context->expression())
+    return L"{" + ParseLatex(context->expression(), style) + L"}";
+
+  if (context->function())
+    return ParseLatex(context->function(), style);
+
+  if (context->matrix()) 
+    return ParseLatex(context->matrix(), style);
+
+  if (context->STRING()) 
+    return ParseStringLatex(context->STRING());
+
+  return L"";
+}
+
 Draw Parse(MathParser::VariableContext* context, Style* style) {
   std::wstring label = to_wstring(context->VARIABLE()->getText());
-  if (style->variable_transform.count(label)) {
+  if (style->variable_transform.count(label))
     label = style->variable_transform.at(label);
-  }
   return Draw(label);
+}
+
+std::wstring ParseLatex(MathParser::VariableContext* context, Style* style) {
+  std::wstring label = to_wstring(context->VARIABLE()->getText());
+  if (style->variable_transform.count(label))
+    label = style->variable_transform.at(label);
+  return label;
 }
 
 Draw Parse(MathParser::MatrixContext* context, Style* style) {
@@ -569,6 +772,25 @@ Draw Parse(MathParser::MatrixContext* context, Style* style) {
   return WrapWithParenthesis(draw, style);
 }
 
+std::wstring ParseLatex(MathParser::MatrixContext* context, Style* style) {
+  std::wstring out = L"\\begin{pmatrix} ";
+  bool first_line = true;
+  for (const auto& line : context->matrixLine()) {
+    if (!first_line)
+      out += L" \\\\ ";
+    first_line = false;
+    bool first_column = true;
+    for (const auto& content : line->expression()) {
+      if (!first_column)
+        out += L" & ";
+      first_column = false;
+      out += ParseLatex(content, style);
+    }
+  }
+
+  return out + L" \\end{pmatrix}";
+}
+
 std::string to_string(const Draw& draw) {
   std::wstring s;
   for (const auto& line : draw.content) {
@@ -584,7 +806,7 @@ std::string Math::Translate(const std::string& input,
                             const std::string& options_string) {
   auto options = SerializeOption(options_string);
   Style style;
-  if (options["ascii_only"] == "true") {
+  if (options["style"] == "ASCII") {
     style.divide = U'-';
     style.multiply = U'.';
     style.greater_or_equal = L">=";
@@ -681,8 +903,11 @@ std::string Math::Translate(const std::string& input,
 
   // Parser.
   MathParser parser(&tokens);
+  auto content = parser.multilineEquation();
+
+  if (options["style"] == "Latex")
+    return to_string(ParseLatex(content, &style)) + '\n';
 
   // Print th
-  auto content = parser.multilineEquation();
   return to_string(Parse(content, &style));
 }

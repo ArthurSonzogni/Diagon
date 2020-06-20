@@ -1,0 +1,13 @@
+int(a,b,c)
+
+int(x^2, x = 1, 100)
+
+int(1/2, x = 1, 100)
+
+int(x^2/2, x = 1, 100)
+
+int(a, bbbbbbbbbbbb, c)
+
+int(aaaaaaaaaaaa, b, c)
+
+int(a, b, cccccccccccc)

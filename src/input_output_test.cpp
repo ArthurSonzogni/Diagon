@@ -19,6 +19,27 @@ std::string ReadFile(std::filesystem::path path) {
   return ss.str();
 }
 
+void ParseDirectoryName(std::string name,
+                        std::string* translator_name,
+                        std::string* options) {
+  std::vector<std::string> parts;
+  int left = 0;
+  int right = 0;
+  while (right < name.size()) {
+    if (name[right] == '_' || name[right] == '=') {
+      parts.push_back(name.substr(left, right - left));
+      left = right + 1;
+    }
+    ++right;
+  }
+  parts.push_back(name.substr(left, right - left));
+
+  *translator_name = parts[0];
+  for(int i = 1; i<parts.size(); ++i) {
+    *options += parts[i] + "\n";
+  }
+}
+
 int main(int, const char**) {
   auto translator_list = TranslatorList();
   int result = 0;
@@ -26,14 +47,17 @@ int main(int, const char**) {
   std::string path = test_directory;
   std::cout << "test_directory = " << test_directory << std::endl;
   for (auto& dir : std::filesystem::directory_iterator(path)) {
-    std::string type = dir.path().filename();
+    std::string translator_name;
+    std::string options;
+    ParseDirectoryName(dir.path().filename(), &translator_name, &options);
+
     for (auto& test : std::filesystem::directory_iterator(dir.path())) {
-      auto translator = translator_list[type]();
+      auto translator = translator_list[translator_name]();
 
       std::string input = ReadFile(test.path() / "input");
       std::string output = ReadFile(test.path() / "output");
 
-      std::string output_computed = translator->Translate(input, "");
+      std::string output_computed = translator->Translate(input, options);
 
       if (output_computed == output) {
         std::cout << "  [PASS] " << test << std::endl;
