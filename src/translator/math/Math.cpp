@@ -600,7 +600,7 @@ std::wstring ParseFunctionCommonLatex(MathParser::FunctionContext* context,
   std::wstring content = ParseLatex(context->equation(0), style);
   for (int i = 1; i < context->equation().size(); ++i)
     content += L"," + ParseLatex(context->equation(0), style);
-  return L"\\" + ParseLatex(context->variable(), style) + L"{" + content + L"}";
+  return ParseLatex(context->variable(), style) + L"{" + content + L"}";
 }
 
 Draw Parse(MathParser::FunctionContext* context, Style* style) {
