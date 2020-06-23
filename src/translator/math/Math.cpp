@@ -194,6 +194,10 @@ Draw WrapWithParenthesis(const Draw& element, Style* style) {
   return draw;
 }
 
+std::wstring WrapWithParenthesisLatex(std::wstring element) {
+  return L"\\left(" + element + L"\\right)";
+}
+
 Draw Parse(MathParser::MultilineEquationContext* context, Style* style) {
   Draw draw;
   for (int i = 0; i < context->equation().size(); ++i) {
@@ -316,13 +320,16 @@ Draw Parse(MathParser::TermContext* context, Style* style) {
 }
 
 std::wstring ParseLatex(MathParser::TermContext* context, Style* style) {
-  std::wstring out = ParseLatex(context->factor(0), style);
+  bool suppress_parenthesis_first =
+      context->mulop().size() && context->mulop(0)->DIV();
+  std::wstring out =
+      ParseLatex(context->factor(0), style, suppress_parenthesis_first);
   for (int i = 1; i < context->factor().size(); ++i) {
     if (context->mulop(i - 1)->DIV()) {
-      out = L"\\frac{" + out + L"}{" + ParseLatex(context->factor(i), style) +
-            L"}";
+      out = L"\\frac{" + out + L"}{" +
+            ParseLatex(context->factor(i), style, true) + L"}";
     } else {
-      out += L" \\times " + ParseLatex(context->factor(i), style);
+      out += L" \\cdot " + ParseLatex(context->factor(i), style, false);
     }
   }
   return out;
@@ -341,11 +348,13 @@ Draw Parse(MathParser::FactorContext* context,
   return draw;
 }
 
-std::wstring ParseLatex(MathParser::FactorContext* context, Style* style) {
-  std::wstring out = ParseLatex(context->valueBang(0), style);
+std::wstring ParseLatex(MathParser::FactorContext* context, Style* style,
+           bool suppress_parenthesis) {
+  suppress_parenthesis &= (context->valueBang().size() == 1);
+  std::wstring out = ParseLatex(context->valueBang(0), style, suppress_parenthesis);
   for (int i = 1; i < context->valueBang().size(); ++i) {
     out += context->powop(i - 1)->POW() ? L"^" : L"_";
-    out += ParseLatex(context->valueBang(i), style);
+    out += ParseLatex(context->valueBang(i), style, false);
   }
   return out;
 }
@@ -353,18 +362,22 @@ std::wstring ParseLatex(MathParser::FactorContext* context, Style* style) {
 Draw Parse(MathParser::ValueBangContext* context,
            Style* style,
            bool suppress_parenthesis) {
-  if (context->value())
+  if (context->value()) {
     return Parse(context->value(), style, suppress_parenthesis);
-
-  return ComposeHorizontal(
-      Parse(context->valueBang(), style, suppress_parenthesis), Draw(L"!"), 0);
+  } else {
+    return ComposeHorizontal(
+        Parse(context->valueBang(), style, suppress_parenthesis), Draw(L"!"),
+        0);
+  }
 }
 
-std::wstring ParseLatex(MathParser::ValueBangContext* context, Style* style) {
+std::wstring ParseLatex(MathParser::ValueBangContext* context,
+                        Style* style,
+                        bool suppress_parenthesis) {
   if (context->value())
-    return ParseLatex(context->value(), style);
+    return ParseLatex(context->value(), style, suppress_parenthesis);
   else
-    return ParseLatex(context->valueBang(), style) + L"!";
+    return ParseLatex(context->valueBang(), style, suppress_parenthesis) + L"!";
 }
 
 bool CheckFunctionSqrt(MathParser::FunctionContext* context) {
@@ -600,7 +613,8 @@ std::wstring ParseFunctionCommonLatex(MathParser::FunctionContext* context,
   std::wstring content = ParseLatex(context->equation(0), style);
   for (int i = 1; i < context->equation().size(); ++i)
     content += L"," + ParseLatex(context->equation(0), style);
-  return ParseLatex(context->variable(), style) + L"{" + content + L"}";
+  return ParseLatex(context->variable(), style) +
+         WrapWithParenthesisLatex(content);
 }
 
 Draw Parse(MathParser::FunctionContext* context, Style* style) {
@@ -641,8 +655,11 @@ Draw Parse(MathParser::ValueContext* context,
   return atom;
 }
 
-std::wstring ParseLatex(MathParser::ValueContext* context, Style* style) {
-  std::wstring atom = ParseLatex(context->atom(), style);
+std::wstring ParseLatex(MathParser::ValueContext* context,
+                        Style* style,
+                        bool suppress_parenthesis) {
+  suppress_parenthesis &= (!context->PLUS() && !context->MINUS());
+  std::wstring atom = ParseLatex(context->atom(), style, suppress_parenthesis);
   if (context->MINUS())
     return L"-" + atom;
   if (context->PLUS())
@@ -688,12 +705,19 @@ Draw Parse(MathParser::AtomContext* context,
   return Draw();
 }
 
-std::wstring ParseLatex(MathParser::AtomContext* context, Style* style) {
+std::wstring ParseLatex(MathParser::AtomContext* context,
+                        Style* style,
+                        bool suppress_parenthesis) {
   if (context->variable()) 
     return ParseLatex(context->variable(), style);
 
-  if (context->expression())
-    return L"{" + ParseLatex(context->expression(), style) + L"}";
+  if (context->expression()) {
+    std::wstring out = ParseLatex(context->expression(), style);
+    if (suppress_parenthesis || context->RBRACE())
+      return out;
+    else
+      return WrapWithParenthesisLatex(out);
+  }
 
   if (context->function())
     return ParseLatex(context->function(), style);

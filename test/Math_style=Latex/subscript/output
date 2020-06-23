@@ -1,10 +1,10 @@
 A_2 \\
 \\
-A_{\frac{1}{2}}_\sqrt{2} \\
+A_\left(\frac{1}{2}\right)_\sqrt{2} \\
 \\
-{A_{\frac{1}{2}}}_\sqrt{2} \\
+\left(A_\left(\frac{1}{2}\right)\right)_\sqrt{2} \\
 \\
-A_{{\frac{1}{2}}_\sqrt{2}} \\
+A_\left(\left(\frac{1}{2}\right)_\sqrt{2}\right) \\
 \\
 A_421 + \frac{1}{2} \\
 \\
