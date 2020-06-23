@@ -407,13 +407,6 @@ Draw ParseFunctionSqrt(MathParser::FunctionContext* context, Style* style) {
   return draw;
 }
 
-std::wstring ParseFunctionSqrtLatex(MathParser::FunctionContext* context, Style* style) {
-  if (!CheckFunctionSqrt(context))
-    return L"(error)";
-
-  return L"\\sqrt{" + ParseLatex(context->equation(0), style) + L"}";
-}
-
 bool CheckFunctionSum(MathParser::FunctionContext* context) {
   int num_arguments = context->equation().size();
   if (num_arguments > 3) {
@@ -617,6 +610,23 @@ std::wstring ParseFunctionCommonLatex(MathParser::FunctionContext* context,
          WrapWithParenthesisLatex(content);
 }
 
+std::wstring ParseFunctionSqrtLatex(MathParser::FunctionContext* context,
+                                     Style* style) {
+  std::wstring content = ParseLatex(context->equation(0), style);
+  for (int i = 1; i < context->equation().size(); ++i)
+    content += L"," + ParseLatex(context->equation(0), style);
+  return L"\\sqrt{" + content + L"}";
+}
+
+std::wstring ParseFunctionKnownLatex(MathParser::FunctionContext* context,
+                                     Style* style,
+                                     const std::wstring& name) {
+  std::wstring content = ParseLatex(context->equation(0), style);
+  for (int i = 1; i < context->equation().size(); ++i)
+    content += L"," + ParseLatex(context->equation(0), style);
+  return name + WrapWithParenthesisLatex(content);
+}
+
 Draw Parse(MathParser::FunctionContext* context, Style* style) {
   std::string function_name = context->variable()->VARIABLE()->getText();
   if (function_name == "sqrt")
@@ -631,6 +641,14 @@ Draw Parse(MathParser::FunctionContext* context, Style* style) {
 }
 
 std::wstring ParseLatex(MathParser::FunctionContext* context, Style* style) {
+  static const std::map<std::string, std::wstring> known = {
+      {"sin", L"\\sin"},       {"cos", L"\\cos"},       {"tan", L"\\tan"},
+      {"cot", L"\\cot"},       {"arcsin", L"\\arcsin"}, {"arccos", L"\\arccos"},
+      {"arctan", L"\\arctan"}, {"sinh", L"\\sinh"},     {"cosh", L"\\cosh"},
+      {"tanh", L"\\tanh"},     {"coth", L"\\coth"},     {"ln", L"\\ln"},
+      {"log", L"\\log"},       {"exp ", L"\\exp "},     {"max", L"\\max"},
+      {"min", L"\\min"},       {"ker", L"\\ker"}, 
+  };
   std::string function_name = context->variable()->VARIABLE()->getText();
   if (function_name == "sqrt")
     return ParseFunctionSqrtLatex(context, style);
@@ -640,6 +658,8 @@ std::wstring ParseLatex(MathParser::FunctionContext* context, Style* style) {
     return ParseFunctionIntegralLatex(context, style);
   if (function_name == "mult")
     return ParseFunctionMultLatex(context, style);
+  if (const auto it = known.find(function_name); it != known.end())
+    return ParseFunctionKnownLatex(context, style, it->second);
   return ParseFunctionCommonLatex(context, style);
 }
 
