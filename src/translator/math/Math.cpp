@@ -354,7 +354,7 @@ std::wstring ParseLatex(MathParser::FactorContext* context, Style* style,
   std::wstring out = ParseLatex(context->valueBang(0), style, suppress_parenthesis);
   for (int i = 1; i < context->valueBang().size(); ++i) {
     out += context->powop(i - 1)->POW() ? L"^" : L"_";
-    out += ParseLatex(context->valueBang(i), style, false);
+    out += L"{" + ParseLatex(context->valueBang(i), style, false) + L"}";
   }
   return out;
 }
