@@ -20,6 +20,8 @@ class Translator {
 
   struct OptionDescription {
     std::string name;
+    std::vector<std::string> values;
+    std::string default_value;
     std::string description;
   };
   virtual std::vector<OptionDescription> Options() { return {}; }

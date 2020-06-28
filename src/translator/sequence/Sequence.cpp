@@ -711,8 +711,12 @@ std::vector<Translator::OptionDescription> Sequence::Options() {
   return {
       {
           "ascii_only",
-          "values: {false, true}\n"
-          "default: --ascii_only=false",
+          {
+              "false",
+              "true",
+          },
+          "false",
+          "Use the full unicode charset or only ASCII.",
       },
   };
 }

@@ -369,17 +369,23 @@ const char* Tree::Description() {
 }
 
 std::vector<Translator::OptionDescription> Tree::Options() {
-  return {{"style",
-           "The style of the table.\n"
-           "Possible values:\n"
-           " - unicode 1\n"
-           " - unicode 2\n"
-           " - ASCII 1\n"
-           " - ASCII 2\n"
-           " - ASCII 3\n"
-           " - unicode right top\n"
-           " - unicode right center\n"
-           " - unicode right bottom"}};
+  return {
+      {
+          "style",
+          {
+              "unicode 1",
+              "unicode 2",
+              "ASCII 1",
+              "ASCII 2",
+              "ASCII 3",
+              "unicode right top",
+              "unicode right center",
+              "unicode right bottom",
+          },
+          "unicode 1",
+          "The style of the tree.",
+      },
+  };
 }
 
 std::vector<Translator::Example> Tree::Examples() {

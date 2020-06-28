@@ -20,13 +20,22 @@ std::vector<Translator::OptionDescription> Math::Options() {
   return {
       {
           "style",
-          "values: {Unicode, ASCII, Latex}\n"
-          "default: --style=Unicode",
+          {
+              "Unicode",
+              "ASCII",
+              "Latex",
+          },
+          "Unicode",
+          "Use the full unicode charset or only ASCII. Or even latex.",
       },
       {
           "transform_math_letters",
-          "values: {false, true}\n"
-          "default: --transform_math_letters=true",
+          {
+              "false",
+              "true",
+          },
+          "true",
+          "Transform letter name into their unicode glyph. alpha -> α."
       },
   };
 }

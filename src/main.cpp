@@ -24,6 +24,7 @@ void replaceAll(std::string& str,
 
 int PrintHelp() {
   std::string output = R"description(
+
 NAME
   diagon - Generate ascii art diagram.
   
@@ -45,17 +46,18 @@ OPTIONS:
   -l, --list:    List the available translators.
 
 TRANSLATOR:
-)description" + 1;
+)description";
 
   for (auto& it : TranslatorList()) {
     output += " - " + it.first + "\n";
   }
 
   output += R"(
-
 TRANSLATOR-OPTIONS:
 
-  --help       : Display translator specific help.
+  --help       : Display translator specific help. For example:
+                 * diagon Math --help
+                 * diagon Table --help
 
   -- <input>   : Read the input from the command line. Without this option, it
                  is read from the standard input.
@@ -77,7 +79,7 @@ WEBSITE:
   This tool can also be used as a WebAssembly application on the website:
   https://arthursonzogni.com/Diagon/
 
-)" + 1;
+)";
 
   std::cout << output;
   return EXIT_SUCCESS;
@@ -93,6 +95,33 @@ int PrintVersion() {
 int PrintError(std::string error) {
   std::cout << error << std::endl;
   return EXIT_FAILURE;
+}
+
+int PrintTranslatorExamples(TranslatorFactory factory) {
+  auto translator = factory();
+  if (!translator->Examples().size()) {
+    std::cout << "No examples" << std::endl;
+    return EXIT_SUCCESS;
+  }
+
+  std::cout << "EXAMPLES:" << std::endl;
+  int i = 0;
+  for (auto& it : translator->Examples()) {
+    std::string input = TranslatorList()["Frame"]()->Translate(
+        it.input, "line_number\nfalse");
+    replaceAll(input, "\n", "\n     ");
+    std::cout << "  " << (++i) << ") input" << std::endl;
+    std::cout << "     " << input;
+
+    std::string output = factory()->Translate(it.input, "");
+    output =
+        TranslatorList()["Frame"]()->Translate(output, "line_number\nfalse");
+    replaceAll(output, "\n", "\n     ");
+    std::cout << " output" << std::endl;
+    std::cout << "     " << output << std::endl;
+  }
+
+  return EXIT_SUCCESS;
 }
 
 int PrintTranslatorHelp(TranslatorFactory factory) {
@@ -111,30 +140,27 @@ int PrintTranslatorHelp(TranslatorFactory factory) {
     std::cout << "OPTIONS:" << std::endl;
     int i = 0;
     for (auto& it : translator->Options()) {
-      std::cout << "  " << (++i) << ") " << it.name << std::endl;
-      replaceAll(it.description, "\n", "\n     ");
-      std::cout << "     " << it.description << std::endl << std::endl;
+      std::cout << "   " << (++i) << ") " << it.description << std::endl;
+      for (auto& value : it.values) {
+        if (value == it.default_value)
+          std::cout << "     --" << it.name << "=" << value << " (default)"
+                    << std::endl;
+        else
+          std::cout << "     --" << it.name << "=" << value << std::endl;
+      }
+      std::cout << std::endl;
     }
   }
-
-  if (translator->Examples().size()) {
+  if (translator->Examples().size() > 2) {
     std::cout << "EXAMPLES:" << std::endl;
-    int i = 0;
-    for (auto& it : translator->Examples()) {
-      std::string input = TranslatorList()["Frame"]()->Translate(
-          it.input, "line_number\nfalse");
-      replaceAll(input, "\n", "\n     ");
-      std::cout << "  " << (++i) << ") input" << std::endl;
-      std::cout << "     " << input;
-
-      std::string output = factory()->Translate(it.input, "");
-      output =
-          TranslatorList()["Frame"]()->Translate(output, "line_number\nfalse");
-      replaceAll(output, "\n", "\n     ");
-      std::cout << " output" << std::endl;
-      std::cout << "     " << output << std::endl;
-    }
+    std::cout << "  " << translator->Examples().size() << " examples found. Print them using:"
+              << std::endl;
+    std::cout << "  diagon " << translator->Name() << " --examples" << std::endl;
+    return EXIT_SUCCESS;
   }
+
+  if (translator->Examples().size() > 0)
+    return PrintTranslatorExamples(factory);
 
   return EXIT_SUCCESS;
 }
@@ -175,6 +201,9 @@ int Translate(TranslatorFactory translator_factory,
 
     if (argument == "--help")
       return PrintTranslatorHelp(translator_factory);
+
+    if (argument == "--examples")
+      return PrintTranslatorExamples(translator_factory);
 
     if (argument == "--") {
       input = read_remaining_args();

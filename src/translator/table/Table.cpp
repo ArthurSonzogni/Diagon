@@ -585,26 +585,28 @@ std::vector<Translator::OptionDescription> Table::Options() {
   return {
       {
           "style",
-          "The style of the table.\n"
-          "Possible values:\n"
-          " - unicode\n"
-          " - unicode rounded\n"
-          " - unicode bold\n"
-          " - unicode double\n"
-          " - unicode with bold header\n"
-          " - unicode with double header\n"
-          " - unicode cells\n"
-          " - unicode cells 2\n"
-          " - ascii\n"
-          " - ascii rounded\n"
-          " - ascii with header 1\n"
-          " - ascii with header 2\n"
-          " - ascii light header\n"
-          " - ascii light header/separator\n"
-          " - ascii light header/separator/border\n"
-          " - ascii light separator/border\n"
-          " - ascii light border\n"
-          " - conceptual",
+          {
+              "unicode",
+              "unicode rounded",
+              "unicode bold",
+              "unicode double",
+              "unicode with bold header",
+              "unicode with double header",
+              "unicode cells",
+              "unicode cells 2",
+              "ascii",
+              "ascii rounded",
+              "ascii with header 1",
+              "ascii with header 2",
+              "ascii light header",
+              "ascii light header/separator",
+              "ascii light header/separator/border",
+              "ascii light separator/border",
+              "ascii light border",
+              "conceptual",
+          },
+          "unicode",
+          "The style of the table.",
       },
   };
 }

@@ -114,13 +114,21 @@ std::vector<Translator::OptionDescription> Frame::Options() {
   return {
       {
           "ascii_only",
-          "values: {false, true}\n"
-          "default: --ascii_only=false",
+          {
+              "false",
+              "true",
+          },
+          "false",
+          "Use the full unicode charset or only ASCII.",
       },
       {
           "line_number",
-          "values: {false, true}\n"
-          "default: --line_number=true",
+          {
+              "false",
+              "true",
+          },
+          "true",
+          "Display the line number.",
       },
   };
 }
