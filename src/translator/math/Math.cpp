@@ -150,6 +150,19 @@ Draw ComposeDiagonalDown(const Draw& A, const Draw& B) {
   return composition;
 }
 
+// Useful for x_a^b
+Draw ComposeDiagonalUpAndDown(const Draw& A, const Draw& B, const Draw& C) {
+  Draw composition;
+  composition.Append(B, A.dim_x, 0);
+  composition.Append(A, 0, B.dim_y);
+  composition.Append(C, A.dim_x, B.dim_y + A.dim_y);
+
+  composition.center_x = composition.dim_x / 2;
+  composition.center_y = A.center_y + B.dim_y;
+
+  return composition;
+}
+
 Draw WrapWithParenthesis(const Draw& element, Style* style) {
   Draw draw;
   draw.Resize(element.dim_x + 2, element.dim_y);
@@ -340,6 +353,21 @@ Draw Parse(MathParser::FactorContext* context,
            bool suppress_parenthesis) {
   suppress_parenthesis &= (context->valueBang().size() == 1);
   Draw draw = Parse(context->valueBang(0), style, suppress_parenthesis);
+
+  // Optimization for a_b^c and a^c:
+  if (context->valueBang().size() == 3) {
+    if (context->powop(0)->POW() && context->powop(1)->SUBSCRIPT()) {
+      return ComposeDiagonalUpAndDown(
+          draw, Parse(context->valueBang(1), style, false),
+          Parse(context->valueBang(2), style, false));
+    }
+    if (context->powop(1)->POW() && context->powop(0)->SUBSCRIPT()) {
+      return ComposeDiagonalUpAndDown(
+          draw, Parse(context->valueBang(2), style, false),
+          Parse(context->valueBang(1), style, false));
+    }
+  }
+
   for (int i = 1; i < context->valueBang().size(); ++i) {
     auto* compose =
         context->powop(i - 1)->POW() ? ComposeDiagonalUp : ComposeDiagonalDown;
