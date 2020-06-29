@@ -1,5 +1,6 @@
 # Diagon
 
+[![logo](./tools/logo.png)](https://arthursonzogni.com/Diagon/)
 
 Diagon is an interactive interpreter. It transforms markdown-style expression
 into an ascii-art representation.
