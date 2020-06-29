@@ -954,33 +954,38 @@ std::string Math::Translate(const std::string& input,
   }
 
   if (options["style"] == "Latex") {
-    style.variable_transform = {
-        {L"Alpha", L"\\Alpha"},     {L"alpha", L"\\alpha"},
-        {L"Digamma", L"\\Digamma"}, {L"digamma", L"\\digamma"},
-        {L"Kappa", L"\\Kappa"},     {L"kappa", L"\\kappa"},
-        {L"Omicron", L"\\Omicron"}, {L"omicron", L"\\omicron"},
-        {L"Upsilon", L"\\Upsilon"}, {L"upsilon", L"\\upsilon"},
-        {L"Beta", L"\\Beta"},       {L"beta", L"\\beta"},
-        {L"Zeta", L"\\Zeta"},       {L"zeta", L"\\zeta"},
-        {L"Lambda", L"\\Lambda"},   {L"lambda", L"\\lambda"},
-        {L"Pi", L"\\Pi"},           {L"pi", L"\\pi"},
-        {L"Phi", L"\\Phi"},         {L"phi", L"\\phi"},
-        {L"Gamma", L"\\Gamma"},     {L"gamma", L"\\gamma"},
-        {L"Eta", L"\\Eta"},         {L"eta", L"\\eta"},
-        {L"Mu", L"\\Mu"},           {L"mu", L"\\mu"},
-        {L"Rho", L"\\Rho"},         {L"rho", L"\\rho"},
-        {L"Chi", L"\\Chi"},         {L"chi", L"\\chi"},
-        {L"Delta", L"\\Delta"},     {L"delta", L"\\delta"},
-        {L"Theta", L"\\Theta"},     {L"theta", L"\\theta"},
-        {L"Nu", L"\\Nu"},           {L"nu", L"\\nu"},
-        {L"Sigma", L"\\Sigma"},     {L"sigma", L"\\sigma"},
-        {L"Psi", L"\\Psi"},         {L"psi", L"\\psi"},
-        {L"Epsilon", L"\\Epsilon"}, {L"epsilon", L"\\epsilon"},
-        {L"Iota", L"\\Iota"},       {L"iota", L"\\iota"},
-        {L"Xi", L"\\Xi"},           {L"xi", L"\\xi"},
-        {L"Tau", L"\\Tau"},         {L"tau", L"\\tau"},
-        {L"Omega", L"\\Omega"},     {L"omega", L"\\omega"},
-    };
+    if (options["transform_math_letters"] != "false") {
+      style.variable_transform = {
+          {L"...", L"\\ldots"},       {L"Alpha", L"\\Alpha"},
+          {L"alpha", L"\\alpha"},     {L"Digamma", L"\\Digamma"},
+          {L"digamma", L"\\digamma"}, {L"Kappa", L"\\Kappa"},
+          {L"kappa", L"\\kappa"},     {L"Omicron", L"\\Omicron"},
+          {L"omicron", L"\\omicron"}, {L"Upsilon", L"\\Upsilon"},
+          {L"upsilon", L"\\upsilon"}, {L"Beta", L"\\Beta"},
+          {L"beta", L"\\beta"},       {L"Zeta", L"\\Zeta"},
+          {L"zeta", L"\\zeta"},       {L"Lambda", L"\\Lambda"},
+          {L"lambda", L"\\lambda"},   {L"Pi", L"\\Pi"},
+          {L"pi", L"\\pi"},           {L"Phi", L"\\Phi"},
+          {L"phi", L"\\phi"},         {L"Gamma", L"\\Gamma"},
+          {L"gamma", L"\\gamma"},     {L"Eta", L"\\Eta"},
+          {L"eta", L"\\eta"},         {L"Mu", L"\\Mu"},
+          {L"mu", L"\\mu"},           {L"Rho", L"\\Rho"},
+          {L"rho", L"\\rho"},         {L"Chi", L"\\Chi"},
+          {L"chi", L"\\chi"},         {L"Delta", L"\\Delta"},
+          {L"delta", L"\\delta"},     {L"Theta", L"\\Theta"},
+          {L"theta", L"\\theta"},     {L"Nu", L"\\Nu"},
+          {L"nu", L"\\nu"},           {L"Sigma", L"\\Sigma"},
+          {L"sigma", L"\\sigma"},     {L"Psi", L"\\Psi"},
+          {L"psi", L"\\psi"},         {L"Epsilon", L"\\Epsilon"},
+          {L"epsilon", L"\\epsilon"}, {L"Iota", L"\\Iota"},
+          {L"iota", L"\\iota"},       {L"Xi", L"\\Xi"},
+          {L"xi", L"\\xi"},           {L"Tau", L"\\Tau"},
+          {L"tau", L"\\tau"},         {L"Omega", L"\\Omega"},
+          {L"omega", L"\\omega"},
+      };
+    }
+
+    style.variable_transform[L"..."] = L"\\ldots";
   } else if (options["transform_math_letters"] != "false") {
     style.variable_transform = {
         {L"Alpha", L"Α"},   {L"alpha", L"α"},   {L"Digamma", L"Ϝ"},
