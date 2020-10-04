@@ -19,6 +19,7 @@ Application.
     * [Frame](#frame)
     * [Table](#table)
     * [Planar graph](#planar-graph)
+ * [Command line interface](#command-line-interface)
  * [Thanks](#thanks)
 
 # Generators
@@ -351,13 +352,26 @@ Output (Unicode)
 └────┘           
 ~~~
 
-#### Universal Linux package:
-[![diagon](https://snapcraft.io/diagon/badge.svg)](https://snapcraft.io/diagon)  
-[![Snap Status](https://build.snapcraft.io/badge/ArthurSonzogni/Diagon.svg)](https://build.snapcraft.io/user/ArthurSonzogni/Diagon)  
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/diagon)  
+# Command line interface
+
+Diagon is also usable as a command line tool.
+For instance:
+```bash
+echo ""1+1/2 + sum(i,0,10) = 112/2" | diagon Math
+            10         
+          ___        
+      1   ╲       112
+  1 + ─ + ╱   i = ───
+      2   ‾‾‾      2 
+           0         
+```
+To use it, you can either compile it from source or use the precompiled binaries published on the snapstore:
 ~~~bash
 sudo snap install diagon
 ~~~
+[![snapstore](https://snapcraft.io/diagon/badge.svg)](https://snapcraft.io/diagon)
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/diagon)  
+
 
 # Thanks
 
