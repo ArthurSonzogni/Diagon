@@ -13,6 +13,7 @@ div {
   --select-bg-color: #EEE;
   --transition-time: 0s;
   --displaylatex: none;
+  --displayhtml: none;
 }
 
 [data-theme="dark"] {
@@ -25,10 +26,15 @@ div {
 
 :root {
   --displaylatex: none;
+  --displayhtml: none;
 }
 
 [data-display-latex="true"] {
   --displaylatex: block;
+}
+
+[data-display-html="true"] {
+  --displayhtml: block;
 }
 
 /* Global */
@@ -52,6 +58,13 @@ html, body {
   display: var(--displaylatex) !important;
   overflow: auto;
   min-height: 0
+}
+
+.displayhtml {
+  display: var(--displayhtml) !important;
+  overflow: auto;
+  min-height: 0;
+  background-color: white;
 }
 
 .gutter {
@@ -243,7 +256,7 @@ textarea {
   outline: none;
 }
 
-#input, #output, #errors, #menu_bar, #latex {
+#input, #output, #errors, #menu_bar, #latex #html {
   display:block;
   color:var(--fg-color);
   background-color:var(--bg-color);
@@ -291,7 +304,7 @@ option {
   margin: 7px;
 }
 
-#input, #output, #latex {
+#input, #output, #latex, #html{
   padding: 7px;
   margin: 7px;
 }
@@ -315,6 +328,7 @@ option {
 
 #code_area {
   background-color: var(--code-area-bg-color);
+  tab-size:2;
 }
 
 #menu_bar {

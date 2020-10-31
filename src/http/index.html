@@ -85,16 +85,16 @@
 
         <!--2 Input / Output -->
         <div class="container device-orientation flex">
-          <div class="gutter"></div>
           <textarea
             aria-label="input"
             id="input"
             class="flex"
             placeholder='input'
             ></textarea>
-          <div class="gutter"></div>
+
           <div class="container vertical flex">
             <div id="latex" class="flex displaylatex"></div>
+            <iframe id="html" class="flex displayhtml"></iframe>
             <textarea
               aria-label="output"
               id="output"
@@ -103,7 +103,7 @@
               readonly
             ></textarea>
           </div>
-          <div class="gutter"></div>
+
         </div>
 
         <div class="gutter"></div>
@@ -131,6 +131,7 @@ let tools_data = [];
 let style_button = document.getElementById("style_button");
 let theme_style = document.getElementById("theme_style");
 let latex = document.getElementById('latex');
+let html = document.getElementById('html');
 
 errors.value = ''; 
 function ClearSelectBox(select_box) {
@@ -293,21 +294,27 @@ function UpdateOutput() {
   errors.value = '';
   translate(tools_data[tools.value].tool, input.value, GetOptions());
 
-  console.log(GetOptions())
-  if (!GetOptions().includes("Latex")) {
+  if (GetOptions().includes("Latex")) {
+    document.documentElement.setAttribute("data-display-latex", "true");
+
+    withKatex(() => {
+      katex.render(output.value, latex, {
+        throwOnError: false,
+        displayMode: true,
+        fleqn: true,
+      });
+    })
+  } else {
     document.documentElement.setAttribute("data-display-latex", "false");
-    return;
   }
 
-  document.documentElement.setAttribute("data-display-latex", "true");
-
-  withKatex(() => {
-    katex.render(output.value, latex, {
-      throwOnError: false,
-      displayMode: true,
-      fleqn: true,
-    });
-  })
+  if (GetOptions().includes("html") ||
+      GetOptions().includes("svg")) {
+    document.documentElement.setAttribute("data-display-html", "true");
+    html.srcdoc = output.value;
+  } else {
+    document.documentElement.setAttribute("data-display-html", "false");
+  }
 }
 
 function OnRuntimeInitialized() {

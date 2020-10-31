@@ -15,11 +15,13 @@ TranslatorPtr PlanarGraphTranslator();
 TranslatorPtr SequenceTranslator();
 TranslatorPtr TableTranslator();
 TranslatorPtr TreeTranslator();
+TranslatorPtr GrammarTranslator();
 
 // Return a map "string" -> "Translator generator function".
 static std::map<std::string, TranslatorFactory> TranslatorList() {
   return {
       {"Frame", FrameTranslator},
+      {"Grammar", GrammarTranslator},
       {"Math", MathTranslator},
       {"PlanarGraph", PlanarGraphTranslator},
       {"Sequence", SequenceTranslator},

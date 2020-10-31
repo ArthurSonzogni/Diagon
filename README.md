@@ -367,9 +367,8 @@ This project has been possible thanks to these great projects
  * [CMake](https://cmake.org/)
  * [Emscripten](https://github.com/kripken/emscripten)
  * [Git](https://git-scm.com/)
+ * [KGT](https://github.com/katef/kgt)
  * [LLVM](https://llvm.org/)
  * [NeoVim](https://neovim.io/)
  * [PlantUML](http://plantuml.com/)
  * [WebAssembly](https://webassembly.org/)
-
-

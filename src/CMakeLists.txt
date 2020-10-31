@@ -26,6 +26,7 @@ configure_file(
 
 add_subdirectory(screen)
 add_subdirectory(translator/frame)
+add_subdirectory(translator/grammar)
 add_subdirectory(translator/math)
 add_subdirectory(translator/planar_graph)
 add_subdirectory(translator/sequence)
@@ -79,16 +80,16 @@ if (Web)
     translator/Factory.h
   )
   target_set_common(main)
-  target_link_libraries(main
-    translator_frame
-    translator_math
-    translator_planar_graph
-    translator_sequence
-    translator_table
-    translator_tree
-    screen
-    antlr4_static
-  )
+  target_link_libraries(main PUBLIC translator_frame)
+  target_link_libraries(main PUBLIC translator_grammar)
+  target_link_libraries(main PUBLIC translator_math)
+  target_link_libraries(main PUBLIC translator_planar_graph)
+  target_link_libraries(main PUBLIC translator_sequence)
+  target_link_libraries(main PUBLIC translator_table)
+  target_link_libraries(main PUBLIC translator_tree)
+  target_link_libraries(main PUBLIC screen)
+  target_link_libraries(main PUBLIC antlr4_static)
+  target_link_libraries(main PUBLIC kgt::abnf)
 
 else()
 
@@ -99,18 +100,16 @@ else()
     translator/Factory.h
   )
   target_set_common(diagon)
-  target_link_libraries(diagon
-    translator_frame
-    translator_math
-    translator_planar_graph
-    translator_sequence
-    translator_table
-    translator_tree
-    screen
-    antlr4_static
-    -static-libstdc++
-    -static-libgcc
-  )
+  target_link_libraries(diagon PUBLIC translator_frame)
+  target_link_libraries(diagon PUBLIC translator_grammar)
+  target_link_libraries(diagon PUBLIC translator_math)
+  target_link_libraries(diagon PUBLIC translator_planar_graph)
+  target_link_libraries(diagon PUBLIC translator_sequence)
+  target_link_libraries(diagon PUBLIC translator_table)
+  target_link_libraries(diagon PUBLIC translator_tree)
+  target_link_libraries(diagon PUBLIC screen)
+  target_link_libraries(diagon PUBLIC antlr4_static)
+  target_link_libraries(diagon PUBLIC -static-libstdc++)
   install(TARGETS diagon RUNTIME DESTINATION "bin")
 
   add_executable(input_output_test
@@ -118,16 +117,15 @@ else()
     input_output_test.cpp
   )
   target_set_common(input_output_test)
-  target_link_libraries(input_output_test
-    translator_frame
-    translator_math
-    translator_planar_graph
-    translator_sequence
-    translator_table
-    translator_tree
-    antlr4_static
-    screen
-    stdc++fs
-  )
+  target_link_libraries(input_output_test PUBLIC translator_frame)
+  target_link_libraries(input_output_test PUBLIC translator_grammar)
+  target_link_libraries(input_output_test PUBLIC translator_math)
+  target_link_libraries(input_output_test PUBLIC translator_planar_graph)
+  target_link_libraries(input_output_test PUBLIC translator_sequence)
+  target_link_libraries(input_output_test PUBLIC translator_table)
+  target_link_libraries(input_output_test PUBLIC translator_tree)
+  target_link_libraries(input_output_test PUBLIC antlr4_static)
+  target_link_libraries(input_output_test PUBLIC screen)
+  target_link_libraries(input_output_test PUBLIC stdc++fs)
 
 endif()
