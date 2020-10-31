@@ -6,15 +6,10 @@ then
   exit
 fi
 
-mkdir cpp_runtime
+mkdir -p cpp_runtime
 
-## Download ANTLR and the CPP runtime
-curl http://www.antlr.org/download/antlr-4.7.1-complete.jar -Lo antlr.jar
-curl http://www.antlr.org/download/antlr4-cpp-runtime-4.7.1-source.zip -Lo cpp_runtime/archive.zip
+## Download the ANTLR executable.
+curl http://www.antlr.org/download/antlr-4.8-complete.jar -L -o antlr.jar
 
-## Unzip cpp runtime
-cd cpp_runtime
-unzip *.zip
-
-## Patch the cpp runtime CMakeLists.txt.
-patch CMakeLists.txt < ../CMakeLists.txt.patch
+## Download the C++ runtime.
+git clone --depth 1 https://github.com/antlr/antlr4 -b 4.8

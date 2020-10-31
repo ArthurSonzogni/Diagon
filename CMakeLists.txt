@@ -25,6 +25,10 @@ execute_process(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools/antlr
 )
 
+SET(WITH_LIBCXX OFF CACHE BOOL "")
+add_subdirectory(${CMAKE_SOURCE_DIR}/tools/antlr/antlr4/runtime/Cpp/ EXCLUDE_FROM_ALL)
+include_directories(${CMAKE_SOURCE_DIR}/tools/antlr/antlr4/runtime/Cpp/runtime/src)
+
 # Function
 #   ANTLR(<file.g4>)
 #
@@ -77,16 +81,6 @@ function(target_set_common target)
     target_compile_options(${target} PRIVATE "-Wno-attributes")
   endif()
 endfunction()
-
-# Build the ANTLR runtime.
-set(CMAKE_CXX_STANDARD 17)
-add_subdirectory(
-  ${CMAKE_SOURCE_DIR}/tools/antlr/cpp_runtime/
-  ${CMAKE_CURRENT_BINARY_DIR}/antlr
-  EXCLUDE_FROM_ALL
-)
-set_property(TARGET antlr4_static PROPERTY CXX_STANDARD 17)
-include_directories(${CMAKE_SOURCE_DIR}/tools/antlr/cpp_runtime/runtime/src)
 
 #-------------------------------------------------------------------------------
 
