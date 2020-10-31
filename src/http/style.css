@@ -256,14 +256,15 @@ textarea {
   outline: none;
 }
 
-#input, #output, #errors, #menu_bar, #latex #html {
+#input, #output, #errors, #menu_bar, #latex, #html {
   display:block;
   color:var(--fg-color);
   background-color:var(--bg-color);
   border:0px solid;
   box-shadow: 0px 0.5vmin 0.5vmin 0 rgba(0,0,0,0.4);
   overflow-y: auto;
-  min-height: 0
+  min-height: 0;
+  white-space: pre;
 }
 
 /* menu bar */

@@ -322,7 +322,7 @@
   },
   {
     "tool": "Grammar",
-    "description": "Grammar (experimental)",
+    "description": "Grammar (kgt - experimental)",
     "options": [
         {
           "type":"combobox",
@@ -440,6 +440,55 @@
           "path-part         = <path production from RFC 3986, section 3.3>",
           "",
           "port-part         = \":\" ( 1*DIGIT / \"*\" )"
+        ]
+      },
+      {
+        "title": "ISO-EBNF - EBNF",
+        "content": [
+          "letter = \"A\" | \"B\" | \"C\" | \"D\" | \"E\" | \"F\" | \"G\"",
+          "       | \"H\" | \"I\" | \"J\" | \"K\" | \"L\" | \"M\" | \"N\"",
+          "       | \"O\" | \"P\" | \"Q\" | \"R\" | \"S\" | \"T\" | \"U\"",
+          "       | \"V\" | \"W\" | \"X\" | \"Y\" | \"Z\" | \"a\" | \"b\"",
+          "       | \"c\" | \"d\" | \"e\" | \"f\" | \"g\" | \"h\" | \"i\"",
+          "       | \"j\" | \"k\" | \"l\" | \"m\" | \"n\" | \"o\" | \"p\"",
+          "       | \"q\" | \"r\" | \"s\" | \"t\" | \"u\" | \"v\" | \"w\"",
+          "       | \"x\" | \"y\" | \"z\" ;",
+          "digit = \"0\" | \"1\" | \"2\" | \"3\" | \"4\" | \"5\" | \"6\" | \"7\" | \"8\" | \"9\" ;",
+          "symbol = \"[\" | \"]\" | \"{\" | \"}\" | \"(\" | \")\" | \"<\" | \">\"",
+          "       | \"'\" | '\"' | \"=\" | \"|\" | \".\" | \",\" | \";\" ;",
+          "character = letter | digit | symbol | \"_\" ;",
+          " ",
+          "identifier = letter , { letter | digit | \"_\" } ;",
+          "terminal = \"'\" , character , { character } , \"'\" ",
+          "         | '\"' , character , { character } , '\"' ;",
+          " ",
+          "lhs = identifier ;",
+          "rhs = identifier",
+          "     | terminal",
+          "     | \"[\" , rhs , \"]\"",
+          "     | \"{\" , rhs , \"}\"",
+          "     | \"(\" , rhs , \")\"",
+          "     | rhs , \"|\" , rhs",
+          "     | rhs , \",\" , rhs ;",
+          "",
+          "rule = lhs , \"=\" , rhs , \";\" ;",
+          "grammar = { rule } ;"
+        ]
+      },
+      {
+        "title": "WSN - WSN",
+        "content": [
+            "SYNTAX     = { PRODUCTION } .",
+            "PRODUCTION = IDENTIFIER \"=\" EXPRESSION \".\" .",
+            "EXPRESSION = TERM { \"|\" TERM } .",
+            "TERM       = FACTOR { FACTOR } .",
+            "FACTOR     = IDENTIFIER",
+            "          | LITERAL",
+            "          | \"[\" EXPRESSION \"]\"",
+            "          | \"(\" EXPRESSION \")\"",
+            "          | \"{\" EXPRESSION \"}\" .",
+            "IDENTIFIER = letter { letter } .",
+            "LITERAL    = \"\"\"\" character { character } \"\"\"\" ."
         ]
       }
     ]
