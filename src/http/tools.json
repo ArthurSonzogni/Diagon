@@ -321,6 +321,130 @@
     ]
   },
   {
+    "tool": "Grammar",
+    "description": "Grammar (experimental)",
+    "options": [
+        {
+          "type":"combobox",
+          "default":true,
+          "label":"Input",
+          "name":"input",
+          "values": [
+            "abnf",
+            "bnf",
+            "iso-ebnf",
+            "rgbnf",
+            "wsn"
+          ]
+        },
+        {
+          "type":"combobox",
+          "default":true,
+          "label":"Output",
+          "name":"output",
+          "values": [
+              "rrutf8",
+              "rrtext",
+              "svg",
+              "html5",
+              "xhtml5",
+              "ebnfhtml5",
+              "ebnfxhtml5",
+              "bnf",
+              "blab",
+              "wsn",
+              "abnf",
+              "iso-ebnf",
+              "rbnf",
+              "sid",
+              "dot",
+              "rrdot",
+              "rrdump",
+              "rrtdump",
+              "rrparcon",
+              "rrll",
+              "rrta"
+          ]
+        }
+    ],
+    "examples": [
+      {
+        "title": "------------------------",
+        "empty": true
+      },
+      {
+        "title": "ABNF - URL",
+        "content": [
+          "URL = domain [path] [attributes] [fragment]",
+          "",
+          "domain = scheme \"://\" [credential] host [port] ",
+          "",
+          "scheme = \"http\" / \"https\"",
+          "",
+          "credential = username [\":\" password]\"@\"",
+          "",
+          "host = 1*(subdomain \".\") domain",
+          "",
+          "port = \":\" number",
+          "",
+          "path = \"/\" ",
+          "",
+          "attributes = \"?\" attribute-key-value *(\"&\" attribute-key-value)",
+          "",
+          "attribute-key-pair = key [\"=\" value]"
+        ]
+      },
+      {
+        "title":"ABNF - CSP",
+        "content": [
+          "source-list       = *WSP [ source-expression *( 1*WSP source-expression ) *WSP ]",
+          "                  / *WSP \"'none'\" *WSP",
+          "",
+          "source-expression = scheme-source",
+          "                  / host-source",
+          "                  / keyword-source",
+          "                  / nonce-source",
+          "                  / hash-source",
+          "",
+          "scheme-source     = scheme-part \":\"",
+          "",
+          "host-source       = [ scheme-part \"://\" ] host-part [ port-part ] [ path-part ]",
+          "",
+          "keyword-source    = \"'self'\"",
+          "                  / \"'unsafe-inline'\"",
+          "                  / \"'unsafe-eval'\"",
+          "",
+          "",
+          "base64-value      = 1*( ALPHA / DIGIT / \"+\" / \"/\" )*2( \"=\" )",
+          "",
+          "nonce-value       = base64-value",
+          "",
+          "hash-value        = base64-value",
+          "",
+          "nonce-source      = \"'nonce-\" nonce-value \"'\"",
+          "",
+          "hash-algo         = \"sha256\"",
+          "                  / \"sha384\"",
+          "                  / \"sha512\"",
+          "",
+          "hash-source       = \"'\" hash-algo \"-\" hash-value \"'\"",
+          "",
+          "scheme-part       = <scheme production from RFC 3986, section 3.1>",
+          "",
+          "host-part         = \"*\" / [ \"*.\" ] 1*host-char *( \".\" 1*host-char )",
+          "",
+          "host-char         = ALPHA",
+          "                  / DIGIT",
+          "                  / \"-\"",
+          "",
+          "path-part         = <path production from RFC 3986, section 3.3>",
+          "",
+          "port-part         = \":\" ( 1*DIGIT / \"*\" )"
+        ]
+      }
+    ]
+  },
+  {
     "tool": "Table",
     "description": "Table",
     "options": [
