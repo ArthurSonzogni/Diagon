@@ -243,7 +243,6 @@ html, body {
 }
 
 /* Application area */
-
 textarea {
   font-variant-numeric: tabular-nums lining-nums;
   font-family: monospace, monospace;
@@ -252,6 +251,12 @@ textarea {
   background-color: transparent;
   resize: none;
   outline: none;
+}
+
+@media handheld {
+  textarea {
+    font-family: "Consolas","Menlo","Monaco","Lucida Console","Liberation Mono","DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New",monospace;
+  }
 }
 
 #input, #output, #errors, #menu_bar, #latex, #html {
