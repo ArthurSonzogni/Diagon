@@ -1,3 +1,4 @@
+@import url(https://fonts.googleapis.com/css?family=Fira+Mono);
 div {
   margin: 0px;
   padding: 0px;
@@ -11,7 +12,7 @@ div {
   --begin-button-hover: #3cb0ff;
   --code-area-bg-color: #AAA;
   --select-bg-color: #EEE;
-  --transition-time: 0s;
+  --transition-time: 0s; /* Modified via js */
   --displaylatex: none;
   --displayhtml: none;
 }
@@ -22,11 +23,6 @@ div {
   --begin-button-hover: green;
   --code-area-bg-color: #222;
   --select-bg-color: #111;
-}
-
-:root {
-  --displaylatex: none;
-  --displayhtml: none;
 }
 
 [data-display-latex="true"] {
@@ -40,7 +36,8 @@ div {
 /* Global */
 
 html {
-  transition: color var(--transition-time), background-color var(--transition-time);
+  transition: color var(--transition-time);
+  transition: background-color var(--transition-time);
   color: var(--fg-color);
   background-color: var(--bg-color);
   font-family: Arial;
@@ -73,7 +70,7 @@ html, body {
 }
 
 .container {
-  overflow: hidden;
+  /*overflow: hidden;*/
   min-height: 0
 }
 
@@ -248,6 +245,7 @@ html, body {
 /* Application area */
 
 textarea {
+  font-variant-numeric: tabular-nums lining-nums;
   font-family: monospace, monospace;
   font-size: 1em;
   border: none;

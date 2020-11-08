@@ -123,17 +123,17 @@
     </div>
 <script>
 
-let tools = document.getElementById('tools');
-let examples = document.getElementById('examples');
-let options = document.getElementById('options');
-let input = document.getElementById('input');
-let output = document.getElementById('output');
-let errors = document.getElementById('errors');
+const tools = document.querySelector('#tools');
+const examples = document.querySelector('#examples');
+const options = document.querySelector('#options');
+const input = document.querySelector('#input');
+const output = document.querySelector('#output');
+const errors = document.querySelector('#errors');
 let tools_data = [];
-let style_button = document.getElementById("style_button");
-let theme_style = document.getElementById("theme_style");
-let latex = document.getElementById('latex');
-let html = document.getElementById('html');
+const style_button = document.querySelector("#style_button");
+const theme_style = document.querySelector("#theme_style");
+const latex = document.querySelector('#latex');
+const html = document.querySelector('#html');
 
 errors.value = ''; 
 function ClearSelectBox(select_box) {
@@ -319,24 +319,22 @@ function UpdateOutput() {
   }
 }
 
-function OnRuntimeInitialized() {
+async function OnRuntimeInitialized() {
   tools.addEventListener("input", UpdateExamples);
   tools.addEventListener("input", UpdateOutput);
   tools.addEventListener("input", UpdateOptions);
   examples.addEventListener("input", UpdateInput);
   input.addEventListener('input', UpdateOutput);
 
-  fetch("tools.json")
-  .then(response => response.json())
-  .then(data => {
-    tools_data = data;
-    UpdateTools();
-    UpdateExamples()
-    UpdateOptions();
-    UpdateInput();
-    UpdateOutput();
-    translate = Module.cwrap('translate', 'void', ['string','string', 'string']);
-  })
+  let json = await fetch("tools.json");
+  tools_data = await json.json();
+
+  UpdateTools();
+  UpdateExamples()
+  UpdateOptions();
+  UpdateInput();
+  UpdateOutput();
+  translate = Module.cwrap('translate', 'void', ['string','string', 'string']);
 }
 
 function print(text) {
