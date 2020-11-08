@@ -96,6 +96,11 @@
           <div class="container vertical flex">
             <div id="latex" class="flex displaylatex"></div>
             <iframe id="html" class="flex displayhtml"></iframe>
+            <div class="copy-wrapper">
+              <div class="copy" id="copy-output">
+                Copy
+              </div>
+            </div>
             <textarea
               aria-label="output"
               id="output"
@@ -403,6 +408,35 @@ setTimeout(() => {
   let style = document.documentElement.style;
   style.setProperty("--transition-time", "0.5s");
 }, 500);
+
+function clearSelection() {
+  if (window.getSelection)
+    window.getSelection().removeAllRanges();
+  else if (document.selection) 
+    document.selection.empty();
+}
+
+const copyOutput = document.querySelector('#copy-output');
+let copying_output = false;
+copyOutput.addEventListener("click", async function() {
+  if (copyOutput.getAttribute("data-active") == "true")
+    return;
+
+  copyOutput.setAttribute("data-active", "true");
+
+  let length = output.value.length;
+  output.select();
+  output.setSelectionRange(0, 99999); /*For mobile devices*/
+  document.execCommand("copy");
+  clearSelection()
+
+  copyOutput.innerText = "Copied " + length + " letters";
+
+  await new Promise(r => setTimeout(r, 5000));
+
+  copyOutput.innerText = "Copy";
+  copyOutput.setAttribute("data-active", "false")
+});
 
 </script>
 <script src="main.js"></script>

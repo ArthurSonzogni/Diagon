@@ -258,20 +258,6 @@ textarea {
   overflow: auto;
 }
 
-letter-spacing: 0.1em;
-
-#input, #output, #errors, #menu_bar, #latex, #html {
-  display:block;
-  color:var(--fg-color);
-  background-color:var(--bg-color);
-  border:0px solid;
-  box-shadow: 0px 0.5vmin 0.5vmin 0 rgba(0,0,0,0.4);
-  overflow-y: auto;
-  min-height: 0;
-  white-space: pre;
-  overflow: auto;
-}
-
 /* menu bar */
 
 #menu_bar {
@@ -311,15 +297,19 @@ option {
 }
 
 #input, #output, #latex, #html{
-  padding: 7px;
-  margin: 7px;
+  padding: 1vh;
+  margin: 1vh;
 }
 
-#input, #output, #errors, #menu_bar {
+#input, #output, #errors, #menu_bar, #latex {
   color:var(--fg-color);
   background-color:var(--bg-color);
   border:0px solid;
   box-shadow: 0px 0.5vmin 0.5vmin 0 rgba(0,0,0,0.4);
+  overflow-y: auto;
+  min-height: 0;
+  white-space: pre;
+  overflow: auto;
 }
 
 #begin_button {
@@ -344,4 +334,32 @@ option {
 select, option {
   color: var(--fg-color);
   background-color:var(--select-bg-color);
+}
+
+.copy-wrapper {
+  position:relative;
+}
+
+.copy {
+  display:block;
+  position:absolute;
+  background-color:black;
+  color:white;
+  opacity: 0.5;
+  right:0;
+  top :0;
+  z-index:2;
+  margin: 1vh;
+  padding: 1vh;
+  transition: opacity 0.3s, background-color 0.3s;
+  box-shadow: x 0.5vmin 0.5vmin 0 inset rgba(0,0,0,0.4);
+}
+
+.copy:hover, .copy[data-active=true] {
+  opacity:0.9;
+  cursor:pointer;
+}
+
+.copy[data-active=true] {
+  background-color:green;
 }
