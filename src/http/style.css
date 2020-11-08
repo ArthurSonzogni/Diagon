@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Fira+Mono);
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
 div {
   margin: 0px;
   padding: 0px;
@@ -245,19 +245,20 @@ html, body {
 /* Application area */
 textarea {
   font-variant-numeric: tabular-nums lining-nums;
-  font-family: monospace, monospace;
-  font-size: 1em;
+  font-family: 'Fira Code', monospace;
+  font-size: 1rem;
+  line-height: 1.171rem;
+  letter-spacing:0;
+  font-kerning:none;
   border: none;
   background-color: transparent;
   resize: none;
   outline: none;
+  white-space: pre;
+  overflow: auto;
 }
 
-@media handheld {
-  textarea {
-    font-family: "Consolas","Menlo","Monaco","Lucida Console","Liberation Mono","DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New",monospace;
-  }
-}
+letter-spacing: 0.1em;
 
 #input, #output, #errors, #menu_bar, #latex, #html {
   display:block;
@@ -268,6 +269,7 @@ textarea {
   overflow-y: auto;
   min-height: 0;
   white-space: pre;
+  overflow: auto;
 }
 
 /* menu bar */
