@@ -296,7 +296,9 @@ let withKatex = f => {
   document.head.appendChild(katex_js);
 }
 
-let translate = function(){};
+let translate = function() {};
+let API = function() {}
+
 function UpdateOutput() {
   errors.value = '';
   translate(tools_data[tools.value].tool, input.value, GetOptions());
@@ -340,6 +342,7 @@ async function OnRuntimeInitialized() {
   UpdateInput();
   UpdateOutput();
   translate = Module.cwrap('translate', 'void', ['string','string', 'string']);
+  API = Module.cwrap('API', 'string', []);
 }
 
 function print(text) {
@@ -439,5 +442,5 @@ copyOutput.addEventListener("click", async function() {
 });
 
 </script>
-<script src="main.js"></script>
+<script src="diagon.js"></script>
 </html>

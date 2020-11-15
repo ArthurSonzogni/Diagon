@@ -152,8 +152,6 @@ std::string Grammar::Translate(const std::string& input,
   FILE* file_write = fopen("/tmp/diagon_grammer.txt", "w");
   dup2(fileno(file_write), 1);
 
-  kgt::ast_rule* model = nullptr;
-
   // Read string to model.
   auto string_reader = StringReader(input);
 
@@ -169,7 +167,7 @@ std::string Grammar::Translate(const std::string& input,
                              ? output_function_map[option_output]
                              : kgt::rrutf8_output;
 
-  model = input_function(StringReader::Read, &string_reader);
+  auto* model = input_function(StringReader::Read, &string_reader);
   output_function(model);
 
   // Restore stdout

@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+@import url('https://fontlibrary.org/face/dejavu-sans-mono');
+
 div {
   margin: 0px;
   padding: 0px;
@@ -245,10 +246,7 @@ html, body {
 /* Application area */
 textarea {
   font-variant-numeric: tabular-nums lining-nums;
-  font-family: 'Fira Code', monospace;
-  font-size: 1rem;
-  line-height: 1.171rem;
-  letter-spacing:0;
+  font-family: 'Dejavu Sans Mono', monospace;
   font-kerning:none;
   border: none;
   background-color: transparent;

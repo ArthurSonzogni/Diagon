@@ -38,15 +38,11 @@ if (Web)
   # Emscripten options
   string(APPEND CMAKE_CXX_FLAGS " -Os")
   string(APPEND CMAKE_CXX_FLAGS " -s WASM=1")
-
   string(APPEND CMAKE_CXX_FLAGS " -s DEMANGLE_SUPPORT=1")
-  string(APPEND CMAKE_CXX_FLAGS " --js-opts 3")
-  string(APPEND CMAKE_CXX_FLAGS " --llvm-lto 3")
-  string(APPEND CMAKE_CXX_FLAGS " --llvm-opts 3")
   string(APPEND CMAKE_CXX_FLAGS " -s ASSERTIONS=2")
   string(APPEND CMAKE_CXX_FLAGS " --closure 1")
   string(APPEND CMAKE_CXX_FLAGS " --no-heap-copy")
-  string(APPEND CMAKE_CXX_FLAGS " -s EXPORTED_FUNCTIONS='[\"_translate\", \"_main\"]'")
+  string(APPEND CMAKE_CXX_FLAGS " -s EXPORTED_FUNCTIONS='[\"_translate\", \"_main\", \"_API\"]'")
   string(APPEND CMAKE_CXX_FLAGS " -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\",\"cwrap\"]'")
 
   option(ADD_GOOGLE_ANALYTICS "Build the static library" ON)
@@ -73,23 +69,23 @@ if (Web)
     ${CMAKE_CURRENT_BINARY_DIR}/run_web_server.sh
     COPYONLY)
 
-  add_executable(main
+  add_executable(diagon
     main_webassembly.cpp
     translator/Translator.cpp
     translator/Translator.h
     translator/Factory.h
   )
-  target_set_common(main)
-  target_link_libraries(main PUBLIC translator_frame)
-  target_link_libraries(main PUBLIC translator_grammar)
-  target_link_libraries(main PUBLIC translator_math)
-  target_link_libraries(main PUBLIC translator_planar_graph)
-  target_link_libraries(main PUBLIC translator_sequence)
-  target_link_libraries(main PUBLIC translator_table)
-  target_link_libraries(main PUBLIC translator_tree)
-  target_link_libraries(main PUBLIC screen)
-  target_link_libraries(main PUBLIC antlr4_static)
-  target_link_libraries(main PUBLIC kgt::abnf)
+  target_set_common(diagon)
+  target_link_libraries(diagon PUBLIC translator_frame)
+  target_link_libraries(diagon PUBLIC translator_grammar)
+  target_link_libraries(diagon PUBLIC translator_math)
+  target_link_libraries(diagon PUBLIC translator_planar_graph)
+  target_link_libraries(diagon PUBLIC translator_sequence)
+  target_link_libraries(diagon PUBLIC translator_table)
+  target_link_libraries(diagon PUBLIC translator_tree)
+  target_link_libraries(diagon PUBLIC screen)
+  target_link_libraries(diagon PUBLIC antlr4_static)
+  target_link_libraries(diagon PUBLIC kgt::abnf)
 
 else()
 

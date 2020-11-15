@@ -38,3 +38,11 @@ int main(int, const char**) {
   std::cout << "main_webassembly loaded" << std::endl;
   return 0;
 }
+
+extern "C" const char* API() {
+  static std::string out;
+  if (out.size() != 0)
+    return out.c_str();
+  out = "[" + out + "]";
+  return out.c_str();
+}
