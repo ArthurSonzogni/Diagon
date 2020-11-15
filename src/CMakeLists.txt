@@ -24,6 +24,12 @@ configure_file(
 
 #-------------------------------------------------------------------------------
 
+add_library(diagon_base STATIC
+  translator/Translator.cpp
+  translator/Translator.h
+  translator/Factory.h
+)
+
 add_subdirectory(screen)
 add_subdirectory(translator/frame)
 add_subdirectory(translator/grammar)
@@ -33,8 +39,23 @@ add_subdirectory(translator/sequence)
 add_subdirectory(translator/table)
 add_subdirectory(translator/tree)
 
-if (Web)
+add_library(diagon_lib STATIC
+  translator/Factory.h
+)
 
+target_link_libraries(diagon_lib PRIVATE diagon_base)
+target_link_libraries(diagon_lib PRIVATE translator_frame)
+target_link_libraries(diagon_lib PRIVATE translator_grammar)
+target_link_libraries(diagon_lib PRIVATE translator_math)
+target_link_libraries(diagon_lib PRIVATE translator_planar_graph)
+target_link_libraries(diagon_lib PRIVATE translator_sequence)
+target_link_libraries(diagon_lib PRIVATE translator_table)
+target_link_libraries(diagon_lib PRIVATE translator_tree)
+target_link_libraries(diagon_lib PRIVATE antlr4_static)
+target_link_libraries(diagon_lib PRIVATE screen)
+target_set_common(diagon_lib)
+
+if (Web)
   # Emscripten options
   string(APPEND CMAKE_CXX_FLAGS " -Os")
   string(APPEND CMAKE_CXX_FLAGS " -s WASM=1")
@@ -50,78 +71,26 @@ if (Web)
     file(READ ${CMAKE_CURRENT_SOURCE_DIR}/http/google-analytics.html google-analytics)
   endif(ADD_GOOGLE_ANALYTICS)
   
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/http/style.css
-    ${CMAKE_CURRENT_BINARY_DIR}/style.css
-  )
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/http/index.html
-    ${CMAKE_CURRENT_BINARY_DIR}/index.html
-  )
+  foreach(file "style.css" "index.html" "tools.json" "run_web_server.sh")
+    configure_file(
+      ${CMAKE_CURRENT_SOURCE_DIR}/http/${file}
+      ${CMAKE_CURRENT_BINARY_DIR}/${file}
+    )
+  endforeach(file)
 
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/http/tools.json
-    ${CMAKE_CURRENT_BINARY_DIR}/tools.json
-  )
-
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/../tools/webserver/run_web_server.sh
-    ${CMAKE_CURRENT_BINARY_DIR}/run_web_server.sh
-    COPYONLY)
-
-  add_executable(diagon
-    main_webassembly.cpp
-    translator/Translator.cpp
-    translator/Translator.h
-    translator/Factory.h
-  )
+  add_executable(diagon main_webassembly.cpp)
+  target_link_libraries(diagon PRIVATE diagon_lib)
   target_set_common(diagon)
-  target_link_libraries(diagon PUBLIC translator_frame)
-  target_link_libraries(diagon PUBLIC translator_grammar)
-  target_link_libraries(diagon PUBLIC translator_math)
-  target_link_libraries(diagon PUBLIC translator_planar_graph)
-  target_link_libraries(diagon PUBLIC translator_sequence)
-  target_link_libraries(diagon PUBLIC translator_table)
-  target_link_libraries(diagon PUBLIC translator_tree)
-  target_link_libraries(diagon PUBLIC screen)
-  target_link_libraries(diagon PUBLIC antlr4_static)
-  target_link_libraries(diagon PUBLIC kgt::abnf)
-
 else()
+  target_link_libraries(diagon_lib PRIVATE -static-libstdc++)
+  target_link_libraries(diagon_lib PRIVATE stdc++fs)
 
-  add_executable(diagon
-    main.cpp
-    translator/Translator.cpp
-    translator/Translator.h
-    translator/Factory.h
-  )
-  target_set_common(diagon)
-  target_link_libraries(diagon PUBLIC translator_frame)
-  target_link_libraries(diagon PUBLIC translator_grammar)
-  target_link_libraries(diagon PUBLIC translator_math)
-  target_link_libraries(diagon PUBLIC translator_planar_graph)
-  target_link_libraries(diagon PUBLIC translator_sequence)
-  target_link_libraries(diagon PUBLIC translator_table)
-  target_link_libraries(diagon PUBLIC translator_tree)
-  target_link_libraries(diagon PUBLIC screen)
-  target_link_libraries(diagon PUBLIC antlr4_static)
-  target_link_libraries(diagon PUBLIC -static-libstdc++)
+  add_executable(diagon main.cpp)
+  target_link_libraries(diagon PRIVATE diagon_lib)
   install(TARGETS diagon RUNTIME DESTINATION "bin")
+  target_set_common(diagon)
 
-  add_executable(input_output_test
-    translator/Translator.cpp
-    input_output_test.cpp
-  )
+  add_executable(input_output_test input_output_test.cpp)
+  target_link_libraries(input_output_test diagon_lib)
   target_set_common(input_output_test)
-  target_link_libraries(input_output_test PUBLIC translator_frame)
-  target_link_libraries(input_output_test PUBLIC translator_grammar)
-  target_link_libraries(input_output_test PUBLIC translator_math)
-  target_link_libraries(input_output_test PUBLIC translator_planar_graph)
-  target_link_libraries(input_output_test PUBLIC translator_sequence)
-  target_link_libraries(input_output_test PUBLIC translator_table)
-  target_link_libraries(input_output_test PUBLIC translator_tree)
-  target_link_libraries(input_output_test PUBLIC antlr4_static)
-  target_link_libraries(input_output_test PUBLIC screen)
-  target_link_libraries(input_output_test PUBLIC stdc++fs)
-
 endif()

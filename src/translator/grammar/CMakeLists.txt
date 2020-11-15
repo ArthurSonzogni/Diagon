@@ -15,4 +15,5 @@ add_library(translator_grammar STATIC
 )
 set_property(TARGET translator_grammar PROPERTY CXX_STANDARD 17)
 
-target_link_libraries(translator_grammar PUBLIC kgt::kgt)
+target_link_libraries(translator_grammar PRIVATE kgt::kgt)
+target_link_libraries(translator_grammar PRIVATE diagon_base)

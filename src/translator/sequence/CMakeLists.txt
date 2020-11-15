@@ -6,3 +6,4 @@ add_library(translator_sequence STATIC
   Sequence.cpp
 )
 target_set_common(translator_sequence)
+target_link_libraries(translator_sequence PRIVATE diagon_base)
