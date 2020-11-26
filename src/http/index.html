@@ -158,18 +158,16 @@ function UpdateExamples() {
   let index = tools.value;
   let tool = tools_data[index];
   ClearSelectBox(examples);
-  for(let i in tool.examples) {
-    let example = tool.examples[i];
-    examples.options[i] = new Option(example.title, i);
-  }
+  examples.options = [];
+  examples.options.add(new Option("---------", -1));
+  for(let i in tool.examples)
+    examples.options.add(new Option(tool.examples[i].title, i));
 }
 
 let nextInstance = 0;
 function UpdateOptions() {
-  // Clear.
-  while(options.firstChild) {
+  while(options.firstChild)
     options.removeChild(options.firstChild);
-  }
 
   let index = tools.value;
   let tool = tools_data[index];
@@ -192,7 +190,7 @@ function UpdateOptions() {
       checkbox.id = instance;
       checkbox.type = "checkbox";
       checkbox.data = option.name;
-      checkbox.checked = option.default;
+      checkbox.checked = option.default == "true";
       checkbox.addEventListener("change", UpdateOutput);
       option_box.appendChild(checkbox);
     }
@@ -232,22 +230,16 @@ function GetOptions() {
     output += name + "\n";
     output += value + "\n";
   }
-  console.log(output);
   return output;
 }
 
 function UpdateInput() {
   let tool_index = tools.value;
   let example_index = examples.value;
-  let example = tools_data[tool_index].examples[example_index];
-  if (example.empty)
+  if (example_index == -1)
     return;
-  input.value = '';
-  for(let i in example.content) {
-    if (i != 0)
-      input.value += "\n";
-    input.value += example.content[i]
-  }
+  let example = tools_data[tool_index].examples[example_index];
+  input.value = example.content;
   UpdateOutput();
 }
 
@@ -326,23 +318,25 @@ function UpdateOutput() {
   }
 }
 
-async function OnRuntimeInitialized() {
-  tools.addEventListener("input", UpdateExamples);
-  tools.addEventListener("input", UpdateOutput);
-  tools.addEventListener("input", UpdateOptions);
+function OnRuntimeInitialized() {
+  translate = Module.cwrap('translate', 'void', ['string','string', 'string']);
+  API = Module.cwrap('API', 'string', []);
+
+  tools.addEventListener("input", () => {
+    UpdateOptions();
+    UpdateExamples();
+    UpdateOutput();
+  });
   examples.addEventListener("input", UpdateInput);
   input.addEventListener('input', UpdateOutput);
 
-  let json = await fetch("tools.json");
-  tools_data = await json.json();
-
+  let api = API();
+  tools_data = JSON.parse(api);
   UpdateTools();
   UpdateExamples()
   UpdateOptions();
   UpdateInput();
   UpdateOutput();
-  translate = Module.cwrap('translate', 'void', ['string','string', 'string']);
-  API = Module.cwrap('API', 'string', []);
 }
 
 function print(text) {
@@ -443,4 +437,11 @@ copyOutput.addEventListener("click", async function() {
 
 </script>
 <script src="diagon.js"></script>
+<link
+  rel="preload"
+  as="style"
+  onload="this.rel=stylesheet"
+  type="text/css"
+  href="https://fontlibrary.org/face/dejavu-sans-mono"
+/>
 </html>

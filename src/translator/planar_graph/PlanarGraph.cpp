@@ -2,13 +2,14 @@
 // Use of this source code is governed by the MIT license that can be found in
 // the LICENSE file.
 
-#include "translator/planar_graph/PlanarGraph.h"
-
 #include <iostream>
+#include <map>
 #include <queue>
 #include <sstream>
-
+#include <string>
+#include <vector>
 #include "screen/Screen.h"
+#include "translator/Translator.h"
 #include "translator/planar_graph/PlanarGraphLexer.h"
 #include "translator/planar_graph/PlanarGraphParser.h"
 
@@ -41,49 +42,149 @@ using Coordinates = struct {
 
 using StraightLineDrawing = std::vector<Coordinates>;
 
-std::unique_ptr<Translator> PlanarGraphTranslator() {
-  return std::make_unique<PlanarGraph>();
+struct Box {
+  int left;
+  int right;
+  int top;
+  int bottom;
+  static Box Union(Box A, Box B);
+  static Box Translate(Box A, int x, int y);
+};
+
+void InitializeEdgeIndex(Graph& graph) {
+  boost::property_map<Graph, boost::edge_index_t>::type e_index =
+      boost::get(boost::edge_index, graph);
+  boost::graph_traits<Graph>::edges_size_type edge_count = 0;
+  boost::graph_traits<Graph>::edge_iterator ei, ei_end;
+  for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei)
+    boost::put(e_index, *ei, edge_count++);
 }
 
-struct PlanarGraph::DrawnEdge {
+bool ComputePlanarEmbedding(const Graph& graph, Embedding& embedding) {
+  embedding = Embedding(boost::num_vertices(graph));
+  return boost::boyer_myrvold_planarity_test(
+      boost::boyer_myrvold_params::graph = graph,
+      boost::boyer_myrvold_params::embedding = embedding.data());
+}
+
+class PlanarGraph;
+
+struct DrawnEdge {
   int x;
   int vertex_up;
   int vertex_down;
   int y_up;
   int y_down;
-  void Draw(Screen& screen, PlanarGraph& graph) {
-    int top = 3 * y_up - 1;
-    int bottom = 3 * y_down + 3;
 
-    screen.DrawVerticalLine(top + 1, bottom - 1, x);
-
-    if (graph.arrow_style[vertex_down][vertex_up] == ArrowStyle::LINE)
-      screen.DrawPixel(x, top, U'┬');
-    else
-      screen.DrawPixel(x, top, U'△');
-
-    if (graph.arrow_style[vertex_up][vertex_down] == ArrowStyle::LINE)
-      screen.DrawPixel(x, bottom, U'┴');
-    else
-      screen.DrawPixel(x, bottom, U'▽');
-  }
+  void Draw(Screen& screen, PlanarGraph& graph);
 };
 
-struct PlanarGraph::DrawnVertex {
+struct DrawnVertex {
   int left;
   int right;
   int y;
   std::wstring text;
-  void Draw(Screen& screen) {
-    screen.DrawBox(left, 3 * y, right - left + 1, 3);
-    int text_position = left + 1 + (right - left - 1 - text.size()) / 2;
-    screen.DrawText(text_position, 3 * y + 1, text);
-  }
   std::vector<DrawnEdge> edges;
+
+  void Draw(Screen& screen);
 };
+
+enum class Arrow {
+  RIGHT,
+  LEFT_RIGHT,
+  NONE,
+  LEFT,
+};
+
+struct Edge {
+  int from;
+  int to;
+  Arrow arrow;
+};
+
+enum class ArrowStyle {
+  NONE,
+  LINE,
+  ARROW,
+};
+
+struct Node {
+  int id;
+  std::vector<Node> childs;
+};
+
+class PlanarGraph : public Translator {
+ public:
+  virtual ~PlanarGraph() = default;
+  std::map<int, std::map<int, ArrowStyle>> arrow_style;
+
+ private:
+  const char* Name() final { return "Planar graph"; }
+  const char* Identifier() final { return "PlanarGraph"; }
+  const char* Description() final {
+    return "Build a graph from node and edges";
+  }
+  std::vector<Translator::OptionDescription> Options() final;
+  std::vector<Translator::Example> Examples() final;
+  std::string Translate(const std::string& input,
+                        const std::string& options_string) final;
+
+  void Read(const std::string& input);
+  void ReadGraph(PlanarGraphParser::GraphContext* graph);
+  void ReadEdges(PlanarGraphParser::EdgesContext* edges);
+  int ReadNode(PlanarGraphParser::NodeContext* node);
+  Arrow ReadArrow(PlanarGraphParser::ArrowContext* arrow);
+
+  void Write();
+  void ComputeArrowStyle();
+
+  bool ascii_only_;
+  std::string output_;
+
+  std::map<std::wstring, int> name_to_id;
+  std::vector<std::wstring> id_to_name;
+  int next_id = 0;
+
+  std::vector<Edge> vertex;
+};
+
+std::vector<Translator::OptionDescription> PlanarGraph::Options() {
+  return {
+      {
+          "ascii_only",
+          {
+              "false",
+              "true",
+          },
+          "false",
+          "Use the full unicode charset or only ASCII.",
+          Widget::Checkbox,
+      },
+  };
+}
+
+std::vector<Translator::Example> PlanarGraph::Examples() {
+  return {
+      {
+          "if then else loop",
+          "if -> \"then A\" -> end\n"
+          "if -> \"then B\" -> end\n"
+          "end -> loop -> if",
+      },
+      {
+          "test",
+          "A -- B\n"
+          "A -- C\n"
+          "A -- D -- G\n"
+          "B -- Z\n"
+          "C -- Z",
+      },
+  };
+}
 
 std::string PlanarGraph::Translate(const std::string& input,
                                    const std::string& options_string) {
+  *this = PlanarGraph();
   auto options = SerializeOption(options_string);
   ascii_only_ = (options["ascii_only"] == "true");
 
@@ -146,8 +247,7 @@ int PlanarGraph::ReadNode(PlanarGraphParser::NodeContext* node) {
   }
 }
 
-PlanarGraph::Arrow PlanarGraph::ReadArrow(
-    PlanarGraphParser::ArrowContext* arrow) {
+Arrow PlanarGraph::ReadArrow(PlanarGraphParser::ArrowContext* arrow) {
   if (arrow->RIGHT_ARROW())
     return Arrow::RIGHT;
   if (arrow->NONE_ARROW())
@@ -158,22 +258,6 @@ PlanarGraph::Arrow PlanarGraph::ReadArrow(
     return Arrow::LEFT;
   // NOTREACHED();
   return Arrow::RIGHT;
-}
-
-void InitializeEdgeIndex(Graph& graph) {
-  boost::property_map<Graph, boost::edge_index_t>::type e_index =
-      boost::get(boost::edge_index, graph);
-  boost::graph_traits<Graph>::edges_size_type edge_count = 0;
-  boost::graph_traits<Graph>::edge_iterator ei, ei_end;
-  for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei)
-    boost::put(e_index, *ei, edge_count++);
-}
-
-bool ComputePlanarEmbedding(const Graph& graph, Embedding& embedding) {
-  embedding = Embedding(boost::num_vertices(graph));
-  return boost::boyer_myrvold_planarity_test(
-      boost::boyer_myrvold_params::graph = graph,
-      boost::boyer_myrvold_params::embedding = embedding.data());
 }
 
 void PlanarGraph::ComputeArrowStyle() {
@@ -393,43 +477,29 @@ void PlanarGraph::Write() {
   return Draw();
 }
 
-const char* PlanarGraph::Name() {
-  return "PlanarGraph";
+void DrawnVertex::Draw(Screen& screen) {
+  screen.DrawBox(left, 3 * y, right - left + 1, 3);
+  int text_position = left + 1 + (right - left - 1 - text.size()) / 2;
+  screen.DrawText(text_position, 3 * y + 1, text);
 }
 
-const char* PlanarGraph::Description() {
-  return "Build a graph from node and edges";
+void DrawnEdge::Draw(Screen& screen, PlanarGraph& graph) {
+  int top = 3 * y_up - 1;
+  int bottom = 3 * y_down + 3;
+
+  screen.DrawVerticalLine(top + 1, bottom - 1, x);
+
+  if (graph.arrow_style[vertex_down][vertex_up] == ArrowStyle::LINE)
+    screen.DrawPixel(x, top, U'┬');
+  else
+    screen.DrawPixel(x, top, U'△');
+
+  if (graph.arrow_style[vertex_up][vertex_down] == ArrowStyle::LINE)
+    screen.DrawPixel(x, bottom, U'┴');
+  else
+    screen.DrawPixel(x, bottom, U'▽');
 }
 
-std::vector<Translator::OptionDescription> PlanarGraph::Options() {
-  return {
-      {
-          "ascii_only",
-          {
-              "false",
-              "true",
-          },
-          "false",
-          "Use the full unicode charset or only ASCII.",
-      },
-  };
-}
-
-std::vector<Translator::Example> PlanarGraph::Examples() {
-  return {
-      {
-          "if then else loop",
-          "if -> \"then A\" -> end\n"
-          "if -> \"then B\" -> end\n"
-          "end -> loop -> if",
-      },
-      {
-          "test",
-          "A -- B\n"
-          "A -- C\n"
-          "A -- D -- G\n"
-          "B -- Z\n"
-          "C -- Z",
-      },
-  };
+std::unique_ptr<Translator> PlanarGraphTranslator() {
+  return std::make_unique<PlanarGraph>();
 }

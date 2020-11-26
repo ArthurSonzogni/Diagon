@@ -367,6 +367,51 @@ namespace {
 class Table : public Translator {
  public:
   virtual ~Table() = default;
+
+ private:
+  const char* Name() final { return "Table"; }
+  const char* Identifier() final { return "Table"; }
+  const char* Description() final { return "Draw table"; }
+
+  std::vector<Translator::OptionDescription> Options() final {
+    return {
+        {
+            "style",
+            {
+                "unicode",
+                "unicode rounded",
+                "unicode bold",
+                "unicode double",
+                "unicode with bold header",
+                "unicode with double header",
+                "unicode cells",
+                "unicode cells 2",
+                "ascii",
+                "ascii rounded",
+                "ascii with header 1",
+                "ascii with header 2",
+                "ascii light header",
+                "ascii light header/separator",
+                "ascii light header/separator/border",
+                "ascii light separator/border",
+                "ascii light border",
+                "conceptual",
+            },
+            "unicode",
+            "The style of the table.",
+            Widget::Combobox,
+        },
+    };
+  }
+
+  std::vector<Translator::Example> Examples() final {
+    return {
+        {"1-simple",
+         "Column 1,Column 2,Column 3\n"
+         "C++,Web,Assembly\n"
+         "Javascript,CSS,HTML"},
+    };
+  }
   std::string Translate(const std::string& input,
                         const std::string& options_string) override {
     auto options = SerializeOption(options_string);
@@ -561,61 +606,8 @@ class Table : public Translator {
 
     return screen.ToString();
   }
-
-  // ----------------------------------------------
-  const char* Name() override;
-  const char* Description() override;
-  std::vector<OptionDescription> Options() override;
-  std::vector<Example> Examples() override;
 };
 
 std::unique_ptr<Translator> TableTranslator() {
   return std::make_unique<Table>();
-}
-
-const char* Table::Name() {
-  return "Table";
-}
-
-const char* Table::Description() {
-  return "Draw table";
-}
-
-std::vector<Translator::OptionDescription> Table::Options() {
-  return {
-      {
-          "style",
-          {
-              "unicode",
-              "unicode rounded",
-              "unicode bold",
-              "unicode double",
-              "unicode with bold header",
-              "unicode with double header",
-              "unicode cells",
-              "unicode cells 2",
-              "ascii",
-              "ascii rounded",
-              "ascii with header 1",
-              "ascii with header 2",
-              "ascii light header",
-              "ascii light header/separator",
-              "ascii light header/separator/border",
-              "ascii light separator/border",
-              "ascii light border",
-              "conceptual",
-          },
-          "unicode",
-          "The style of the table.",
-      },
-  };
-}
-
-std::vector<Translator::Example> Table::Examples() {
-  return {
-      {"1-simple",
-       "Column 1,Column 2,Column 3\n"
-       "C++,Web,Assembly\n"
-       "Javascript,CSS,HTML"},
-  };
 }

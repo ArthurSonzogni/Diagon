@@ -27,7 +27,6 @@ configure_file(
 add_library(diagon_base STATIC
   translator/Translator.cpp
   translator/Translator.h
-  translator/Factory.h
 )
 
 add_subdirectory(screen)
@@ -40,6 +39,7 @@ add_subdirectory(translator/table)
 add_subdirectory(translator/tree)
 
 add_library(diagon_lib STATIC
+  translator/Factory.cpp
   translator/Factory.h
 )
 
@@ -59,10 +59,8 @@ if (Web)
   # Emscripten options
   string(APPEND CMAKE_CXX_FLAGS " -Os")
   string(APPEND CMAKE_CXX_FLAGS " -s WASM=1")
-  string(APPEND CMAKE_CXX_FLAGS " -s DEMANGLE_SUPPORT=1")
-  string(APPEND CMAKE_CXX_FLAGS " -s ASSERTIONS=2")
   string(APPEND CMAKE_CXX_FLAGS " --closure 1")
-  string(APPEND CMAKE_CXX_FLAGS " --no-heap-copy")
+  string(APPEND CMAKE_CXX_FLAGS " -s DISABLE_EXCEPTION_CATCHING=0")
   string(APPEND CMAKE_CXX_FLAGS " -s EXPORTED_FUNCTIONS='[\"_translate\", \"_main\", \"_API\"]'")
   string(APPEND CMAKE_CXX_FLAGS " -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\",\"cwrap\"]'")
 
@@ -71,7 +69,10 @@ if (Web)
     file(READ ${CMAKE_CURRENT_SOURCE_DIR}/http/google-analytics.html google-analytics)
   endif(ADD_GOOGLE_ANALYTICS)
   
-  foreach(file "style.css" "index.html" "tools.json" "run_web_server.sh")
+  foreach(file
+      "style.css"
+      "index.html"
+      "run_web_server.sh")
     configure_file(
       ${CMAKE_CURRENT_SOURCE_DIR}/http/${file}
       ${CMAKE_CURRENT_BINARY_DIR}/${file}
@@ -81,6 +82,21 @@ if (Web)
   add_executable(diagon main_webassembly.cpp)
   target_link_libraries(diagon PRIVATE diagon_lib)
   target_set_common(diagon)
+
+  include(FetchContent)
+
+  FetchContent_Declare(json
+    GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent
+    GIT_TAG v3.9.1)
+
+  FetchContent_GetProperties(json)
+  if(NOT json_POPULATED)
+    FetchContent_Populate(json)
+    add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
+  endif()
+
+  target_link_libraries(diagon PRIVATE nlohmann_json::nlohmann_json)
+
 else()
   target_link_libraries(diagon_lib PRIVATE -static-libstdc++)
   target_link_libraries(diagon_lib PRIVATE stdc++fs)

@@ -349,58 +349,49 @@ class Tree : public Translator {
       return print_function["unicode 2"](std::move(tree));
     }
   }
-  // ----------------------------------------------
-  const char* Name() override;
-  const char* Description() override;
-  std::vector<OptionDescription> Options() override;
-  std::vector<Example> Examples() override;
+
+  const char* Name() final { return "Tree"; }
+  const char* Identifier() final { return "Tree"; }
+  const char* Description() final { return "Draw a tree"; }
+
+  std::vector<Translator::OptionDescription> Options() final {
+    return {
+        {
+            "style",
+            {
+                "unicode 1",
+                "unicode 2",
+                "ASCII 1",
+                "ASCII 2",
+                "ASCII 3",
+                "unicode right top",
+                "unicode right center",
+                "unicode right bottom",
+            },
+            "unicode 1",
+            "The style of the tree.",
+        },
+    };
+  }
+
+  std::vector<Translator::Example> Examples() final {
+    return {
+        {"1 - Simple",
+         "Linux\n"
+         "  Android\n"
+         "  Debian\n"
+         "    Ubuntu\n"
+         "      Lubuntu\n"
+         "      Kubuntu\n"
+         "      Xubuntu\n"
+         "      Xubuntu\n"
+         "    Mint\n"
+         "  Centos\n"
+         "  Fedora"},
+    };
+  }
 };
 
 std::unique_ptr<Translator> TreeTranslator() {
   return std::make_unique<Tree>();
-}
-
-const char* Tree::Name() {
-  return "Tree";
-}
-
-const char* Tree::Description() {
-  return "Draw a tree";
-}
-
-std::vector<Translator::OptionDescription> Tree::Options() {
-  return {
-      {
-          "style",
-          {
-              "unicode 1",
-              "unicode 2",
-              "ASCII 1",
-              "ASCII 2",
-              "ASCII 3",
-              "unicode right top",
-              "unicode right center",
-              "unicode right bottom",
-          },
-          "unicode 1",
-          "The style of the tree.",
-      },
-  };
-}
-
-std::vector<Translator::Example> Tree::Examples() {
-  return {
-      {"1 - Simple",
-       "Linux\n"
-       "  Android\n"
-       "  Debian\n"
-       "    Ubuntu\n"
-       "      Lubuntu\n"
-       "      Kubuntu\n"
-       "      Xubuntu\n"
-       "      Xubuntu\n"
-       "    Mint\n"
-       "  Centos\n"
-       "  Fedora"},
-  };
 }

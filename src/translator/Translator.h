@@ -15,14 +15,21 @@ class Translator {
   virtual ~Translator() = default;
 
   // Reflection API ------------------------------------------------------------
+  virtual const char* Identifier() { return ""; }
   virtual const char* Name() { return ""; }
   virtual const char* Description() { return ""; }
+
+  enum Widget {
+    Combobox,
+    Checkbox,
+  };
 
   struct OptionDescription {
     std::string name;
     std::vector<std::string> values;
     std::string default_value;
     std::string description;
+    Widget type;
   };
   virtual std::vector<OptionDescription> Options() { return {}; }
 

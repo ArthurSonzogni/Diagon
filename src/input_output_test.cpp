@@ -41,9 +41,7 @@ void ParseDirectoryName(std::string name,
 }
 
 int main(int, const char**) {
-  auto translator_list = TranslatorList();
-  int result = 0;
-
+  int result = EXIT_SUCCESS;
   std::string path = test_directory;
   std::cout << "test_directory = " << test_directory << std::endl;
   for (auto& dir : std::filesystem::directory_iterator(path)) {
@@ -52,7 +50,7 @@ int main(int, const char**) {
     ParseDirectoryName(dir.path().filename(), &translator_name, &options);
 
     for (auto& test : std::filesystem::directory_iterator(dir.path())) {
-      auto translator = translator_list[translator_name]();
+      auto translator = FindTranslator(translator_name);
 
       std::string input = ReadFile(test.path() / "input");
       std::string output = ReadFile(test.path() / "output");
@@ -68,6 +66,7 @@ int main(int, const char**) {
         std::cout << "---[Expected]----------------" << std::endl;
         std::cout << output << std::endl;
         std::cout << "---------------------" << std::endl;
+        result = EXIT_FAILURE;
       }
     }
   }

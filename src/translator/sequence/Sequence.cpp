@@ -2,22 +2,60 @@
 // Use of this source code is governed by the MIT license that can be found in
 // the LICENSE file.
 
-#include "translator/sequence/Sequence.h"
+#include "translator/sequence/Sequence.hpp"
 
 #include <functional>
 #include <queue>
 #include <set>
 #include <sstream>
-
+#include <string>
+#include <vector>
 #include "screen/Screen.h"
-#include "translator/sequence/SequenceLexer.h"
-#include "translator/sequence/SequenceParser.h"
+#include "translator/sequence/Graph.hpp"
 
-std::unique_ptr<Translator> SequenceTranslator() {
-  return std::make_unique<Sequence>();
+void Actor::Draw(Screen& screen, int height) {
+  screen.DrawBoxedText(left, 0, name);
+  screen.DrawVerticalLine(3, height - 4, center);
+  screen.DrawBoxedText(left, height - 3, name);
+  screen.DrawPixel(center, 2, U'┬');
+  screen.DrawPixel(center, height - 3, U'┴');
 }
 
-bool Sequence::Dependency::operator<(const Sequence::Dependency& other) const {
+void Message::Draw(Screen& screen) {
+  if (line_top == line_bottom) {
+    screen.DrawHorizontalLine(line_left, line_right, line_top);
+  } else {
+    if (direction == Direction::Right) {
+      screen.DrawHorizontalLine(line_left, line_left + offset, line_top);
+      screen.DrawVerticalLine(line_top, line_bottom, line_left + offset);
+      screen.DrawHorizontalLine(line_left + offset, line_right, line_bottom);
+      screen.DrawPixel(line_left + offset, line_top, U'┐');
+      screen.DrawPixel(line_left + offset, line_bottom, U'└');
+    } else {
+      screen.DrawHorizontalLine(line_right - offset, line_right, line_top);
+      screen.DrawVerticalLine(line_top, line_bottom, line_right - offset);
+      screen.DrawHorizontalLine(line_left, line_right - offset, line_bottom);
+      screen.DrawPixel(line_right - offset, line_top, U'┌');
+      screen.DrawPixel(line_right - offset, line_bottom, U'┘');
+    }
+  }
+
+  // Tip of the arrow.
+  if (direction == Direction::Right) {
+    screen.DrawPixel(line_right, line_bottom, U'>');
+  } else {
+    screen.DrawPixel(line_left, line_bottom, U'<');
+  }
+
+  // The message
+  int y = top;
+  for (auto& line : messages) {
+    screen.DrawText(left, y, line);
+    ++y;
+  }
+}
+
+bool Dependency::operator<(const Dependency& other) const {
   if (from < other.from)
     return true;
   if (from > other.from)
@@ -25,8 +63,194 @@ bool Sequence::Dependency::operator<(const Sequence::Dependency& other) const {
   return to < other.to;
 }
 
+std::vector<std::set<int>> Cut(const MessageDependencies& message_dependencies,
+                               std::function<bool(int, int)> preference) {
+  std::vector<std::set<int>> output;
+
+  // Groups the nodes that independants on each other.
+  std::vector<MessageDependencies> independants;
+  {
+    std::map<int, std::set<int>> neighbours;
+    for (const Dependency& dependency : message_dependencies.dependencies) {
+      neighbours[dependency.from].insert(dependency.to);
+      neighbours[dependency.to].insert(dependency.from);
+    }
+    std::set<int> non_used;
+    for (int message : message_dependencies.messages) {
+      non_used.insert(message);
+    }
+    while (!non_used.empty()) {
+      MessageDependencies dependant;
+      std::queue<int> tasks;
+      tasks.push(*non_used.begin());
+      while (!tasks.empty()) {
+        // Take a new task
+        int message = tasks.front();
+        tasks.pop();
+
+        // Check there is work to do for this task.
+        {
+          auto it = non_used.find(message);
+          if (it == non_used.end())
+            continue;
+          non_used.erase(it);
+        }
+
+        dependant.messages.insert(message);
+        for (int next : neighbours[message]) {
+          tasks.push(next);
+        }
+      }
+      independants.push_back(std::move(dependant));
+    }
+
+    // Split the dependencies between each independant groups.
+    std::map<int, int> index;
+    for (int i = 0; i < independants.size(); ++i) {
+      for (int j : independants[i].messages)
+        index[j] = i;
+    }
+    for (const Dependency& dependency : message_dependencies.dependencies) {
+      independants[index[dependency.from]].dependencies.insert(dependency);
+    }
+
+    // Sort indepents groups such that messages are displayed in the order they
+    // are written.
+    std::sort(
+        independants.begin(), independants.end(),
+        [&](const MessageDependencies left, const MessageDependencies right) {
+          return preference(*left.messages.begin(), *right.messages.begin());
+        });
+  }
+
+  for (auto& dependant : independants) {
+    // Find cycles.
+    std::vector<MessageSetWithWeight> cycles;
+    {
+      // Compute initial state.
+      std::map<int, std::set<int>> reachable_from;
+      for (int message : dependant.messages) {
+        reachable_from[message].insert(message);
+      }
+      std::map<int, std::set<int>> new_reachable_from(reachable_from);
+
+      // Find the closure.
+      while (true) {
+        for (const Dependency& dependency : dependant.dependencies) {
+          const auto& addition = reachable_from[dependency.to];
+          new_reachable_from[dependency.from].insert(addition.cbegin(),
+                                                     addition.cend());
+        }
+
+        if (reachable_from == new_reachable_from)
+          break;
+        reachable_from = new_reachable_from;
+      }
+
+      // Group elements that can reach the same set of elements.
+      std::map<std::set<int>, std::set<int>> groups;
+      for (const auto& it : reachable_from) {
+        groups[it.second].insert(it.first);
+      }
+
+      for (auto& group : groups) {
+        cycles.push_back(
+            MessageSetWithWeight{std::move(group.second), group.first.size()});
+      }
+
+      // This is implicit, but it is indeed a topological sort.
+      sort(cycles.begin(), cycles.end());
+    }
+
+    for (auto& it : cycles)
+      output.push_back(std::move(it.messages));
+  }
+
+  // Separate cycles th
+
+  // std::set<Dependency> external_dependencies;
+  // for(const Dependency& dependency : message_dependencies.dependencies) {
+  // bool found = false;
+  // for(MessageDependencies& cycle : output) {
+  // if (cycle.messages.count(dependency.from) &&
+  // cycle.messages.count(dependency.to)) {
+  // cycle.dependencies.insert(dependency);
+  // found = true;
+  // break;
+  //}
+  //}
+  // if (!found) {
+  // external_dependencies.insert(dependency);
+  //}
+  //}
+
+  // TODO: sort the cycles.
+
+  return output;
+}
+const char* Sequence::Identifier() {
+  return "Sequence";
+}
+const char* Sequence::Name() {
+  return "Sequence diagram";
+}
+const char* Sequence::Description() {
+  return "Draw sequence diagram";
+}
+
+std::vector<Translator::OptionDescription> Sequence::Options() {
+  return {
+      {
+          "ascii_only",
+          {
+              "false",
+              "true",
+          },
+          "false",
+          "Use the full unicode charset or only ASCII.",
+          Widget::Checkbox,
+      },
+  };
+}
+
+std::vector<Translator::Example> Sequence::Examples() {
+  return {
+      {"1-basic",
+       "Alice -> Bob: Hello Bob!\n"
+       "Alice <- Bob: Hello Alice!"},
+      {"2-More actors",
+       "Renderer -> Browser: BeginNavigation()\n"
+       "Browser -> Network: URLRequest()\n"
+       "Browser <- Network: URLResponse()\n"
+       "Renderer <- Browser: CommitNavigation()\n"
+       "Renderer -> Browser: DidCommitNavigation()"},
+      {"3-Actors order",
+       "Actor 2 -> Actor 3: message 1\n"
+       "Actor 1 -> Actor 2: message 2\n"
+       "\n"
+       "Actor 1:\n"
+       "Actor 2:\n"
+       "Actor 3:"},
+      {"4-Message order",
+       "2) Actor 2 -> Actor 3: message 1\n"
+       "1) Actor 1 -> Actor 2: message 2\n"
+       "\n"
+       "Actor 1:\n"
+       "Actor 2: 1<2\n"
+       "Actor 3:"},
+      {"5-Message crossing",
+       "1) Renderer -> Browser: Message 1\n"
+       "2) Renderer <- Browser: Message 2\n"
+       "\n"
+       "Renderer: 1<2\n"
+       "Browser: 2<1"},
+  };
+}
+
 std::string Sequence::Translate(const std::string& input,
                                 const std::string& options_string) {
+  *this = Sequence();
+
   auto options = SerializeOption(options_string);
   ascii_only_ = (options["ascii_only"] == "true");
 
@@ -229,18 +453,6 @@ int Sequence::GetNumber(SequenceParser::NumberContext* number) {
   return std::stoi(number->Number()->getSymbol()->getText());
 }
 
-// std::vector<std::wstring> Sequence::GetMessage(
-// SequenceParser::MessageContext* message) {
-// std::vector<std::wstring> messages;
-
-// messages.push_back(to_wstring(message->text()->getText()));
-////for (auto text : message->text()) {
-////messages.push_back(to_wstring(text->getText()));
-////}
-
-// return messages;
-//}
-
 void Sequence::Layout() {
   LayoutComputeMessageWidth();
   LayoutComputeActorsPositions();
@@ -254,13 +466,6 @@ void Sequence::LayoutComputeMessageWidth() {
     }
   }
 }
-
-// Define minimum space between two actors.
-struct ActorSpace {
-  int a;
-  int b;
-  int space;
-};
 
 void Sequence::LayoutComputeActorsPositions() {
   std::vector<ActorSpace> spaces;
@@ -307,226 +512,9 @@ void Sequence::LayoutComputeActorsPositions() {
   }
 }
 
-namespace graph {
-
-struct Message {
-  int id;    // message.
-  int from;  // actor.
-  int to;    // actor.
-};
-
-using Dependency = Sequence::Dependency;
-
-struct Node {
-  int actor;
-  int message;
-
-  Node(int actor, int message) : actor(actor), message(message){};
-};
-
-struct Vertex {
-  Node from;
-  Node to;
-
-  Vertex(const Node& from, const Node& to) : from(from), to(to) {}
-  Vertex(const Message& message)
-      : from(Node(message.from, message.id)),
-        to(Node(message.to, message.id)) {}
-};
-
-using Graph = std::set<Vertex>;
-
-bool operator<(const Node& a, const Node& b) {
-  if (a.actor < b.actor)
-    return true;
-  if (b.actor < a.actor)
-    return false;
-  return a.message < b.message;
-}
-
-bool operator<(const Vertex& a, const Vertex& b) {
-  if (a.from < b.from)
-    return true;
-  if (b.from < a.from)
-    return false;
-  return a.to < b.to;
-}
-
-struct MessageDependencies {
-  std::set<int> messages;
-  std::set<Dependency> dependencies;
-};
-
-struct MessageSetWithWeight {
-  std::set<int> messages;
-  size_t weight;
-  bool operator<(const MessageSetWithWeight& other) const {
-    return weight > other.weight;
-  }
-};
-
-std::vector<std::set<int>> Cut(const MessageDependencies& message_dependencies,
-                               std::function<bool(int, int)> preference) {
-  std::vector<std::set<int>> output;
-
-  // Groups the nodes that independants on each other.
-  std::vector<MessageDependencies> independants;
-  {
-    std::map<int, std::set<int>> neighbours;
-    for (const Dependency& dependency : message_dependencies.dependencies) {
-      neighbours[dependency.from].insert(dependency.to);
-      neighbours[dependency.to].insert(dependency.from);
-    }
-    std::set<int> non_used;
-    for (int message : message_dependencies.messages) {
-      non_used.insert(message);
-    }
-    while (!non_used.empty()) {
-      MessageDependencies dependant;
-      std::queue<int> tasks;
-      tasks.push(*non_used.begin());
-      while (!tasks.empty()) {
-        // Take a new task
-        int message = tasks.front();
-        tasks.pop();
-
-        // Check there is work to do for this task.
-        {
-          auto it = non_used.find(message);
-          if (it == non_used.end())
-            continue;
-          non_used.erase(it);
-        }
-
-        dependant.messages.insert(message);
-        for (int next : neighbours[message]) {
-          tasks.push(next);
-        }
-      }
-      independants.push_back(std::move(dependant));
-    }
-
-    // Split the dependencies between each independant groups.
-    std::map<int, int> index;
-    for (int i = 0; i < independants.size(); ++i) {
-      for (int j : independants[i].messages)
-        index[j] = i;
-    }
-    for (const Dependency& dependency : message_dependencies.dependencies) {
-      independants[index[dependency.from]].dependencies.insert(dependency);
-    }
-
-    // Sort indepents groups such that messages are displayed in the order they
-    // are written.
-    std::sort(
-        independants.begin(), independants.end(),
-        [&](const MessageDependencies left, const MessageDependencies right) {
-          return preference(*left.messages.begin(), *right.messages.begin());
-        });
-  }
-
-  for (auto& dependant : independants) {
-    // Find cycles.
-    std::vector<MessageSetWithWeight> cycles;
-    {
-      // Compute initial state.
-      std::map<int, std::set<int>> reachable_from;
-      for (int message : dependant.messages) {
-        reachable_from[message].insert(message);
-      }
-      std::map<int, std::set<int>> new_reachable_from(reachable_from);
-
-      // Find the closure.
-      while (true) {
-        for (const Dependency& dependency : dependant.dependencies) {
-          const auto& addition = reachable_from[dependency.to];
-          new_reachable_from[dependency.from].insert(addition.cbegin(),
-                                                     addition.cend());
-        }
-
-        if (reachable_from == new_reachable_from)
-          break;
-        reachable_from = new_reachable_from;
-      }
-
-      // Group elements that can reach the same set of elements.
-      std::map<std::set<int>, std::set<int>> groups;
-      for (const auto& it : reachable_from) {
-        groups[it.second].insert(it.first);
-      }
-
-      for (auto& group : groups) {
-        cycles.push_back(
-            MessageSetWithWeight{std::move(group.second), group.first.size()});
-      }
-
-      // This is implicit, but it is indeed a topological sort.
-      sort(cycles.begin(), cycles.end());
-    }
-
-    for (auto& it : cycles)
-      output.push_back(std::move(it.messages));
-  }
-
-  // Separate cycles th
-
-  // std::set<Dependency> external_dependencies;
-  // for(const Dependency& dependency : message_dependencies.dependencies) {
-  // bool found = false;
-  // for(MessageDependencies& cycle : output) {
-  // if (cycle.messages.count(dependency.from) &&
-  // cycle.messages.count(dependency.to)) {
-  // cycle.dependencies.insert(dependency);
-  // found = true;
-  // break;
-  //}
-  //}
-  // if (!found) {
-  // external_dependencies.insert(dependency);
-  //}
-  //}
-
-  // TODO: sort the cycles.
-
-  return output;
-}
-
-std::vector<Node> FindTopologicalOrder(const Graph& graph) {
-  std::map<Node, int> weight;
-  bool work_to_do = true;
-  int iteration = 0;
-  while (work_to_do) {
-    work_to_do = false;
-    for (const auto& vertex : graph) {
-      if (weight[vertex.to] <= weight[vertex.from]) {
-        weight[vertex.to] = weight[vertex.from] + 1;
-        work_to_do = true;
-      }
-    }
-
-    iteration++;
-    if (iteration >= 1000) {
-      std::cout << "There are cycles" << std::endl;
-      break;
-    }
-  }
-
-  std::vector<Node> nodes;
-  for (auto& it : weight) {
-    nodes.push_back(it.first);
-  }
-  std::sort(nodes.begin(), nodes.end(),
-            [&weight](const Node& a, const Node& b) {
-              return weight[a] < weight[b];
-            });
-  return nodes;
-}
-
-}  // namespace graph
-
 void Sequence::LayoutComputeMessagesPositions() {
   // Build graph
-  graph::MessageDependencies message_dependencies;
+  MessageDependencies message_dependencies;
   for (int a = 0; a < actors.size(); ++a) {
     auto& actor = actors[a];
     for (const Dependency& dependency : actor.dependencies) {
@@ -544,9 +532,9 @@ void Sequence::LayoutComputeMessagesPositions() {
     message.right = actors[actor_index[message.to]].center;
     if (message.left > message.right) {
       std::swap(message.left, message.right);
-      message.direction = Message::Direction::Left;
+      message.direction = Direction::Left;
     } else {
-      message.direction = Message::Direction::Right;
+      message.direction = Direction::Right;
     }
     message.left += 1;
     message.right -= 1;
@@ -577,7 +565,7 @@ void Sequence::LayoutComputeMessagesPositions() {
     return message_index[a] < message_index[b];
   };
 
-  for (auto& cut : graph::Cut(message_dependencies, preference)) {
+  for (auto& cut : Cut(message_dependencies, preference)) {
     int offset = 2;
 
     // Fast path: Only one message, no crossing.
@@ -594,16 +582,15 @@ void Sequence::LayoutComputeMessagesPositions() {
       auto& actor = actors[a];
       for (const Dependency& dependency : actor.dependencies) {
         if (cut.count(dependency.from) && cut.count(dependency.to)) {
-          graph.insert(graph::Vertex(graph::Node(a, dependency.from),  //
-                                     graph::Node(a, dependency.to)));
+          graph.insert({{a, dependency.from}, {a, dependency.to}});
         }
       }
     }
 
     for (auto& message : messages) {
       if (cut.count(message.id)) {
-        graph::Node from{actor_index[message.from], message.id};
-        graph::Node to{actor_index[message.to], message.id};
+        graph::Node from = {actor_index[message.from], message.id};
+        graph::Node to = {actor_index[message.to], message.id};
         graph.insert(graph::Vertex(from, to));
       }
     }
@@ -635,48 +622,6 @@ void Sequence::LayoutComputeMessagesPositions() {
             });
 }
 
-void Sequence::Actor::Draw(Screen& screen, int height) {
-  screen.DrawBoxedText(left, 0, name);
-  screen.DrawVerticalLine(3, height - 4, center);
-  screen.DrawBoxedText(left, height - 3, name);
-  screen.DrawPixel(center, 2, U'┬');
-  screen.DrawPixel(center, height - 3, U'┴');
-}
-
-void Sequence::Message::Draw(Screen& screen) {
-  if (line_top == line_bottom) {
-    screen.DrawHorizontalLine(line_left, line_right, line_top);
-  } else {
-    if (direction == Message::Direction::Right) {
-      screen.DrawHorizontalLine(line_left, line_left + offset, line_top);
-      screen.DrawVerticalLine(line_top, line_bottom, line_left + offset);
-      screen.DrawHorizontalLine(line_left + offset, line_right, line_bottom);
-      screen.DrawPixel(line_left + offset, line_top, U'┐');
-      screen.DrawPixel(line_left + offset, line_bottom, U'└');
-    } else {
-      screen.DrawHorizontalLine(line_right - offset, line_right, line_top);
-      screen.DrawVerticalLine(line_top, line_bottom, line_right - offset);
-      screen.DrawHorizontalLine(line_left, line_right - offset, line_bottom);
-      screen.DrawPixel(line_right - offset, line_top, U'┌');
-      screen.DrawPixel(line_right - offset, line_bottom, U'┘');
-    }
-  }
-
-  // Tip of the arrow.
-  if (direction == Message::Direction::Right) {
-    screen.DrawPixel(line_right, line_bottom, U'>');
-  } else {
-    screen.DrawPixel(line_left, line_bottom, U'<');
-  }
-
-  // The message
-  int y = top;
-  for (auto& line : messages) {
-    screen.DrawText(left, y, line);
-    ++y;
-  }
-}
-
 std::string Sequence::Draw() {
   // Estimate output dimension.
   int width = actors.back().right;
@@ -699,58 +644,6 @@ std::string Sequence::Draw() {
   return screen.ToString();
 }
 
-const char* Sequence::Name() {
-  return "Sequence";
-}
-
-const char* Sequence::Description() {
-  return "Draw sequence diagram";
-}
-
-std::vector<Translator::OptionDescription> Sequence::Options() {
-  return {
-      {
-          "ascii_only",
-          {
-              "false",
-              "true",
-          },
-          "false",
-          "Use the full unicode charset or only ASCII.",
-      },
-  };
-}
-
-std::vector<Translator::Example> Sequence::Examples() {
-  return {
-      {"1-basic",
-       "Alice -> Bob: Hello Bob!\n"
-       "Alice <- Bob: Hello Alice!"},
-      {"2-More actors",
-       "Renderer -> Browser: BeginNavigation()\n"
-       "Browser -> Network: URLRequest()\n"
-       "Browser <- Network: URLResponse()\n"
-       "Renderer <- Browser: CommitNavigation()\n"
-       "Renderer -> Browser: DidCommitNavigation()"},
-      {"3-Actors order",
-       "Actor 2 -> Actor 3: message 1\n"
-       "Actor 1 -> Actor 2: message 2\n"
-       "\n"
-       "Actor 1:\n"
-       "Actor 2:\n"
-       "Actor 3:"},
-      {"4-Message order",
-       "2) Actor 2 -> Actor 3: message 1\n"
-       "1) Actor 1 -> Actor 2: message 2\n"
-       "\n"
-       "Actor 1:\n"
-       "Actor 2: 1<2\n"
-       "Actor 3:"},
-      {"5-Message crossing",
-       "1) Renderer -> Browser: Message 1\n"
-       "2) Renderer <- Browser: Message 2\n"
-       "\n"
-       "Renderer: 1<2\n"
-       "Browser: 2<1"},
-  };
+std::unique_ptr<Translator> SequenceTranslator() {
+  return std::make_unique<Sequence>();
 }

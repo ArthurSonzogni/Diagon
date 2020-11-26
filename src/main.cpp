@@ -49,7 +49,7 @@ TRANSLATOR:
 )description";
 
   for (auto& it : TranslatorList()) {
-    output += " - " + it.first + "\n";
+    output += std::string(" - ") + it->Identifier() + "\n";
   }
 
   output += R"(
@@ -97,25 +97,24 @@ int PrintError(std::string error) {
   return EXIT_FAILURE;
 }
 
-int PrintTranslatorExamples(TranslatorFactory factory) {
-  auto translator = factory();
+int PrintTranslatorExamples(Translator* translator) {
   if (!translator->Examples().size()) {
     std::cout << "No examples" << std::endl;
     return EXIT_SUCCESS;
   }
 
+  
   std::cout << "EXAMPLES:" << std::endl;
   int i = 0;
   for (auto& it : translator->Examples()) {
-    std::string input = TranslatorList()["Frame"]()->Translate(
-        it.input, "line_number\nfalse");
+    std::string input =
+        FindTranslator("Frame")->Translate(it.input, "line_number\nfalse");
     replaceAll(input, "\n", "\n     ");
     std::cout << "  " << (++i) << ") input" << std::endl;
     std::cout << "     " << input;
 
-    std::string output = factory()->Translate(it.input, "");
-    output =
-        TranslatorList()["Frame"]()->Translate(output, "line_number\nfalse");
+    std::string output = translator->Translate(it.input, "");
+    output = FindTranslator("Frame")->Translate(output, "line_number\nfalse");
     replaceAll(output, "\n", "\n     ");
     std::cout << " output" << std::endl;
     std::cout << "     " << output << std::endl;
@@ -124,10 +123,9 @@ int PrintTranslatorExamples(TranslatorFactory factory) {
   return EXIT_SUCCESS;
 }
 
-int PrintTranslatorHelp(TranslatorFactory factory) {
-  auto translator = factory();
+int PrintTranslatorHelp(Translator* translator) {
   std::cout << "SYNOPSIS:" << std::endl;
-  std::cout << "  diagon " << translator->Name() << " [--option=value]*"
+  std::cout << "  diagon " << translator->Identifier() << " [--option=value]*"
             << std::endl
             << std::endl;
 
@@ -153,19 +151,20 @@ int PrintTranslatorHelp(TranslatorFactory factory) {
   }
   if (translator->Examples().size() > 2) {
     std::cout << "EXAMPLES:" << std::endl;
-    std::cout << "  " << translator->Examples().size() << " examples found. Print them using:"
+    std::cout << "  " << translator->Examples().size()
+              << " examples found. Print them using:" << std::endl;
+    std::cout << "  diagon " << translator->Identifier() << " --examples"
               << std::endl;
-    std::cout << "  diagon " << translator->Name() << " --examples" << std::endl;
     return EXIT_SUCCESS;
   }
 
   if (translator->Examples().size() > 0)
-    return PrintTranslatorExamples(factory);
+    return PrintTranslatorExamples(translator);
 
   return EXIT_SUCCESS;
 }
 
-int Translate(TranslatorFactory translator_factory,
+int Translate(Translator* translator,
               int argument_count,
               const char** arguments) {
   // Read the options
@@ -200,10 +199,10 @@ int Translate(TranslatorFactory translator_factory,
     std::string argument = next_argument();
 
     if (argument == "--help")
-      return PrintTranslatorHelp(translator_factory);
+      return PrintTranslatorHelp(translator);
 
     if (argument == "--examples")
-      return PrintTranslatorExamples(translator_factory);
+      return PrintTranslatorExamples(translator);
 
     if (argument == "--") {
       input = read_remaining_args();
@@ -239,7 +238,6 @@ int Translate(TranslatorFactory translator_factory,
     input = read_stdin();
   }
 
-  auto translator = translator_factory();
   std::string output = translator->Translate(input, option_list);
   std::cout << output << std::endl;
   return EXIT_SUCCESS;
@@ -249,8 +247,8 @@ int PrintTranslatorNotFound(const std::string& translator) {
   std::cout << "The translator: " << translator << " doesn't exist"
             << std::endl;
   std::cout << "List of available translator:" << std::endl;
-  for (auto& it : TranslatorList())
-    std::cout << "  - " + it.first << std::endl;
+  for (auto& translator: TranslatorList())
+    std::cout << std::string("  - ") + translator->Identifier() << std::endl;
 
   std::cout << "Please read the manual by using diagon --help" << std::endl;
   return EXIT_SUCCESS;
@@ -270,7 +268,7 @@ int main(int argument_count, const char** arguments) {
     return PrintVersion();
 
   std::string translator_name = arguments[1];
-  auto translator = TranslatorList()[translator_name];
+  auto* translator = FindTranslator(translator_name);
 
   if (translator)
     return Translate(std::move(translator), argument_count - 2, arguments + 2);
