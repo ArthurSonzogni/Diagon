@@ -8,6 +8,7 @@ TranslatorPtr SequenceTranslator();
 TranslatorPtr TableTranslator();
 TranslatorPtr TreeTranslator();
 TranslatorPtr GrammarTranslator();
+TranslatorPtr DirectedAcyclicGraphTranslator();
 
 std::vector<TranslatorPtr>& TranslatorList() {
   static std::vector<TranslatorPtr> out;
@@ -20,6 +21,7 @@ std::vector<TranslatorPtr>& TranslatorList() {
   out.push_back(TableTranslator());
   out.push_back(GrammarTranslator());
   out.push_back(FrameTranslator());
+  out.push_back(DirectedAcyclicGraphTranslator());
   out.push_back(PlanarGraphTranslator());
   return out;
 }

@@ -30,6 +30,7 @@ add_library(diagon_base STATIC
 )
 
 add_subdirectory(screen)
+add_subdirectory(translator/directed_acyclic_graph)
 add_subdirectory(translator/frame)
 add_subdirectory(translator/grammar)
 add_subdirectory(translator/math)
@@ -44,6 +45,7 @@ add_library(diagon_lib STATIC
 )
 
 target_link_libraries(diagon_lib PRIVATE diagon_base)
+target_link_libraries(diagon_lib PRIVATE translator_directed_acyclic_graph)
 target_link_libraries(diagon_lib PRIVATE translator_frame)
 target_link_libraries(diagon_lib PRIVATE translator_grammar)
 target_link_libraries(diagon_lib PRIVATE translator_math)

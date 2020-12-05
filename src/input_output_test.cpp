@@ -51,6 +51,12 @@ int main(int, const char**) {
 
     for (auto& test : std::filesystem::directory_iterator(dir.path())) {
       auto translator = FindTranslator(translator_name);
+      if (!translator) {
+        std::cout << "Translator " << translator_name << " not found."
+                  << std::endl;
+        result = EXIT_FAILURE;
+        continue;
+      }
 
       std::string input = ReadFile(test.path() / "input");
       std::string output = ReadFile(test.path() / "output");
