@@ -1,6 +1,0 @@
-add_library(translator_directed_acyclic_graph STATIC
-  DirectedAcyclicGraph.cpp
-  dag_to_graph.cpp
-)
-target_link_libraries(translator_directed_acyclic_graph PRIVATE diagon_base)
-target_set_common(translator_directed_acyclic_graph)

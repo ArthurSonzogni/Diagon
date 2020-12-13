@@ -1,0 +1,22 @@
+chrome -> content
+chrome -> blink
+chrome -> base
+
+content -> blink
+content -> net
+content -> base
+
+blink -> v8
+blink -> CC
+blink -> WTF
+blink -> skia
+blink -> base
+blink -> net
+
+weblayer -> content
+weblayer -> chrome
+weblayer -> base
+
+net -> base
+WTF -> base
+weblayer -> v8

@@ -18,6 +18,7 @@ class Screen {
   void DrawVerticalLine(int top, int bottom, int x, wchar_t c = U'│');
   void ASCIIfy(int style = 0);
   std::string ToString();
+  wchar_t& Pixel(int x, int y);
 
  private:
   int width_;

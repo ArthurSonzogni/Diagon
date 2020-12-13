@@ -114,4 +114,8 @@ void Screen::ASCIIfy(int style) {
     return;
   }
 }
+
+wchar_t& Screen::Pixel(int x, int y) {
+  return lines_[y][x];
+}
 // clang-format on
