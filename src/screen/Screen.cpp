@@ -19,15 +19,15 @@ std::wstring to_wstring(const std::string& s) {
 }
 
 Screen::Screen(int width, int height)
-    : width_(width),
-      height_(height),
-      lines_(height_, std::wstring(width_, U' ')) {}
+    : dim_x_(width),
+      dim_y_(height),
+      lines_(dim_y_, std::wstring(dim_x_, U' ')) {}
 
 void Screen::DrawPixel(int x, int y, wchar_t c) {
   lines_[y][x] = c;
 }
 
-void Screen::DrawText(int x, int y, const std::wstring& text) {
+void Screen::DrawText(int x, int y, std::wstring_view text) {
   for (auto& c : text)
     lines_[y][x++] = c;
 }
@@ -54,7 +54,7 @@ void Screen::DrawBoxedText(int x, int y, const std::wstring& text) {
 
 std::string Screen::ToString() {
   std::stringstream ss;
-  for (int y = 0; y < height_; ++y) {
+  for (int y = 0; y < dim_y_; ++y) {
     ss << to_string(lines_[y]) << '\n';
   }
   return ss.str();
@@ -72,6 +72,58 @@ void Screen::DrawVerticalLine(int top, int bottom, int x, wchar_t c) {
   }
 }
 
+void Screen::DrawVerticalLineComplete(int top, int bottom, int x) {
+  for (int y = top; y <= bottom; ++y) {
+    auto& p = Pixel(x, y);
+    if (p == U'─') {
+      bool left = (x != 0 && Pixel(x - 1, y) != U' ');
+      bool right = (x != dim_x_ - 1 && Pixel(x + 1, y) != U' ');
+      if (y == top) {
+        if (left && right)
+          p = U'┬';
+        else if (left)
+          p = U'┐';
+        else if (right)
+          p = U'┌';
+        else
+          p = U'┼';
+      }
+      else if (y == bottom) {
+        if (left && right)
+          p = U'┴';
+        else if (left)
+          p = U'┘';
+        else if (right)
+          p = U'└';
+        else
+          p = U'┼';
+      }
+      else {
+        if (left && right)
+          p = U'┼';
+        else if (left)
+          p = U'┤';
+        else if (right)
+          p = U'├';
+        else
+          p = U'┼';
+      }
+    } else {
+      // clang-format off
+      switch(p) {
+        case U'┐': p = U'┤'; break;
+        case U'┘': p = U'┤'; break;
+        case U'┌': p = U'├'; break;
+        case U'└': p = U'├'; break;
+        case U'┬': p = U'┼'; break;
+        case U'┴': p = U'┼'; break;
+        default:   p = U'│'; break;
+      }
+      // clang-format on
+    }
+  }
+}
+
 // clang-format off
 void Screen::ASCIIfy(int style) {
   if (style == 0) {
@@ -86,6 +138,8 @@ void Screen::ASCIIfy(int style) {
           case U'└': c = '\''; break;
           case U'┬': c = '-'; break;
           case U'┴': c = '-'; break;
+          case U'├': c = '-'; break;
+          case U'┤': c = '-'; break;
           case U'△': c = '^'; break;
           case U'▽': c = 'V'; break;
         }
@@ -106,6 +160,8 @@ void Screen::ASCIIfy(int style) {
           case U'└': c = '\''; break;
           case U'┬': c = '.'; break;
           case U'┴': c = '\''; break;
+          case U'├': c = '-'; break;
+          case U'┤': c = '-'; break;
           case U'△': c = '^'; break;
           case U'▽': c = 'V'; break;
         }
@@ -117,5 +173,27 @@ void Screen::ASCIIfy(int style) {
 
 wchar_t& Screen::Pixel(int x, int y) {
   return lines_[y][x];
+}
+
+void Screen::Resize(int new_dim_x, int new_dim_y) {
+  dim_x_ = new_dim_x;
+  dim_y_ = new_dim_y;
+
+  lines_.resize(dim_y_);
+  for (auto& line : lines_) {
+    line.resize(dim_x_, L' ');
+  }
+}
+
+void Screen::Append(const Screen& other, int x, int y) {
+  Resize(std::max(dim_x_, x + other.dim_x_),  //
+         std::max(dim_y_, y + other.dim_y_));
+
+  // Write
+  for (size_t dy = 0; dy < other.dim_y_; ++dy) {
+    for (size_t dx = 0; dx < other.dim_x_; ++dx) {
+      lines_[y + dy][x + dx] = other.lines_[dy][dx];
+    }
+  }
 }
 // clang-format on

@@ -21,6 +21,8 @@ function(target_set_common target)
   endif()
 endfunction()
 
+set(test_directory ${CMAKE_CURRENT_SOURCE_DIR}/test)
+
 # Include source files and the generated files
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -59,6 +61,7 @@ add_subdirectory(src/translator/grammar)
 add_subdirectory(src/translator/graph_dag)
 add_subdirectory(src/translator/graph_planar)
 add_subdirectory(src/translator/math)
+add_subdirectory(src/translator/flowchart)
 add_subdirectory(src/translator/sequence)
 add_subdirectory(src/translator/table)
 add_subdirectory(src/translator/tree)
@@ -75,6 +78,7 @@ target_link_libraries(diagon_lib
   PRIVATE translator_graph_dag
   PRIVATE translator_graph_planar
   PRIVATE translator_math
+  PRIVATE translator_flowchart
   PRIVATE translator_sequence
   PRIVATE translator_table
   PRIVATE translator_tree

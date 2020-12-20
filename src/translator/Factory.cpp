@@ -9,6 +9,7 @@ TranslatorPtr MathTranslator();
 TranslatorPtr SequenceTranslator();
 TranslatorPtr TableTranslator();
 TranslatorPtr TreeTranslator();
+TranslatorPtr FlowchartTranslator();
 
 std::vector<TranslatorPtr>& TranslatorList() {
   static std::vector<TranslatorPtr> out;
@@ -23,6 +24,7 @@ std::vector<TranslatorPtr>& TranslatorList() {
   out.push_back(FrameTranslator());
   out.push_back(GraphDAGTranslator());
   out.push_back(GraphPlanarTranslator());
+  out.push_back(FlowchartTranslator());
   return out;
 }
 

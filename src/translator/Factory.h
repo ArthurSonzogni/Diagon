@@ -7,15 +7,6 @@
 
 using TranslatorPtr = std::unique_ptr<Translator>;
 
-// List of exported translator.
-TranslatorPtr FrameTranslator();
-TranslatorPtr MathTranslator();
-TranslatorPtr PlanarGraphTranslator();
-TranslatorPtr SequenceTranslator();
-TranslatorPtr TableTranslator();
-TranslatorPtr TreeTranslator();
-TranslatorPtr GrammarTranslator();
-
 std::vector<TranslatorPtr>& TranslatorList();
 Translator* FindTranslator(const std::string& name);
 

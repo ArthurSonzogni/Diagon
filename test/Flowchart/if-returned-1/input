@@ -1,0 +1,9 @@
+if ("a") {
+  if ("b")
+    return "c";
+  else
+    "d";
+}
+else
+  "e";
+"f";

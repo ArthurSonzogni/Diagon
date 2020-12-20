@@ -1,0 +1,22 @@
+"start";
+
+if ("Does it cost > 1000 ?")
+  "Very expensive";
+else if ("Does it cost > 100?") {
+  if ("Does it cost > 0.5?")
+    "Very expensive";
+  else if ("Does it cost > 0.1?")
+    "expensive";
+  else if ("Does it cost > 0.01?")
+    "Correct";
+  else if ("Does it cost > 0.001?")
+    "Cheap";
+  else
+    "Take my money";
+} else if ("Does it cost > 10?")
+  "Correct";
+else if ("Does it cost > 1?")
+  "Cheap";
+else {
+  "coucou"
+}
