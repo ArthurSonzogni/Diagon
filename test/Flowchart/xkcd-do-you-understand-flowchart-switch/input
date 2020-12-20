@@ -1,0 +1,35 @@
+switch ("DO YOU UNDERSTAND FLOW CHARTS?") {
+  case "YES":
+    noop;
+  case "NO": {
+    switch ("OKAY, YOU SEE THE LINE LABELED \"YES\"?") {
+      case "YES":
+        switch ("... AND YOU CAN SEE THE ONES LABELED \"NO\"?") {
+          case "YES":
+            "GOOD" case "NO" : {
+              switch ("BUT YOU JUST FOLLOWED THEM TWICE?") {
+                case "NO":
+                  noop;
+                case "YES":
+                  noop;
+              }
+              "(THAT WASN'T A QUESTION)";
+              "SCREW IT"
+            }
+        }
+      case "NO":
+        return switch ("BUT YOU SEE THE ONES LABELED \"NO\"?") {
+          case "YES":
+            "WAIT, WHAT?";
+          case "NO": {
+            "LISTEN";
+            "I HATE YOU";
+          }
+        }
+    }
+  }
+}
+
+"LET'S GO DRING";
+"6 DRINKS";
+"HEY, I SHOULD TRY INSTALLING FREEBSD!"
