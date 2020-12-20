@@ -293,7 +293,11 @@ let diagon = {
   API: () => {},
 }
 
+let push_state = () => {};
+
 function UpdateOutput() {
+  push_state();
+
   errors.value = '';
   output.value =
     diagon.translate(tools_data[tools.value].tool, input.value, GetOptions());
@@ -321,20 +325,23 @@ function UpdateOutput() {
   }
 }
 
+let OnToolsChanged = function() {
+  UpdateOptions();
+  UpdateExamples();
+  UpdateOutput();
+}
+
 function OnRuntimeInitialized() {
   diagon.translate = Module.cwrap('translate', 'string', ['string','string', 'string']);
   diagon.API = Module.cwrap('API', 'string', []);
 
-  tools.addEventListener("input", () => {
-    UpdateOptions();
-    UpdateExamples();
-    UpdateOutput();
-  });
+  tools.addEventListener("input", OnToolsChanged);
   examples.addEventListener("input", UpdateInput);
   input.addEventListener('input', UpdateOutput);
 
   let api = diagon.API();
   tools_data = JSON.parse(api);
+  setTimeout(PullState, 0);
   UpdateTools();
   UpdateExamples()
   UpdateOptions();
@@ -438,33 +445,33 @@ copyOutput.addEventListener("click", async function() {
   copyOutput.setAttribute("data-active", "false")
 });
 
-//const main = async function() {
-//  const wasm = fetch("diagon.wasm");
-//  const import_object = {
-//    wasi_snapshot_preview1: {
-//      proc_exit: (a) => { console.log("here"); return 0; },
-//      fd_close: (a) => { console.log("here"); return 0; },
-//      fd_write: (a, b, c, d) => { console.log("here"); return 0; },
-//      args_sizes_get: (a, b) => { console.log("here"); return 0; },
-//      environ_get: (a, b) => { console.log("here"); return 0; },
-//      environ_sizes_get: (a, b) => { console.log("here"); return 0; },
-//      fd_seek: (a, b, c, d) => { console.log("here"); return 0; },
-//      fd_read: (a, b, c, d) => { console.log("here"); return 0; },
-//      args_get: (a, b) => { console.log("here"); return 0; },
-//    },
-//    env: {
-//      memory,
-//      __sys_dup: (a) => { console.log("here"); return 0;},
-//      __sys_dup2: (a, b) => { console.log("here"); return 0; },
-//    },
-//    js: {
-//      mem: new WebAssembly.Memory({initial:10}),
-//    },
-//  }
-//  diagon = await WebAssembly.instantiateStreaming(wasm, import_object);
-//}
-//
-//main();
+const PushState = async function() {
+  await new Promise(r => setTimeout(r, 0));
+
+  let data = tools_data[tools.value].tool;
+  history.pushState({},'Flowchart', '#' + data);
+}
+
+const PullState = async function() {
+  push_state = PushState;
+
+  if (!location.hash || location.hash == "#landing_page") {
+    document.querySelector("#landing_page").scrollIntoView();
+    return;
+  }
+
+  let data = location.hash.substr(1);
+  for(let i in tools_data) {
+    if (tools_data[i].tool !== data)
+      continue;
+    console.log(i);
+    tools.selectedIndex = i;
+    document.querySelector("#code_area").scrollIntoView();
+    OnToolsChanged();
+  }
+}
+window.onpopstate = PullState;
+
 </script>
 <script src="diagon.js"></script>
 <link

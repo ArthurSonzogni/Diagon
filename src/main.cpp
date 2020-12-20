@@ -6,7 +6,6 @@
 #include "api.hpp"
 #include "environment.h"
 #include "translator/Factory.h"
-#include "util.hpp"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>

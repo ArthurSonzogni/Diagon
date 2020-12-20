@@ -20,16 +20,51 @@ class Flowchart : public Translator {
   virtual ~Flowchart() = default;
 
  private:
-  const char* Name() final { return "Flowchart"; }
+  const char* Name() final { return "Flowchart (Work in progress)"; }
   const char* Identifier() final { return "Flowchart"; }
   const char* Description() final {
     return "Transform a program into ascii art flowchart";
   }
   std::vector<Translator::OptionDescription> Options() final { return {}; }
-  std::vector<Translator::Example> Examples() final { return {}; }
+  std::vector<Translator::Example> Examples() final;
   std::string Translate(const std::string& input,
                         const std::string& options_string) final;
 };
+
+std::vector<Translator::Example> Flowchart::Examples() {
+  return {
+      {
+          "xkcd - Flowchart explained by flowchart",
+R"source(
+if ("DO YOU UNDERSTAND FLOW CHARTS?")
+  "GOOD!";
+else if ("OKAY, YOU SEE THE LINE LABELED 'YES'?") {
+  if ("... AND YOU CAN SEE THE ONES LABELED 'NO'?") {
+    "GOOD";
+  } else {
+    if ("BUT YOU JUST FOLLOWED THEM TWICE?")
+      noop;
+    else
+      noop;
+    "(THAT WASN'T A QUESTION)";
+    "SCREW IT"
+  }
+} else {
+  if ("BUT YOU SEE THE ONES LABELED 'NO'?") {
+    return "WAIT, WHAT?";
+  } else {
+    "LISTEN.";
+    return "I HATE YOU";
+  }
+}
+
+"LET'S GO DRING";
+"HEY, I SHOULD TRY INSTALLING FREEBSD!"
+
+)source",
+      },
+  };
+}
 
 struct Point {
   int x;
@@ -177,18 +212,18 @@ Draw ConnectHorizontally(Draw a,
 
   int edge_y = a_y + a.right.y;
 
-  auto& left = out.screen.Pixel(width - 1, edge_y);
-  auto& right = out.screen.Pixel(width, edge_y);
+  //auto& left = out.screen.Pixel(width - 1, edge_y);
+  //auto& right = out.screen.Pixel(width, edge_y);
 
-  if (left == U'│')
-    left = U'├';
-  else
-    left = U'─';
+  ////if (left == U'│')
+    ////left = U'├';
+  ////else
+    ////left = U'─';
 
-  right = U'>';
+  ////right = U'>';
 
   out.screen.DrawHorizontalLine(a_x + a.right.x + 1, b_x + b.left.x - 1,
-                                edge_y);
+                                edge_y, U'_');
   out.returned = b.returned;
   return out;
 }
@@ -202,14 +237,17 @@ Draw Parse(FlowchartParser::ConditionContext* condition, bool is_final);
 Draw Parse(FlowchartParser::GroupContext* group, bool is_final);
 Draw Parse(FlowchartParser::InstructionContext* instruction, bool is_final);
 Draw Parse(FlowchartParser::ProgramContext* program, bool is_final);
-Draw Parse(FlowchartParser::NoopContext* instruction);
+Draw Parse(FlowchartParser::NoopContext* instruction, bool is_final);
 
 Draw Noop() {
   Draw draw;
+  draw.screen.Resize(1,1);
+  //draw.screen.Pixel(0,0) = U'─';
   draw.left = {0, 0};
   draw.right = {0, 0};
   draw.down= {0, 0};
   draw.up = {0, 0};
+  draw.down.y++;
   return draw;
 }
 
@@ -295,6 +333,88 @@ std::vector<std::wstring_view> Broke(std::wstring_view content) {
   return Broke(content, right);
 }
 
+//        ______
+//       ╱      ╲
+//      ╱ Do you ╲
+//     ╱ Do you   ╲
+//    ╱ Do you     ╲
+//    ╲ Like?      ╱
+//     ╲ Like?    ╱
+//      ╲ Like?  ╱
+//       ╲______╱
+//       ______
+//      ╱      ╲
+//     ╱ Do you ╲
+//    ╱ Do you   ╲
+//    ╲ Like?    ╱
+//     ╲ Like?  ╱
+//      ╲______╱
+
+//      ______
+//     ╱      ╲           ┌──────┐
+//    ╱ Do you ╲__________│jacket│
+//    ╲ Like?  ╱yes       │      │
+//     ╲______╱           └──────┘
+//        │no
+// ┌──────▽───────┐
+// │jacket        │
+// └──────────────┘
+
+Draw Diamond(std::string content, bool is_final) {
+  std::wstring content_ws = to_wstring(content);
+  std::vector<std::wstring_view> lines = Broke(content_ws);
+  if (lines.size() % 2) {
+    lines.push_back(L"");
+    std::rotate(lines.rbegin(), lines.rbegin() + 1, lines.rend());
+  }
+
+  int width = 0;
+  for (auto& line : lines)
+    width = std::max(width, int(line.size()));
+  int height = lines.size();
+
+  width = std::max(3, width);
+  width = width + height + 2;
+
+  Draw out;
+  out.screen.Resize(width, height+3);
+
+  for (int x = height / 2+1; x < width - height / 2-1; ++x) {
+    out.screen.Pixel(x, 0) = U'_';
+    out.screen.Pixel(x, height+2) = U'_';
+  }
+
+  for (int i = 0; i < height/2+1; ++i) {
+    int I = width-i-1;
+    out.screen.Pixel(i,1+height/2-i+0) = U'╱';
+    out.screen.Pixel(i,1+height/2+i+1) = U'╲';
+    out.screen.Pixel(I,1+height/2-i+0) = U'╲';
+    out.screen.Pixel(I,1+height/2+i+1) = U'╱';
+  }
+
+  for(int i = 0; i<lines.size(); ++i)
+    out.screen.DrawText(height/2+1, i+2, lines[i]);
+
+  width = out.screen.width();
+  height = out.screen.height();
+
+  out.up.x = width / 2 - 1 + width%2;
+  out.up.y = 0;
+
+  out.down.x = width / 2 - 1 + width%2;
+  out.down.y = height - 1;
+
+  out.left.x = 0;
+  out.left.y = height / 2;
+
+  out.right.x = width - 1;
+  out.right.y = height / 2;
+
+  out.returned = is_final;
+
+  return out;
+}
+
 Draw Boxed(std::string content, bool is_final) {
   std::wstring content_ws = to_wstring(content);
   std::vector<std::wstring_view> lines = Broke(content_ws);
@@ -373,10 +493,16 @@ Draw Parse(FlowchartParser::ElementContext* element, bool is_final) {
   return Boxed(Parse(element->string()), is_final);
 }
 
+void AddLabel(Screen& screen, Point point, std::wstring_view label) {
+  Screen label_screen(label.size(), 1);
+  label_screen.DrawText(0, 0, label);
+  screen.Append(label_screen, point.x + 1, point.y + 1);
+}
+
 Draw Parse(FlowchartParser::ConditionContext* condition, bool is_final) {
   if (condition->instruction().size() == 1) {
-    Point if_right;
-    Draw if_ = Boxed(Parse(condition->string()), /*is_final=*/false);
+    //Point if_right;
+    Draw if_ = Diamond(Parse(condition->string()), /*is_final=*/false);
     Draw then_ = Parse(condition->instruction()[0], is_final);
     Draw all = ConnectHorizontally(if_, then_);
     if (is_final)
@@ -397,7 +523,11 @@ Draw Parse(FlowchartParser::ConditionContext* condition, bool is_final) {
   }
 
   Point if_right;
-  Draw if_ = Boxed(Parse(condition->string()), /*is_final=*/false);
+  Draw if_ = Diamond(Parse(condition->string()), /*is_final=*/false);
+  AddLabel(if_.screen, if_.down, L"no");
+  AddLabel(if_.screen, if_.right, L"yes");
+  if_.down.y++;
+
   Draw then_ = Parse(condition->instruction()[0], is_final);
   Draw else_ = Parse(condition->instruction()[1], is_final);
   Draw left = ConnectVertically(if_, else_, if_right);
@@ -476,6 +606,9 @@ Draw Parse(FlowchartParser::InstructionContext* instruction, bool is_final) {
 
   if (instruction->returninstruction())
     return Parse(instruction->returninstruction());
+
+  if (instruction->noop())
+    return Parse(instruction->noop(), is_final);
 
   return Unimplemented(is_final);
 }
