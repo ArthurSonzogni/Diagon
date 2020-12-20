@@ -10,3 +10,4 @@ add_library(translator_sequence STATIC
 )
 target_set_common(translator_sequence)
 target_link_libraries(translator_sequence PRIVATE diagon_base)
+target_link_libraries(translator_sequence PRIVATE antlr4_static)

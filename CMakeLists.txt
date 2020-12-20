@@ -1,73 +1,13 @@
 cmake_minimum_required (VERSION 3.11)
-project(Diagon)
+project(Diagon LANGUAGES C CXX)
 
-# ┌─────────────────────────────────────────────────┐
-# │ Print Information about the compilation system  │
-# └─────────────────────────────────────────────────┘
-if(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
-  set(Web true)
-else()
-  set(Web false)
-endif()
-message("┌── Diagon  configuration ───────────────────────")
-message("│ - Build type : " ${CMAKE_BUILD_TYPE})
-message("│ - C compiler: ${CMAKE_C_COMPILER}")
-message("│ - C++ compiler: ${CMAKE_CXX_COMPILER}")
-message("│ - System: " ${CMAKE_SYSTEM_NAME} )
-message("│ - Use Web : " ${Web})
-message("└────────────────────────────────────────────────")
+include(FetchContent)
 
-# ┌─────────────────────────────────────────────────┐
-# │ ANTLR                                           │
-# └─────────────────────────────────────────────────┘
-execute_process(
-  COMMAND bash download_and_patch.sh
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools/antlr
-)
-
-SET(WITH_LIBCXX OFF CACHE BOOL "")
-add_subdirectory(${CMAKE_SOURCE_DIR}/tools/antlr/antlr4/runtime/Cpp/ EXCLUDE_FROM_ALL)
-include_directories(${CMAKE_SOURCE_DIR}/tools/antlr/antlr4/runtime/Cpp/runtime/src)
-
-# Function
-#   ANTLR(<file.g4>)
-#
-# Description:
-#   Take an ANTLR file and produce a CMake rule to generate the corresponding
-#   C++ files.
-#
-# Notes:
-#   The ANTLR file path must be relative to ${CMAKE_CURRENT_SOURCE_DIR}
-#
-# Example:
-#   ANTLR(Grammar.g4)
-function(ANTLR source)
-  get_filename_component(source_filename ${CMAKE_CURRENT_SOURCE_DIR}/${source} NAME_WE)
-  get_filename_component(source_src_dir  ${CMAKE_CURRENT_SOURCE_DIR}/${source} DIRECTORY)
-  get_filename_component(source_gen_dir  ${CMAKE_CURRENT_BINARY_DIR}/${source} DIRECTORY)
-  add_custom_command(
-    OUTPUT
-      ${source_gen_dir}/${source_filename}Lexer.cpp
-      ${source_gen_dir}/${source_filename}Parser.cpp
-      ${source_gen_dir}/${source_filename}Lexer.h
-      ${source_gen_dir}/${source_filename}Parser.h
-    COMMAND
-      java
-    ARGS
-      -jar ${CMAKE_SOURCE_DIR}/tools/antlr/antlr.jar
-      -Dlanguage=Cpp
-      -no-listener
-      -no-visitor
-      -o ${source_gen_dir}
-      ${source_src_dir}/${source_filename}.g4
-    MAIN_DEPENDENCY
-      ${source_src_dir}/${source_filename}.g4
-  )
-endfunction()
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
 function(target_set_common target)
   set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)
-  if (Web)
+  if (EMSCRIPTEN)
     # Nothing
   elseif (MSVC)
     target_compile_options(${target} PRIVATE "/wd4244")
@@ -76,16 +16,19 @@ function(target_set_common target)
     target_compile_options(${target} PRIVATE "/wd4305")
   else()
     target_compile_options(${target} PRIVATE "-Wall")
-    #target_compile_options(${target} PRIVATE "-Werror")
     target_compile_options(${target} PRIVATE "-Wno-sign-compare")
     target_compile_options(${target} PRIVATE "-Wno-attributes")
   endif()
 endfunction()
 
+# Include source files and the generated files
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+set(test_directory ${CMAKE_CURRENT_SOURCE_DIR}/test)
+
 #-------------------------------------------------------------------------------
-
-add_subdirectory(src)
-
+# Environment variable available in C++ source
 #-------------------------------------------------------------------------------
 
 execute_process(
@@ -97,6 +40,104 @@ execute_process(
     git_version
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/environment.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/src/environment.h
+)
+
+#-------------------------------------------------------------------------------
+
+add_library(diagon_base STATIC
+  src/translator/Translator.cpp
+  src/translator/Translator.h
+)
+
+add_subdirectory(src/screen)
+add_subdirectory(src/translator/frame)
+add_subdirectory(src/translator/grammar)
+add_subdirectory(src/translator/graph_dag)
+add_subdirectory(src/translator/graph_planar)
+add_subdirectory(src/translator/math)
+add_subdirectory(src/translator/sequence)
+add_subdirectory(src/translator/table)
+add_subdirectory(src/translator/tree)
+
+add_library(diagon_lib STATIC
+  src/translator/Factory.cpp
+  src/translator/Factory.h
+)
+
+target_link_libraries(diagon_lib
+  PRIVATE diagon_base
+  PRIVATE translator_frame
+  PRIVATE translator_grammar
+  PRIVATE translator_graph_dag
+  PRIVATE translator_graph_planar
+  PRIVATE translator_math
+  PRIVATE translator_sequence
+  PRIVATE translator_table
+  PRIVATE translator_tree
+  PRIVATE antlr4_static
+  PRIVATE screen
+)
+target_set_common(diagon_lib)
+
+if (EMSCRIPTEN)
+  # Emscripten options
+  string(APPEND CMAKE_CXX_FLAGS " -Os")
+  string(APPEND CMAKE_CXX_FLAGS " -s WASM=1")
+  string(APPEND CMAKE_CXX_FLAGS " --closure 1")
+  string(APPEND CMAKE_CXX_FLAGS " -s DISABLE_EXCEPTION_CATCHING=0")
+  string(APPEND CMAKE_CXX_FLAGS " -s EXPORTED_FUNCTIONS='[\"_translate\", \"_main\", \"_API\"]'")
+  string(APPEND CMAKE_CXX_FLAGS " -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\",\"cwrap\"]'")
+
+  option(ADD_GOOGLE_ANALYTICS "Build the static library" ON)
+  if (ADD_GOOGLE_ANALYTICS)
+    file(READ
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/http/google-analytics.html
+      google-analytics)
+  endif(ADD_GOOGLE_ANALYTICS)
+  
+  foreach(file
+      "style.css"
+      "index.html"
+      "run_web_server.sh")
+    configure_file(
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/http/${file}
+      ${CMAKE_CURRENT_BINARY_DIR}/${file}
+    )
+  endforeach(file)
+
+  add_executable(diagon src/main_webassembly.cpp)
+  target_link_libraries(diagon PRIVATE diagon_lib)
+  target_set_common(diagon)
+
+  FetchContent_Declare(json
+    GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent
+    GIT_TAG v3.9.1)
+
+  FetchContent_GetProperties(json)
+  if(NOT json_POPULATED)
+    FetchContent_Populate(json)
+    add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
+  endif()
+
+  target_link_libraries(diagon PRIVATE nlohmann_json::nlohmann_json)
+
+else()
+  target_link_libraries(diagon_lib PRIVATE -static-libstdc++)
+  target_link_libraries(diagon_lib PRIVATE stdc++fs)
+
+  add_executable(diagon src/main.cpp)
+  target_link_libraries(diagon PRIVATE diagon_lib)
+  install(TARGETS diagon RUNTIME DESTINATION "bin")
+  target_set_common(diagon)
+
+  add_executable(input_output_test src/input_output_test.cpp)
+  target_link_libraries(input_output_test diagon_lib)
+  target_set_common(input_output_test)
+endif()
 
 set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_NAME "diagon")
