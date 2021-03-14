@@ -3,9 +3,29 @@
 // the LICENSE file.
 
 #include <iostream>
-
+#include "api.hpp"
 #include "environment.h"
 #include "translator/Factory.h"
+#include "util.hpp"
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+extern "C" const char* translate(const char* translator_name,
+                                 const char* input,
+                                 const char* options) {
+  auto* translator = FindTranslator(translator_name);
+  if (!translator)
+    std::cerr << "Translator not found" << std::endl;
+
+  static std::string out;
+  try {
+    out = translator->Translate(input, options);
+  } catch (...) {
+    std::cerr << "Error" << std::endl;
+  }
+  return out.c_str();
+}
+#endif
 
 namespace {
 
@@ -254,18 +274,34 @@ int PrintTranslatorNotFound(const std::string& translator) {
   return EXIT_SUCCESS;
 }
 
+int PrintAPI() {
+  std::cout << API() << std::endl;
+  return EXIT_SUCCESS;
+}
+
 }  // namespace
 
 int main(int argument_count, const char** arguments) {
   if (argument_count <= 1)
     return PrintHelp();
-
   std::string argument_1 = arguments[1];
-  if (argument_1 == "-h" || argument_1 == "--help")
-    return PrintHelp();
 
-  if (argument_1 == "-v" || argument_1 == "--version")
+  if (argument_1 == "API")
+    return PrintAPI();
+
+  if (argument_1 == "help" ||  //
+      argument_1 == "-h" ||    //
+      argument_1 == "--help"   //
+  ) {
+    return PrintHelp();
+  }
+
+  if (argument_1 == "-v" ||         //
+      argument_1 == "--version" ||  //
+      argument_1 == "version"       //
+  ) {
     return PrintVersion();
+  }
 
   std::string translator_name = arguments[1];
   auto* translator = FindTranslator(translator_name);

@@ -1,32 +1,7 @@
-// Copyright 2020 Arthur Sonzogni. All rights reserved.
-// Use of this source code is governed by the MIT license that can be found in
-// the LICENSE file.
+#include "api.hpp"
 
-#include <emscripten.h>
-#include <iostream>
 #include <nlohmann/json.hpp>
-#include "util.hpp"
-
 #include "translator/Factory.h"
-
-extern "C" void translate(const char* translator_name,
-                          const char* input,
-                          const char* options) {
-  auto* translator = FindTranslator(translator_name);
-  if (!translator)
-    std::cerr << "Translator not found" << std::endl;
-
-  std::string command = translator->Translate(input, options);
-  replaceAll(command, "\\", "\\\\");
-  replaceAll(command, "\"", "\\\"");
-  replaceAll(command, "\n", "\\n");
-  command = "output.value=\"" + command + "\";";
-  emscripten_run_script(command.c_str());
-}
-
-int main(int, const char**) {
-  return 0;
-}
 
 using json = nlohmann::json;
 
@@ -76,7 +51,7 @@ json API(const TranslatorPtr& translator) {
 extern "C" const char* API() {
   static std::string out;
   if (out.size() == 0)
-    out = API(TranslatorList()).dump();
+    out = API(TranslatorList()).dump(2);
 
   return out.c_str();
 }

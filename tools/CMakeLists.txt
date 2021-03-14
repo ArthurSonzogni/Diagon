@@ -8,23 +8,6 @@ execute_process(
   WORKING_DIRECTORY ${DIAGON_TOOLS_DIR}
 )
 
-FetchContent_Declare(antlr
-  GIT_REPOSITORY https://github.com/antlr/antlr4
-  GIT_TAG 4.8)
-
-FetchContent_GetProperties(antlr)
-if(NOT json_POPULATED)
-  FetchContent_Populate(antlr)
-  SET(WITH_LIBCXX OFF CACHE BOOL "")
-  add_subdirectory(
-    ${antlr_SOURCE_DIR}/runtime/Cpp
-    ${antlr_BINARY_DIR}
-    EXCLUDE_FROM_ALL)
-  target_include_directories(antlr4_static
-    PUBLIC ${antlr_SOURCE_DIR}/runtime/Cpp/runtime/src
-  )
-endif()
-
 # Function
 #   ANTLR(<file.g4>)
 #
@@ -60,4 +43,3 @@ function(ANTLR source)
       ${source_src_dir}/${source_filename}.g4
   )
 endfunction()
-

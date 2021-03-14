@@ -3,6 +3,39 @@ project(Diagon LANGUAGES C CXX)
 
 include(FetchContent)
 
+#-------------------------------------------------------------------------------
+
+FetchContent_Declare(json
+  GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent
+  GIT_TAG v3.9.1)
+
+FetchContent_GetProperties(json)
+if(NOT json_POPULATED)
+  FetchContent_Populate(json)
+  add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+#-------------------------------------------------------------------------------
+
+FetchContent_Declare(antlr
+  GIT_REPOSITORY https://github.com/antlr/antlr4
+  GIT_TAG 4.8)
+
+FetchContent_GetProperties(antlr)
+if(NOT antlr_POPULATED)
+  FetchContent_Populate(antlr)
+  SET(WITH_LIBCXX OFF CACHE BOOL "")
+  add_subdirectory(
+    ${antlr_SOURCE_DIR}/runtime/Cpp
+    ${antlr_BINARY_DIR}
+    EXCLUDE_FROM_ALL)
+  target_include_directories(antlr4_static
+    PUBLIC ${antlr_SOURCE_DIR}/runtime/Cpp/runtime/src
+  )
+endif()
+
+#-------------------------------------------------------------------------------
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
 function(target_set_common target)
@@ -67,6 +100,8 @@ add_subdirectory(src/translator/table)
 add_subdirectory(src/translator/tree)
 
 add_library(diagon_lib STATIC
+  src/api.cpp
+  src/api.hpp
   src/translator/Factory.cpp
   src/translator/Factory.h
 )
@@ -84,15 +119,24 @@ target_link_libraries(diagon_lib
   PRIVATE translator_tree
   PRIVATE antlr4_static
   PRIVATE screen
+  PRIVATE nlohmann_json::nlohmann_json
 )
 target_set_common(diagon_lib)
+
+add_executable(diagon src/main.cpp)
+target_link_libraries(diagon PRIVATE diagon_lib)
+target_set_common(diagon)
 
 if (EMSCRIPTEN)
   # Emscripten options
   string(APPEND CMAKE_CXX_FLAGS " -Os")
   string(APPEND CMAKE_CXX_FLAGS " -s WASM=1")
   string(APPEND CMAKE_CXX_FLAGS " --closure 1")
-  string(APPEND CMAKE_CXX_FLAGS " -s DISABLE_EXCEPTION_CATCHING=0")
+  string(APPEND CMAKE_CXX_FLAGS " -fexceptions")
+  #string(APPEND CMAKE_CXX_FLAGS " -s STANDALONE_WASM")
+  #string(APPEND CMAKE_CXX_FLAGS " -s WASM_ASYNC_COMPILATION=0")
+  #string(APPEND CMAKE_CXX_FLAGS " -s SIDE_MODULE=1")
+  #string(APPEND CMAKE_CXX_FLAGS " -s DISABLE_EXCEPTION_CATCHING=0")
   string(APPEND CMAKE_CXX_FLAGS " -s EXPORTED_FUNCTIONS='[\"_translate\", \"_main\", \"_API\"]'")
   string(APPEND CMAKE_CXX_FLAGS " -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\",\"cwrap\"]'")
 
@@ -113,30 +157,13 @@ if (EMSCRIPTEN)
     )
   endforeach(file)
 
-  add_executable(diagon src/main_webassembly.cpp)
-  target_link_libraries(diagon PRIVATE diagon_lib)
-  target_set_common(diagon)
-
-  FetchContent_Declare(json
-    GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent
-    GIT_TAG v3.9.1)
-
-  FetchContent_GetProperties(json)
-  if(NOT json_POPULATED)
-    FetchContent_Populate(json)
-    add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
-  endif()
-
-  target_link_libraries(diagon PRIVATE nlohmann_json::nlohmann_json)
+  #set_target_properties(diagon PROPERTIES SUFFIX ".wasm")
 
 else()
   target_link_libraries(diagon_lib PRIVATE -static-libstdc++)
   target_link_libraries(diagon_lib PRIVATE stdc++fs)
 
-  add_executable(diagon src/main.cpp)
-  target_link_libraries(diagon PRIVATE diagon_lib)
   install(TARGETS diagon RUNTIME DESTINATION "bin")
-  target_set_common(diagon)
 
   add_executable(input_output_test src/input_output_test.cpp)
   target_link_libraries(input_output_test diagon_lib)

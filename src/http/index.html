@@ -288,12 +288,15 @@ let withKatex = f => {
   document.head.appendChild(katex_js);
 }
 
-let translate = function() {};
-let API = function() {}
+let diagon = {
+  translate: () => {},
+  API: () => {},
+}
 
 function UpdateOutput() {
   errors.value = '';
-  translate(tools_data[tools.value].tool, input.value, GetOptions());
+  output.value =
+    diagon.translate(tools_data[tools.value].tool, input.value, GetOptions());
 
   if (GetOptions().includes("Latex")) {
     document.documentElement.setAttribute("data-display-latex", "true");
@@ -319,8 +322,8 @@ function UpdateOutput() {
 }
 
 function OnRuntimeInitialized() {
-  translate = Module.cwrap('translate', 'void', ['string','string', 'string']);
-  API = Module.cwrap('API', 'string', []);
+  diagon.translate = Module.cwrap('translate', 'string', ['string','string', 'string']);
+  diagon.API = Module.cwrap('API', 'string', []);
 
   tools.addEventListener("input", () => {
     UpdateOptions();
@@ -330,7 +333,7 @@ function OnRuntimeInitialized() {
   examples.addEventListener("input", UpdateInput);
   input.addEventListener('input', UpdateOutput);
 
-  let api = API();
+  let api = diagon.API();
   tools_data = JSON.parse(api);
   UpdateTools();
   UpdateExamples()
@@ -435,6 +438,33 @@ copyOutput.addEventListener("click", async function() {
   copyOutput.setAttribute("data-active", "false")
 });
 
+//const main = async function() {
+//  const wasm = fetch("diagon.wasm");
+//  const import_object = {
+//    wasi_snapshot_preview1: {
+//      proc_exit: (a) => { console.log("here"); return 0; },
+//      fd_close: (a) => { console.log("here"); return 0; },
+//      fd_write: (a, b, c, d) => { console.log("here"); return 0; },
+//      args_sizes_get: (a, b) => { console.log("here"); return 0; },
+//      environ_get: (a, b) => { console.log("here"); return 0; },
+//      environ_sizes_get: (a, b) => { console.log("here"); return 0; },
+//      fd_seek: (a, b, c, d) => { console.log("here"); return 0; },
+//      fd_read: (a, b, c, d) => { console.log("here"); return 0; },
+//      args_get: (a, b) => { console.log("here"); return 0; },
+//    },
+//    env: {
+//      memory,
+//      __sys_dup: (a) => { console.log("here"); return 0;},
+//      __sys_dup2: (a, b) => { console.log("here"); return 0; },
+//    },
+//    js: {
+//      mem: new WebAssembly.Memory({initial:10}),
+//    },
+//  }
+//  diagon = await WebAssembly.instantiateStreaming(wasm, import_object);
+//}
+//
+//main();
 </script>
 <script src="diagon.js"></script>
 <link
