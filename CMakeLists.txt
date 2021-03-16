@@ -25,6 +25,7 @@ FetchContent_GetProperties(antlr)
 if(NOT antlr_POPULATED)
   FetchContent_Populate(antlr)
   SET(WITH_LIBCXX OFF CACHE BOOL "")
+  SET(CMAKE_HOME_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
   add_subdirectory(
     ${antlr_SOURCE_DIR}/runtime/Cpp
     ${antlr_BINARY_DIR}
@@ -143,7 +144,7 @@ if (EMSCRIPTEN)
   option(ADD_GOOGLE_ANALYTICS "Build the static library" ON)
   if (ADD_GOOGLE_ANALYTICS)
     file(READ
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/http/google-analytics.html
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/google-analytics.html
       google-analytics)
   endif(ADD_GOOGLE_ANALYTICS)
   
@@ -152,7 +153,7 @@ if (EMSCRIPTEN)
       "index.html"
       "run_web_server.sh")
     configure_file(
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/http/${file}
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/${file}
       ${CMAKE_CURRENT_BINARY_DIR}/${file}
     )
   endforeach(file)
