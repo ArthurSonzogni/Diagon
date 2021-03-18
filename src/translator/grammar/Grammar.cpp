@@ -10,7 +10,7 @@
 #include "screen/Screen.h"
 #include "translator/Translator.h"
 
-#ifndef MSVC
+#ifndef _WIN32
 
 #include <unistd.h>
 
@@ -272,7 +272,7 @@ LITERAL    = """" character { character } """" .
   };
 }
 
-#ifdef MSVC
+#ifdef _WIN32
 std::string Grammar::Translate(const std::string& input,
                                const std::string& options_string) {
   // Duplicate stdout, so that we can restore it later.
