@@ -1078,7 +1078,7 @@ class Math : public Translator {
             {L"iota", L"\\iota"},       {L"Xi", L"\\Xi"},
             {L"xi", L"\\xi"},           {L"Tau", L"\\Tau"},
             {L"tau", L"\\tau"},         {L"Omega", L"\\Omega"},
-            {L"omega", L"\\omega"},
+            {L"omega", L"\\omega"},     {L"infty", L"\\infty"},
         };
       }
 
@@ -1101,7 +1101,7 @@ class Math : public Translator {
           {L"psi", L"ψ"},     {L"Epsilon", L"ϵ"}, {L"epsilon", L"ε"},
           {L"Iota", L"Ι"},    {L"iota", L"ι"},    {L"Xi", L"Ξ"},
           {L"xi", L"ξ"},      {L"Tau", L"Τ"},     {L"tau", L"τ"},
-          {L"Omega", L"Ω"},   {L"omega", L"ω"}};
+          {L"Omega", L"Ω"},   {L"omega", L"ω"},   {L"infty", L"∞"}};
     }
 
     //
