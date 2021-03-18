@@ -29,20 +29,15 @@ jobs:
             cxx: "clang++-9"
 
   steps:
-    - uses: actions/checkout
-
+    - uses: actions/checkout@v2
     - uses: seanmiddleditch/gha-setup-ninja@master
-
     - name: Set Windows ENV
       if: runner.os == 'Windows'
-      uses: ilammy/msvc-dev-cmd
-
+      uses: ilammy/msvc-dev-cmd@v1
     - name: Install Linux Dependencies
       if: runner.os == 'Linux'
       run: sudo apt install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglew-dev
-
     - name: CMake Configure
       run: cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
-
     - name: CMake Build
       run: cmake --build build
