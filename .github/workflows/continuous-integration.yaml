@@ -29,13 +29,13 @@ jobs:
             cxx: "clang++-9"
 
   steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout
 
     - uses: seanmiddleditch/gha-setup-ninja@master
 
     - name: Set Windows ENV
       if: runner.os == 'Windows'
-      uses: ilammy/msvc-dev-cmd@v1
+      uses: ilammy/msvc-dev-cmd
 
     - name: Install Linux Dependencies
       if: runner.os == 'Linux'
