@@ -43,12 +43,12 @@ jobs:
         run:  sudo apt install libboost-graph-dev
 
       - name: CMake configure
-        run: |
-          cmake \
-            -Bbuild \
-            -GNinja \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_C_COMPILER=${{ matrix.config.cc }} \
+        run: >
+          cmake
+            -B build
+            -G Ninja
+            -DCMAKE_BUILD_TYPE=Debug
+            -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
             -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
 
       - name: cmake build
