@@ -1,0 +1,52 @@
+name: Build Project
+
+on:
+  - push
+  - pull_request
+
+jobs:
+
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Windows Latest - MSVC"
+            artifact: "windows-msvc.tar.xz"
+            os: windows-latest
+            cc: "cl", cxx: "cl"
+          }
+        - {
+            name: "Ubuntu Latest - GCC"
+            artifact: "linux-gcc.tar.xz"
+            os: ubuntu-latest
+            cc: "gcc-9", cxx: "g++-9"
+          }
+        - {
+            name: "Ubuntu Latest - Clang"
+            artifact: "linux-clang.tar.xz"
+            os: ubuntu-latest
+            cc: "clang-9", cxx: "clang++-9"
+          }
+
+  steps:
+    - uses: actions/checkout@v2
+
+    - uses: seanmiddleditch/gha-setup-ninja@master
+
+    - name: Set Windows ENV
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Install Linux Dependencies
+      if: runner.os == 'Linux'
+      run: sudo apt install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglew-dev
+
+    - name: CMake Configure
+      run: cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
+
+    - name: CMake Build
+      run: cmake --build build
