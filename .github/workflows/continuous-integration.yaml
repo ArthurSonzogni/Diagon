@@ -31,9 +31,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: seanmiddleditch/gha-setup-ninja@master
 
+      - name: Set Windows ENV
       - name: Install Windows dependencies
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install boost for windows
         uses: MarkusJx/install-boost@v1.0.1
 
       - name: Install Linux Dependencies
@@ -49,5 +52,5 @@ jobs:
             -DCMAKE_C_COMPILER=${{ matrix.config.cc }} \
             -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
 
-      - name: cmake build
+      - name: cmake builk
         run: cmake --build build
