@@ -2,7 +2,6 @@
 // Use of this source code is governed by the MIT license that can be found in
 // the LICENSE file.
 
-#include <unistd.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -10,6 +9,10 @@
 #include <vector>
 #include "screen/Screen.h"
 #include "translator/Translator.h"
+
+#ifndef MSVC
+
+#include <unistd.h>
 
 namespace kgt {
 extern "C" {
@@ -25,16 +28,10 @@ const char* css_file = nullptr;
 #include "html5/io.h"
 #include "iso-ebnf/io.h"
 #include "rbnf/io.h"
+#include "rrtext/io.h"
 #include "sid/io.h"
 #include "svg/io.h"
 #include "wsn/io.h"
-//#include "rrdot/io.h"
-//#include "rrdump/io.h"
-//#include "rrll/io.h"
-//#include "rrparcon/io.h"
-//#include "rrta/io.h"
-//#include "rrtdump/io.h"
-#include "rrtext/io.h"
 }
 }  // namespace kgt
 
@@ -63,10 +60,8 @@ using OutputFunction = void(const struct kgt::ast_rule*);
 InputFunction* f = kgt::abnf_input;
 
 std::map<std::string, InputFunction*> input_function_map = {
-    {"abnf", kgt::abnf_input},
-    {"bnf", kgt::bnf_input},
-    {"iso-ebnf", kgt::iso_ebnf_input},
-    {"rbnf", kgt::rbnf_input},
+    {"abnf", kgt::abnf_input},         {"bnf", kgt::bnf_input},
+    {"iso-ebnf", kgt::iso_ebnf_input}, {"rbnf", kgt::rbnf_input},
     {"wsn", kgt::wsn_input},
 };
 
@@ -100,6 +95,8 @@ std::map<std::string, OutputFunction*> output_function_map = {
 
 }  // namespace
 
+#endif
+
 class Grammar : public Translator {
  public:
   virtual ~Grammar() = default;
@@ -132,21 +129,11 @@ std::vector<Translator::OptionDescription> Grammar::Options() {
       {
           "output",
           {
-              "unicode",
-              "ascii",
+              "unicode", "ascii",
 
-              "svg",
-              "html5",
-              "xhtml5",
-              "ebnfhtml5",
-              "ebnfxhtml5",
+              "svg", "html5", "xhtml5", "ebnfhtml5", "ebnfxhtml5",
 
-              "abnf",
-              "blab",
-              "bnf",
-              "iso-ebnf",
-              "rbnf",
-              "wsn",
+              "abnf", "blab", "bnf", "iso-ebnf", "rbnf", "wsn",
 
               //"dot",
 
@@ -285,6 +272,7 @@ LITERAL    = """" character { character } """" .
   };
 }
 
+#ifdef MSVC
 std::string Grammar::Translate(const std::string& input,
                                const std::string& options_string) {
   // Duplicate stdout, so that we can restore it later.
@@ -322,6 +310,12 @@ std::string Grammar::Translate(const std::string& input,
   return std::string((std::istreambuf_iterator<char>(file_read)),
                      std::istreambuf_iterator<char>());
 }
+#else
+std::string Grammar::Translate(const std::string& input,
+                               const std::string& options_string) {
+  return "Not supported on Windows";
+}
+#endif
 
 std::unique_ptr<Translator> GrammarTranslator() {
   return std::make_unique<Grammar>();
