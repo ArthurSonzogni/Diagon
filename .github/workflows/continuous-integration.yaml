@@ -50,11 +50,14 @@ jobs:
           -DCMAKE_BUILD_TYPE=Debug
           -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
+        shell: bash
 
       - name: cmake build
         run: cmake --build build
+        shell: bash
 
       - name: tests
         run: |
           cd build
           ./input_output_test
+        shell: bash
