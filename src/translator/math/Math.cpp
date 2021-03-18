@@ -201,8 +201,8 @@ Draw WrapWithParenthesis(const Draw& element, Style* style) {
   draw.Resize(element.dim_x + 2, element.dim_y);
 
   for (auto& line : draw.content) {
-    line.front() = U'|';
-    line.back() = U'|';
+    line.front() = L'|';
+    line.back() = L'|';
   }
 
   for (int i = 0; i < draw.content.size(); ++i) {
@@ -287,11 +287,11 @@ Draw Parse(MathParser::EquationContext* context, Style* style) {
     auto op = context->relop(i - 1);
     std::wstring symbol;
     // clang-format off
-         if (op->LT()) symbol = U'<';
-    else if (op->GT()) symbol = U'>';
+         if (op->LT()) symbol = L'<';
+    else if (op->GT()) symbol = L'>';
     else if (op->LE()) symbol = style->lower_or_equal;
     else if (op->GE()) symbol = style->greater_or_equal;
-    else if (op->EQ()) symbol = U'=';
+    else if (op->EQ()) symbol = L'=';
     // clang-format on
 
     int op_x = draw.dim_x + 1;
@@ -330,7 +330,7 @@ Draw Parse(MathParser::ExpressionContext* context, Style* style) {
     int op_x = draw.dim_x + 1;
     draw = ComposeHorizontal(draw, Parse(context->term(i), style), 3);
     draw.content[draw.center_y][op_x] =
-        context->addop(i - 1)->PLUS() ? U'+' : U'-';
+        context->addop(i - 1)->PLUS() ? L'+' : L'-';
   }
   return draw;
 }
@@ -660,7 +660,7 @@ Draw ParseFunctionCommon(MathParser::FunctionContext* context, Style* style) {
   for (int i = 1; i < context->equation().size(); ++i) {
     int x = content.dim_x;
     content = ComposeHorizontal(content, Parse(context->equation(i), style), 2);
-    content.content[content.center_y][x] = U',';
+    content.content[content.center_y][x] = L',';
   }
   return ComposeHorizontal(Parse(context->variable(), style),
                            WrapWithParenthesis(content, style),
@@ -985,22 +985,22 @@ class Math : public Translator {
     auto options = SerializeOption(options_string);
     Style style;
     if (options["style"] == "ASCII") {
-      style.divide = U'-';
-      style.multiply = U'.';
+      style.divide = L'-';
+      style.multiply = L'.';
       style.greater_or_equal = L">=";
       style.lower_or_equal = L"<=";
-      style.left_parenthesis_0 = U'(';
-      style.left_parenthesis_1 = U'/';
-      style.left_parenthesis_2 = U'|';
-      style.left_parenthesis_3 = U'\\';
-      style.right_parenthesis_0 = U')';
-      style.right_parenthesis_1 = U'\\';
-      style.right_parenthesis_2 = U'|';
-      style.right_parenthesis_3 = U'/';
+      style.left_parenthesis_0 = L'(';
+      style.left_parenthesis_1 = L'/';
+      style.left_parenthesis_2 = L'|';
+      style.left_parenthesis_3 = L'\\';
+      style.right_parenthesis_0 = L')';
+      style.right_parenthesis_1 = L'\\';
+      style.right_parenthesis_2 = L'|';
+      style.right_parenthesis_3 = L'/';
 
-      style.sqrt_0 = U'\\';
-      style.sqrt_1 = U'/';
-      style.sqrt_2 = U'_';
+      style.sqrt_0 = L'\\';
+      style.sqrt_1 = L'/';
+      style.sqrt_2 = L'_';
 
       style.summation_top = L'=';
       style.summation_bottom = L'=';
@@ -1011,29 +1011,29 @@ class Math : public Translator {
       style.mult_bottom = L'|';
       style.mult_intersection = L'_';
 
-      style.integral_top = {U' ', U'.', U'-'};
-      style.integral_middle = {U' ', U'|', U' '};
-      style.integral_bottom = {U'-', U'\'', U' '};
+      style.integral_top = {L' ', L'.', L'-'};
+      style.integral_middle = {L' ', L'|', L' '};
+      style.integral_bottom = {L'-', L'\'', L' '};
       style.integral_min_height = 3;
     } else {
-      style.divide = U'─';
-      // style.multiply = U'×';
-      style.multiply = U'⋅';
+      style.divide = L'─';
+      // style.multiply = L'×';
+      style.multiply = L'⋅';
       style.greater_or_equal = L"≥";
       style.lower_or_equal = L"≤";
 
-      style.left_parenthesis_0 = U'(';
-      style.left_parenthesis_1 = U'⎛';
-      style.left_parenthesis_2 = U'⎜';
-      style.left_parenthesis_3 = U'⎝';
-      style.right_parenthesis_0 = U')';
-      style.right_parenthesis_1 = U'⎞';
-      style.right_parenthesis_2 = U'⎟';
-      style.right_parenthesis_3 = U'⎠';
+      style.left_parenthesis_0 = L'(';
+      style.left_parenthesis_1 = L'⎛';
+      style.left_parenthesis_2 = L'⎜';
+      style.left_parenthesis_3 = L'⎝';
+      style.right_parenthesis_0 = L')';
+      style.right_parenthesis_1 = L'⎞';
+      style.right_parenthesis_2 = L'⎟';
+      style.right_parenthesis_3 = L'⎠';
 
-      style.sqrt_0 = U'╲';
-      style.sqrt_1 = U'╱';
-      style.sqrt_2 = U'_';
+      style.sqrt_0 = L'╲';
+      style.sqrt_1 = L'╱';
+      style.sqrt_2 = L'_';
 
       style.summation_top = L'_';
       style.summation_bottom = L'‾';
@@ -1044,9 +1044,9 @@ class Math : public Translator {
       style.mult_bottom = L'┃';
       style.mult_intersection = L'┳';
 
-      style.integral_top = {U'⌠'};
-      style.integral_middle = {U'⎮'};
-      style.integral_bottom = {U'⌡'};
+      style.integral_top = {L'⌠'};
+      style.integral_middle = {L'⎮'};
+      style.integral_bottom = {L'⌡'};
       style.integral_min_height = 2;
     }
 

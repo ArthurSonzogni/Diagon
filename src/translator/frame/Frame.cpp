@@ -124,8 +124,8 @@ std::string Frame::Translate(const std::string& input,
 
   // Draw box.
   if (ascii_only) {
-    screen.DrawHorizontalLine(1, width - 2, 0, U'_');
-    screen.DrawHorizontalLine(1, width - 2, height - 1, U'_');
+    screen.DrawHorizontalLine(1, width - 2, 0, L'_');
+    screen.DrawHorizontalLine(1, width - 2, height - 1, L'_');
     screen.DrawVerticalLine(1, height - 1, 0);
     screen.DrawVerticalLine(1, height - 1, width - 1);
   } else {
@@ -135,11 +135,11 @@ std::string Frame::Translate(const std::string& input,
   // Draw the line number separator.
   if (line_number) {
     if (ascii_only) {
-      screen.DrawVerticalLine(1, height - 1, number_length + 1, U'|');
+      screen.DrawVerticalLine(1, height - 1, number_length + 1, L'|');
     } else {
-      screen.DrawPixel(number_length + 1, 0, U'┬');
+      screen.DrawPixel(number_length + 1, 0, L'┬');
       screen.DrawVerticalLine(1, height - 1, number_length + 1);
-      screen.DrawPixel(number_length + 1, height - 1, U'┴');
+      screen.DrawPixel(number_length + 1, height - 1, L'┴');
     }
   }
 

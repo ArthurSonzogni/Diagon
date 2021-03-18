@@ -142,7 +142,7 @@ Draw ConnectVertically(Draw a,
 
   int edge_x = a_x + a.down.x;
   out.screen.DrawVerticalLineComplete(a_y + a.down.y, b_y + b.up.y, edge_x);
-  out.screen.Pixel(edge_x, height) = U'▽';
+  out.screen.Pixel(edge_x, height) = L'▽';
 
   out.returned = b.returned;
   return out;
@@ -215,15 +215,15 @@ Draw ConnectHorizontally(Draw a,
   //auto& left = out.screen.Pixel(width - 1, edge_y);
   //auto& right = out.screen.Pixel(width, edge_y);
 
-  ////if (left == U'│')
-    ////left = U'├';
+  ////if (left == L'│')
+    ////left = L'├';
   ////else
-    ////left = U'─';
+    ////left = L'─';
 
-  ////right = U'>';
+  ////right = L'>';
 
   out.screen.DrawHorizontalLine(a_x + a.right.x + 1, b_x + b.left.x - 1,
-                                edge_y, U'_');
+                                edge_y, L'_');
   out.returned = b.returned;
   return out;
 }
@@ -242,7 +242,7 @@ Draw Parse(FlowchartParser::NoopContext* instruction, bool is_final);
 Draw Noop() {
   Draw draw;
   draw.screen.Resize(1,1);
-  //draw.screen.Pixel(0,0) = U'─';
+  //draw.screen.Pixel(0,0) = L'─';
   draw.left = {0, 0};
   draw.right = {0, 0};
   draw.down= {0, 0};
@@ -380,16 +380,16 @@ Draw Diamond(std::string content, bool is_final) {
   out.screen.Resize(width, height+3);
 
   for (int x = height / 2+1; x < width - height / 2-1; ++x) {
-    out.screen.Pixel(x, 0) = U'_';
-    out.screen.Pixel(x, height+2) = U'_';
+    out.screen.Pixel(x, 0) = L'_';
+    out.screen.Pixel(x, height+2) = L'_';
   }
 
   for (int i = 0; i < height/2+1; ++i) {
     int I = width-i-1;
-    out.screen.Pixel(i,1+height/2-i+0) = U'╱';
-    out.screen.Pixel(i,1+height/2+i+1) = U'╲';
-    out.screen.Pixel(I,1+height/2-i+0) = U'╲';
-    out.screen.Pixel(I,1+height/2+i+1) = U'╱';
+    out.screen.Pixel(i,1+height/2-i+0) = L'╱';
+    out.screen.Pixel(i,1+height/2+i+1) = L'╲';
+    out.screen.Pixel(I,1+height/2-i+0) = L'╲';
+    out.screen.Pixel(I,1+height/2+i+1) = L'╱';
   }
 
   for(int i = 0; i<lines.size(); ++i)

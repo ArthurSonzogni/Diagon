@@ -426,7 +426,7 @@ class Table : public Translator {
     // Separator.
     std::wstring separator = to_wstring(options["separator"]);
     if (separator.size() != 1) {
-      separator = U',';
+      separator = L',';
     }
 
     // Parse data.
