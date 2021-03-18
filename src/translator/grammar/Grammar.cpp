@@ -272,7 +272,7 @@ LITERAL    = """" character { character } """" .
   };
 }
 
-#ifdef _WIN32
+#ifndef _WIN32
 std::string Grammar::Translate(const std::string& input,
                                const std::string& options_string) {
   // Duplicate stdout, so that we can restore it later.
