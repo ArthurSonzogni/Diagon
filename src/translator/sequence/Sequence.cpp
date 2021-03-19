@@ -17,8 +17,8 @@ void Actor::Draw(Screen& screen, int height) {
   screen.DrawBoxedText(left, 0, name);
   screen.DrawVerticalLine(3, height - 4, center);
   screen.DrawBoxedText(left, height - 3, name);
-  screen.DrawPixel(center, 2, U'┬');
-  screen.DrawPixel(center, height - 3, U'┴');
+  screen.DrawPixel(center, 2, L'┬');
+  screen.DrawPixel(center, height - 3, L'┴');
 }
 
 void Message::Draw(Screen& screen) {
@@ -29,22 +29,22 @@ void Message::Draw(Screen& screen) {
       screen.DrawHorizontalLine(line_left, line_left + offset, line_top);
       screen.DrawVerticalLine(line_top, line_bottom, line_left + offset);
       screen.DrawHorizontalLine(line_left + offset, line_right, line_bottom);
-      screen.DrawPixel(line_left + offset, line_top, U'┐');
-      screen.DrawPixel(line_left + offset, line_bottom, U'└');
+      screen.DrawPixel(line_left + offset, line_top, L'┐');
+      screen.DrawPixel(line_left + offset, line_bottom, L'└');
     } else {
       screen.DrawHorizontalLine(line_right - offset, line_right, line_top);
       screen.DrawVerticalLine(line_top, line_bottom, line_right - offset);
       screen.DrawHorizontalLine(line_left, line_right - offset, line_bottom);
-      screen.DrawPixel(line_right - offset, line_top, U'┌');
-      screen.DrawPixel(line_right - offset, line_bottom, U'┘');
+      screen.DrawPixel(line_right - offset, line_top, L'┌');
+      screen.DrawPixel(line_right - offset, line_bottom, L'┘');
     }
   }
 
   // Tip of the arrow.
   if (direction == Direction::Right) {
-    screen.DrawPixel(line_right, line_bottom, U'>');
+    screen.DrawPixel(line_right, line_bottom, L'>');
   } else {
-    screen.DrawPixel(line_left, line_bottom, U'<');
+    screen.DrawPixel(line_left, line_bottom, L'<');
   }
 
   // The message

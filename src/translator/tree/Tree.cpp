@@ -153,7 +153,7 @@ enum class Align {
 DisplayTree MergeDisplayTree(std::wstring content,
                              std::vector<DisplayTree> children,
                              Align align) {
-  std::wstring space_to_add(content.size() + 3, U' ');
+  std::wstring space_to_add(content.size() + 3, L' ');
   DisplayTree ret;
 
   // Leaf of the recursion.
@@ -206,7 +206,7 @@ DisplayTree MergeDisplayTree(std::wstring content,
     for (auto& line : child.content) {
       (void)line;
       if (y >= first_entrance && y <= last_entrance) {
-        ret.content[y][content.size() + 1] = U'│';
+        ret.content[y][content.size() + 1] = L'│';
       }
       ++y;
     }
@@ -215,29 +215,29 @@ DisplayTree MergeDisplayTree(std::wstring content,
     int child_entrance = start + child.entrance;
     auto& connector = ret.content[child_entrance][content.size() + 1];
     if (first_entrance == last_entrance)
-      connector = U'─';
+      connector = L'─';
     else if (child_entrance == first_entrance)
-      connector = U'┌';
+      connector = L'┌';
     else if (child_entrance < last_entrance)
-      connector = U'├';
+      connector = L'├';
     else
-      connector = U'└';
+      connector = L'└';
 
     // Draw connector to child entrance.
-    ret.content[child_entrance][content.size() + 2] = U'─';
+    ret.content[child_entrance][content.size() + 2] = L'─';
   }
 
   // Draw parent entrance to connector.
-  ret.content[ret.entrance][content.size() + 0] = U'─';
+  ret.content[ret.entrance][content.size() + 0] = L'─';
   // Refine connector on parent entrance points.
   auto& connector = ret.content[ret.entrance][content.size() + 1];
   // clang-format off
   switch (connector) {
-    case U'─': connector = U'─'; break;
-    case U'┌': connector = U'┬'; break;
-    case U'├': connector = U'┼'; break;
-    case U'└': connector = U'┴'; break;
-    case U'│': connector = U'┤'; break;
+    case L'─': connector = L'─'; break;
+    case L'┌': connector = L'┬'; break;
+    case L'├': connector = L'┼'; break;
+    case L'└': connector = L'┴'; break;
+    case L'│': connector = L'┤'; break;
   }
   // clang-format on
 
@@ -311,8 +311,8 @@ class Tree : public Translator {
       Line line;
       line.content = to_wstring(line_text);
       while (line.spaces < line.content.size() &&
-             (line.content[line.spaces] == U' ' ||
-              line.content[line.spaces] == U'\t')) {
+             (line.content[line.spaces] == L' ' ||
+              line.content[line.spaces] == L'\t')) {
         line.spaces++;
       }
       line.content = line.content.substr(line.spaces, -1);

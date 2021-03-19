@@ -490,14 +490,14 @@ void DrawnEdge::Draw(Screen& screen, GraphPlanar& graph) {
   screen.DrawVerticalLine(top + 1, bottom - 1, x);
 
   if (graph.arrow_style[vertex_down][vertex_up] == ArrowStyle::LINE)
-    screen.DrawPixel(x, top, U'┬');
+    screen.DrawPixel(x, top, L'┬');
   else
-    screen.DrawPixel(x, top, U'△');
+    screen.DrawPixel(x, top, L'△');
 
   if (graph.arrow_style[vertex_up][vertex_down] == ArrowStyle::LINE)
-    screen.DrawPixel(x, bottom, U'┴');
+    screen.DrawPixel(x, bottom, L'┴');
   else
-    screen.DrawPixel(x, bottom, U'▽');
+    screen.DrawPixel(x, bottom, L'▽');
 }
 
 std::unique_ptr<Translator> GraphPlanarTranslator() {

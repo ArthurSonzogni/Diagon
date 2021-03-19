@@ -757,19 +757,19 @@ void Adapter::Construct() {
     }
 
     rendering = std::vector<std::vector<wchar_t>>(
-        height, std::vector<wchar_t>(width, U' '));
+        height, std::vector<wchar_t>(width, L' '));
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
         wchar_t& v = rendering[y][x];
         if (assigned(x, y, 1))
-          v = U'─';
+          v = L'─';
         if (assigned(x, y, 0))
-          v = U'│';
+          v = L'│';
         if (assigned(x, y, 2)) {
           if (assigned(x, y, 0))
-            v = assigned(x, y, 1) ? U'┌' : U'┐';
+            v = assigned(x, y, 1) ? L'┌' : L'┐';
           else
-            v = assigned(x, y, 1) ? U'└' : U'┘';
+            v = assigned(x, y, 1) ? L'└' : L'┘';
         }
       }
     }
@@ -781,7 +781,7 @@ void Adapter::Render(Screen& screen) {
   for (int dy = 0; dy < height-1; ++dy) {
     int x = 0;
     for (auto value : rendering[dy]) {
-      if (value == U' ') {
+      if (value == L' ') {
         ++x;
         continue;
       }
@@ -789,15 +789,15 @@ void Adapter::Render(Screen& screen) {
       auto& pixel = screen.Pixel(x, y+dy);
 
       if (dy == 0) {
-        if (pixel == U'─')
-          pixel = U'┬';
+        if (pixel == L'─')
+          pixel = L'┬';
         ++x;
         continue;
       }
 
       if (dy == height - 2) {
-        if (pixel == U'─')
-          pixel = U'▽';
+        if (pixel == L'─')
+          pixel = L'▽';
         ++x;
         continue;
       }
@@ -836,8 +836,8 @@ std::string Context::Render() {
   for (int y = 0; y < layers.size(); ++y) {
     auto& layer = layers[y];
     for (Edge& edge : layer.edges) {
-      wchar_t up = nodes[edge.up].is_connector ? U'│' : U'┬';
-      wchar_t down = nodes[edge.down].is_connector ? U'│' : U'▽';
+      wchar_t up = nodes[edge.up].is_connector ? L'│' : L'┬';
+      wchar_t down = nodes[edge.down].is_connector ? L'│' : L'▽';
       screen.DrawPixel(edge.x, edge.y + 0, up);
       screen.DrawPixel(edge.x, edge.y + 1, down);
     }

@@ -21,7 +21,7 @@ std::wstring to_wstring(const std::string& s) {
 Screen::Screen(int width, int height)
     : dim_x_(width),
       dim_y_(height),
-      lines_(dim_y_, std::wstring(dim_x_, U' ')) {}
+      lines_(dim_y_, std::wstring(dim_x_, L' ')) {}
 
 void Screen::DrawPixel(int x, int y, wchar_t c) {
   lines_[y][x] = c;
@@ -55,17 +55,17 @@ void Screen::DrawText(int x, int y, std::wstring_view text) {
 //  ╲______╱
 
 void Screen::DrawBox(int x, int y, int w, int h) {
-  lines_[y][x + w - 1] = U'┐';
-  lines_[y + h - 1][x + w - 1] = U'┘';
-  lines_[y][x] = U'┌';
-  lines_[y + h - 1][x] = U'└';
+  lines_[y][x + w - 1] = L'┐';
+  lines_[y + h - 1][x + w - 1] = L'┘';
+  lines_[y][x] = L'┌';
+  lines_[y + h - 1][x] = L'└';
   for (int xx = 1; xx < w - 1; ++xx) {
-    lines_[y][x + xx] = U'─';
-    lines_[y + h - 1][x + xx] = U'─';
+    lines_[y][x + xx] = L'─';
+    lines_[y + h - 1][x + xx] = L'─';
   }
   for (int yy = 1; yy < h - 1; ++yy) {
-    lines_[y + yy][x] = U'│';
-    lines_[y + yy][x + w - 1] = U'│';
+    lines_[y + yy][x] = L'│';
+    lines_[y + yy][x + w - 1] = L'│';
   }
 }
 
@@ -90,56 +90,56 @@ void Screen::DrawHorizontalLine(int left, int right, int y, wchar_t c) {
 
 void Screen::DrawVerticalLine(int top, int bottom, int x, wchar_t c) {
   for (int y = top; y <= bottom; ++y) {
-    lines_[y][x] = U'│';
+    lines_[y][x] = L'│';
   }
 }
 
 void Screen::DrawVerticalLineComplete(int top, int bottom, int x) {
   for (int y = top; y <= bottom; ++y) {
     auto& p = Pixel(x, y);
-    if (p == U'─') {
-      bool left = (x != 0 && Pixel(x - 1, y) != U' ');
-      bool right = (x != dim_x_ - 1 && Pixel(x + 1, y) != U' ');
+    if (p == L'─') {
+      bool left = (x != 0 && Pixel(x - 1, y) != L' ');
+      bool right = (x != dim_x_ - 1 && Pixel(x + 1, y) != L' ');
       if (y == top) {
         if (left && right)
-          p = U'┬';
+          p = L'┬';
         else if (left)
-          p = U'┐';
+          p = L'┐';
         else if (right)
-          p = U'┌';
+          p = L'┌';
         else
-          p = U'┼';
+          p = L'┼';
       }
       else if (y == bottom) {
         if (left && right)
-          p = U'┴';
+          p = L'┴';
         else if (left)
-          p = U'┘';
+          p = L'┘';
         else if (right)
-          p = U'└';
+          p = L'└';
         else
-          p = U'┼';
+          p = L'┼';
       }
       else {
         if (left && right)
-          p = U'┼';
+          p = L'┼';
         else if (left)
-          p = U'┤';
+          p = L'┤';
         else if (right)
-          p = U'├';
+          p = L'├';
         else
-          p = U'┼';
+          p = L'┼';
       }
     } else {
       // clang-format off
       switch(p) {
-        case U'┐': p = U'┤'; break;
-        case U'┘': p = U'┤'; break;
-        case U'┌': p = U'├'; break;
-        case U'└': p = U'├'; break;
-        case U'┬': p = U'┼'; break;
-        case U'┴': p = U'┼'; break;
-        default:   p = U'│'; break;
+        case L'┐': p = L'┤'; break;
+        case L'┘': p = L'┤'; break;
+        case L'┌': p = L'├'; break;
+        case L'└': p = L'├'; break;
+        case L'┬': p = L'┼'; break;
+        case L'┴': p = L'┼'; break;
+        default:   p = L'│'; break;
       }
       // clang-format on
     }
@@ -152,18 +152,18 @@ void Screen::ASCIIfy(int style) {
     for(auto& line : lines_) {
       for(auto& c : line) {
         switch(c) {
-          case U'─': c = '-'; break;
-          case U'│': c = '|'; break;
-          case U'┐': c = '.'; break;
-          case U'┘': c = '\''; break;
-          case U'┌': c = '.'; break;
-          case U'└': c = '\''; break;
-          case U'┬': c = '-'; break;
-          case U'┴': c = '-'; break;
-          case U'├': c = '-'; break;
-          case U'┤': c = '-'; break;
-          case U'△': c = '^'; break;
-          case U'▽': c = 'V'; break;
+          case L'─': c = '-'; break;
+          case L'│': c = '|'; break;
+          case L'┐': c = '.'; break;
+          case L'┘': c = '\''; break;
+          case L'┌': c = '.'; break;
+          case L'└': c = '\''; break;
+          case L'┬': c = '-'; break;
+          case L'┴': c = '-'; break;
+          case L'├': c = '-'; break;
+          case L'┤': c = '-'; break;
+          case L'△': c = '^'; break;
+          case L'▽': c = 'V'; break;
         }
       }
     }
@@ -174,18 +174,18 @@ void Screen::ASCIIfy(int style) {
     for(auto& line : lines_) {
       for(auto& c : line) {
         switch(c) {
-          case U'─': c = '-'; break;
-          case U'│': c = '|'; break;
-          case U'┐': c = '.'; break;
-          case U'┘': c = '\''; break;
-          case U'┌': c = '.'; break;
-          case U'└': c = '\''; break;
-          case U'┬': c = '.'; break;
-          case U'┴': c = '\''; break;
-          case U'├': c = '-'; break;
-          case U'┤': c = '-'; break;
-          case U'△': c = '^'; break;
-          case U'▽': c = 'V'; break;
+          case L'─': c = '-'; break;
+          case L'│': c = '|'; break;
+          case L'┐': c = '.'; break;
+          case L'┘': c = '\''; break;
+          case L'┌': c = '.'; break;
+          case L'└': c = '\''; break;
+          case L'┬': c = '.'; break;
+          case L'┴': c = '\''; break;
+          case L'├': c = '-'; break;
+          case L'┤': c = '-'; break;
+          case L'△': c = '^'; break;
+          case L'▽': c = 'V'; break;
         }
       }
     }

@@ -1,0 +1,63 @@
+name: Build and run tests
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          #- name: "Windows Latest - MSVC"
+            #os: windows-latest
+            #cc: "cl"
+            #cxx: "cl"
+          - name: "Ubuntu Latest - GCC"
+            os: ubuntu-latest
+            cc: "gcc-9"
+            cxx: "g++-9"
+          - name: "Ubuntu Latest - Clang"
+            os: ubuntu-latest
+            cc: "clang-9"
+            cxx: "clang++-9"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: seanmiddleditch/gha-setup-ninja@master
+
+      - name: Set Windows ENV
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install boost for windows
+        if: runner.os == 'Windows'
+        uses: MarkusJx/install-boost@v1.0.1
+        with:
+          boost_version: 1.73.0
+
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
+        run:  sudo apt install libboost-graph-dev
+
+      - name: CMake configure
+        run: >
+          cmake
+          -B build
+          -G Ninja
+          -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
+        shell: bash
+
+      - name: cmake build
+        run: cmake --build build
+        shell: bash
+
+      - name: tests
+        run: |
+          cd build
+          ./input_output_test
+        shell: bash
