@@ -67,5 +67,19 @@ jobs:
       - name: tests
         if: ${{ matrix.config.cc  != 'emcc' }}
         run: >
-          cd build;
           ./input_output_test
+
+      - name: tests
+        if: ${{ matrix.config.cc  != 'emcc' }}
+        run: >
+          ./input_output_test
+
+      - name: tests
+        if: ${{ matrix.config.cc  == 'emcc' }}
+        run: >
+          mkdir distribution
+          cp diagon.js distribution/
+          cp diagon.wasm distribution/
+          cp diagon.wasm distribution/
+          cp index.html distribution/
+          cp index.html distribution/
