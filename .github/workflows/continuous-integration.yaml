@@ -74,12 +74,18 @@ jobs:
         run: >
           ./input_output_test
 
-      - name: tests
+      - name: Make webAssembly distribution
         if: ${{ matrix.config.cc  == 'emcc' }}
         run: >
           mkdir distribution
           cp diagon.js distribution/
           cp diagon.wasm distribution/
-          cp diagon.wasm distribution/
-          cp index.html distribution/
-          cp index.html distribution/
+          cp style.css distribution/
+          cp run_diagon.sh distribution/
+
+      - name: Upload WebAssembly distribution
+        if: ${{ matrix.config.cc  == 'emcc' }}
+        uses: actions/upload-artifact@v2
+        with: 
+          name: distribution
+          path: distribution
