@@ -83,6 +83,6 @@ jobs:
       - name: Upload WebAssembly distribution
         if: ${{ matrix.config.cc  == 'emcc' }}
         uses: actions/upload-artifact@v2
-        with: 
+        with:
           name: distribution
           path: distribution
