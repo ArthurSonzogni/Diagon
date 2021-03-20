@@ -72,10 +72,10 @@ jobs:
       - name: Make webAssembly distribution
         if: ${{ matrix.config.cc  == 'emcc' }}
         run: >
-          mkdir distribution;
-          cp diagon.js distribution;
+          mkdir -p distribution;
+          cp diagon.js distribution
           cp diagon.wasm distribution;
-          cp index.html distribution
+          cp index.html distribution;
           cp run_diagon.sh distribution;
           cp style.css distribution;
 
