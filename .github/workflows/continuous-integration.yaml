@@ -59,7 +59,6 @@ jobs:
         run: >
           mkdir build;
           ${{ matrix.config.cmake }}
-          -G Ninja
           -DCMAKE_BUILD_TYPE=Debug
           -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }};
