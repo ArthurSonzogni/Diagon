@@ -73,7 +73,7 @@ jobs:
         if: ${{ matrix.config.cc  == 'emcc' }}
         run: >
           mkdir -p distribution;
-          cp diagon.js distribution
+          cp diagon.js distribution;
           cp diagon.wasm distribution;
           cp index.html distribution;
           cp run_diagon.sh distribution;
