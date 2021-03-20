@@ -62,7 +62,7 @@ jobs:
           -G Ninja
           -DCMAKE_BUILD_TYPE=Debug
           -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
-          -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }};
           make -j
 
       - name: tests
