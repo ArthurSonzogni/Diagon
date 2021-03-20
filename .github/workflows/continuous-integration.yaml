@@ -59,7 +59,7 @@ jobs:
         run: >
           mkdir build;
           ${{ matrix.config.cmake }}
-          -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }};
           make
@@ -75,8 +75,9 @@ jobs:
           mkdir distribution;
           cp diagon.js distribution;
           cp diagon.wasm distribution;
-          cp style.css distribution;
+          cp index.html distribution
           cp run_diagon.sh distribution;
+          cp style.css distribution;
 
       - name: Upload WebAssembly distribution
         if: ${{ matrix.config.cc  == 'emcc' }}
