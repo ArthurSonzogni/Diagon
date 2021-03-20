@@ -62,14 +62,9 @@ jobs:
           -DCMAKE_BUILD_TYPE=Debug
           -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }};
-          make -j
+          make
 
-      - name: tests
-        if: ${{ matrix.config.cc  != 'emcc' }}
-        run: >
-          ./input_output_test
-
-      - name: tests
+      - name: Tests
         if: ${{ matrix.config.cc  != 'emcc' }}
         run: >
           ./input_output_test
@@ -77,11 +72,11 @@ jobs:
       - name: Make webAssembly distribution
         if: ${{ matrix.config.cc  == 'emcc' }}
         run: >
-          mkdir distribution
-          cp diagon.js distribution/
-          cp diagon.wasm distribution/
-          cp style.css distribution/
-          cp run_diagon.sh distribution/
+          mkdir distribution;
+          cp diagon.js distribution;
+          cp diagon.wasm distribution;
+          cp style.css distribution;
+          cp run_diagon.sh distribution;
 
       - name: Upload WebAssembly distribution
         if: ${{ matrix.config.cc  == 'emcc' }}
