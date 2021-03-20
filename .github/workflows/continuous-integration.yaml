@@ -50,8 +50,6 @@ jobs:
       - name: Setup Emscripten
         if: ${{ matrix.config.cc  == 'emcc' }}
         uses: mymindstorm/setup-emsdk@v7
-        with:
-          version: 1.38.40
 
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
@@ -59,18 +57,20 @@ jobs:
 
       - name: CMake configure
         run: >
+          mkdir build;
           ${{ matrix.config.cmake }}
-          -B build
           -G Ninja
           -DCMAKE_BUILD_TYPE=Debug
           -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
 
       - name: cmake build
-        run: cmake --build build
+        run: >
+          cd build;
+          cmake --build build
 
       - name: tests
         if: ${{ matrix.config.cc  != 'emcc' }}
-        run: |
-          cd build
+        run: >
+          cd build;
           ./input_output_test
