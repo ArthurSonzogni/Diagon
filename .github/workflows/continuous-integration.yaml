@@ -46,7 +46,7 @@ jobs:
 
       - name: Setup Emscripten
         if: ${{ matrix.config.cc  == 'emcc' }}
-        uses: lovasoa/setup-emscripten@v1
+        uses: mymindstorm/setup-emsdk@v7
 
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
