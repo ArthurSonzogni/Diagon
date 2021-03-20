@@ -58,20 +58,24 @@ jobs:
       - name: Build
         run: >
           mkdir build;
+          cd build;
           ${{ matrix.config.cmake }}
+          ..
           -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }};
-          make
+          cmake --build . --config Release
 
       - name: Tests
         if: ${{ matrix.config.cc  != 'emcc' }}
         run: >
+          cd build;
           ./input_output_test
 
       - name: Make webAssembly distribution
         if: ${{ matrix.config.cc  == 'emcc' }}
         run: >
+          cd build;
           mkdir -p distribution;
           cp diagon.js distribution;
           cp diagon.wasm distribution;
@@ -85,4 +89,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: distribution
-          path: distribution
+          path: build/distribution
