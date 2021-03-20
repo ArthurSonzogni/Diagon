@@ -76,8 +76,9 @@ jobs:
           cp diagon.js distribution;
           cp diagon.wasm distribution;
           cp index.html distribution;
-          cp run_diagon.sh distribution;
           cp style.css distribution;
+          cp run_diagon.sh distribution;
+          chmod a+x ./distribution/run_diagon.sh
 
       - name: Upload WebAssembly distribution
         if: ${{ matrix.config.cc  == 'emcc' }}
