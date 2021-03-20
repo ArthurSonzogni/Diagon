@@ -20,10 +20,19 @@ jobs:
             os: ubuntu-latest
             cc: "gcc-9"
             cxx: "g++-9"
+            cmake: "cmake"
+
           - name: "Ubuntu Latest - Clang"
             os: ubuntu-latest
             cc: "clang-9"
             cxx: "clang++-9"
+            cmake: "cmake"
+
+          - name: "Ubuntu Latest - Emscripten"
+            os: ubuntu-latest
+            cc: "emcc"
+            cxx: "em++"
+            cmake: "emcmake cmake"
     steps:
       - uses: actions/checkout@v2
       - uses: seanmiddleditch/gha-setup-ninja@master
@@ -38,26 +47,42 @@ jobs:
         with:
           boost_version: 1.73.0
 
+      - name: Setup Emscripten
+        if: ${{ matrix.config.cc  == 'emcc' }}
+        uses: mymindstorm/setup-emsdk@v7
+
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
         run:  sudo apt install libboost-graph-dev
 
-      - name: CMake configure
+      - name: Build
         run: >
-          cmake
-          -B build
-          -G Ninja
-          -DCMAKE_BUILD_TYPE=Debug
+          mkdir build;
+          ${{ matrix.config.cmake }}
+          -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
-          -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
-        shell: bash
+          -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }};
+          make
 
-      - name: cmake build
-        run: cmake --build build
-        shell: bash
-
-      - name: tests
-        run: |
-          cd build
+      - name: Tests
+        if: ${{ matrix.config.cc  != 'emcc' }}
+        run: >
           ./input_output_test
-        shell: bash
+
+      - name: Make webAssembly distribution
+        if: ${{ matrix.config.cc  == 'emcc' }}
+        run: >
+          mkdir -p distribution;
+          cp diagon.js distribution;
+          cp diagon.wasm distribution;
+          cp index.html distribution;
+          cp style.css distribution;
+          cp run_diagon.sh distribution;
+          chmod a+x ./distribution/run_diagon.sh
+
+      - name: Upload WebAssembly distribution
+        if: ${{ matrix.config.cc  == 'emcc' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: distribution
+          path: distribution

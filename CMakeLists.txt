@@ -155,7 +155,7 @@ if (EMSCRIPTEN)
   foreach(file
       "style.css"
       "index.html"
-      "run_web_server.sh")
+      "run_diagon.sh")
     configure_file(
       ${CMAKE_CURRENT_SOURCE_DIR}/src/${file}
       ${CMAKE_CURRENT_BINARY_DIR}/${file}
