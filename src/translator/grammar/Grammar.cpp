@@ -55,7 +55,7 @@ using AstRulePtr = kgt::ast_rule*;
 using Opaque = void*;
 using OpaqueRead = int(Opaque);
 using InputFunction = AstRulePtr(OpaqueRead, Opaque);
-using OutputFunction = void(const struct kgt::ast_rule*);
+using OutputFunction = int(const struct kgt::ast_rule*);
 
 InputFunction* f = kgt::abnf_input;
 
@@ -298,7 +298,7 @@ std::string Grammar::Translate(const std::string& input,
                              : kgt::rrutf8_output;
 
   auto* model = input_function(StringReader::Read, &string_reader);
-  output_function(model);
+  int error = output_function(model);
 
   // Restore stdout
   dup2(old_stdout, 1);
