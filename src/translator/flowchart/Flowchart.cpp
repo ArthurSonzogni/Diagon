@@ -27,8 +27,8 @@ class Flowchart : public Translator {
   }
   std::vector<Translator::OptionDescription> Options() final { return {}; }
   std::vector<Translator::Example> Examples() final;
-  std::string Translate(const std::string& input,
-                        const std::string& options_string) final;
+  TranslatorResult Translate(const std::string& input,
+                             const std::string& options_string) final;
 };
 
 std::vector<Translator::Example> Flowchart::Examples() {
@@ -627,8 +627,8 @@ Draw Parse(FlowchartParser::ProgramContext* program, bool is_final) {
   return out;
 }
 
-std::string Flowchart::Translate(const std::string& input,
-                                 const std::string& options_string) {
+TranslatorResult Flowchart::Translate(const std::string& input,
+                                      const std::string& options_string) {
   antlr4::ANTLRInputStream input_stream(input);
 
   // Lexer.

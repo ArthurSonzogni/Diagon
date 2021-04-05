@@ -298,9 +298,27 @@ let push_state = () => {};
 function UpdateOutput() {
   push_state();
 
-  errors.value = '';
-  output.value =
-    diagon.translate(tools_data[tools.value].tool, input.value, GetOptions());
+  errors.value = "";
+  let out = {};
+  try {
+    const json = diagon.translate(
+      tools_data[tools.value].tool,
+      input.value,
+      GetOptions()
+    );
+
+    out = JSON.parse(json);
+    if (errors.value != "") {
+      errors.value = out.errors
+        .map(e => e.line + ":" + e.column + ":" + e.description)
+        .join('\n');
+    }
+
+  } catch(error) {
+  }
+
+  if (out.output)
+    output.value = out.output;
 
   if (GetOptions().includes("Latex")) {
     document.documentElement.setAttribute("data-display-latex", "true");

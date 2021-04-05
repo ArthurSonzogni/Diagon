@@ -980,8 +980,8 @@ class Math : public Translator {
     };
   }
 
-  std::string Translate(const std::string& input,
-                        const std::string& options_string) final {
+  TranslatorResult Translate(const std::string& input,
+                             const std::string& options_string) final {
     auto options = SerializeOption(options_string);
     Style style;
     if (options["style"] == "ASCII") {

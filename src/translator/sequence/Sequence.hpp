@@ -115,8 +115,8 @@ class Sequence : public Translator {
   const char* Description() final;
   std::vector<OptionDescription> Options() final;
   std::vector<Example> Examples() final;
-  std::string Translate(const std::string& input,
-                        const std::string& options_string) override;
+  TranslatorResult Translate(const std::string& input,
+                             const std::string& options_string) override;
 
   std::vector<Actor> actors;
   std::vector<Message> messages;

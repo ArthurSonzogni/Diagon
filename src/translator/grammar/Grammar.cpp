@@ -54,7 +54,7 @@ struct StringReader {
 using AstRulePtr = kgt::ast_rule*;
 using Opaque = void*;
 using OpaqueRead = int(Opaque);
-using InputFunction = AstRulePtr(OpaqueRead, Opaque);
+using InputFunction = AstRulePtr(OpaqueRead, Opaque, kgt::parsing_error_queue*);
 using OutputFunction = int(const struct kgt::ast_rule*);
 
 InputFunction* f = kgt::abnf_input;
@@ -107,8 +107,8 @@ class Grammar : public Translator {
   }
   std::vector<Translator::OptionDescription> Options() final;
   std::vector<Translator::Example> Examples() final;
-  std::string Translate(const std::string& input,
-                        const std::string& options_string) final;
+  TranslatorResult Translate(const std::string& input,
+                             const std::string& options_string) final;
 };
 
 std::vector<Translator::OptionDescription> Grammar::Options() {
@@ -273,7 +273,7 @@ LITERAL    = """" character { character } """" .
 }
 
 #ifndef _WIN32
-std::string Grammar::Translate(const std::string& input,
+TranslatorResult Grammar::Translate(const std::string& input,
                                const std::string& options_string) {
   // Duplicate stdout, so that we can restore it later.
   int old_stdout = dup(1);
@@ -297,18 +297,36 @@ std::string Grammar::Translate(const std::string& input,
                              ? output_function_map[option_output]
                              : kgt::rrutf8_output;
 
-  auto* model = input_function(StringReader::Read, &string_reader);
-  int error = output_function(model);
+  kgt::parsing_error_queue errors = nullptr;
+  auto* model = input_function(StringReader::Read, &string_reader, &errors);
+
+  TranslatorResult out;
+
+  while (errors) {
+    kgt::parsing_error error;
+    kgt::parsing_error_queue_pop(&errors, &error);
+    out.errors.push_back({
+        error.line,
+        error.column,
+        error.description,
+    });
+  }
 
   // Restore stdout
   dup2(old_stdout, 1);
   close(old_stdout);
-
   fclose(file_write);
 
-  auto file_read = std::ifstream("/tmp/diagon_grammer.txt");
-  return std::string((std::istreambuf_iterator<char>(file_read)),
-                     std::istreambuf_iterator<char>());
+  int error = output_function(model);
+  //if (error != 0)
+    //out.errors.push_back({-1, -1, "Error"});
+  //else {
+    auto file_read = std::ifstream("/tmp/diagon_grammer.txt");
+    out.output = std::string((std::istreambuf_iterator<char>(file_read)),
+                             std::istreambuf_iterator<char>());
+  //}
+
+  return out;
 }
 #else
 std::string Grammar::Translate(const std::string& input,

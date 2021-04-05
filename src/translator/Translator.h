@@ -7,11 +7,31 @@
 #include <string>
 #include <vector>
 
+struct TranslatorError {
+  TranslatorError(int line, int column, std::string description)
+      : line(line), column(column), description(description) {}
+  int line;
+  int column;
+  std::string description;
+};
+
+struct TranslatorResult {
+  TranslatorResult() {}
+  TranslatorResult(const char* output) : output(output) {}
+  TranslatorResult(std::string output) : output(output) {}
+  TranslatorResult(TranslatorError error) : errors({std::move(error)}) {}
+  TranslatorResult(int line, int column, std::string description)
+      : TranslatorResult(TranslatorError(line, column, description)) {}
+
+  std::string output;
+  std::vector<TranslatorError> errors;
+};
+
 class Translator {
  public:
   // Main API implemented by translator. ---------------------------------------
-  virtual std::string Translate(const std::string& input,
-                                const std::string& option) = 0;
+  virtual TranslatorResult Translate(const std::string& input,
+                                     const std::string& option) = 0;
   virtual ~Translator() = default;
 
   // Reflection API ------------------------------------------------------------

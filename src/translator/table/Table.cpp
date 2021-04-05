@@ -412,8 +412,8 @@ class Table : public Translator {
          "Javascript,CSS,HTML"},
     };
   }
-  std::string Translate(const std::string& input,
-                        const std::string& options_string) override {
+  TranslatorResult Translate(const std::string& input,
+                             const std::string& options_string) override {
     auto options = SerializeOption(options_string);
 
     // Style.

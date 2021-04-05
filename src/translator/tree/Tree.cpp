@@ -295,8 +295,8 @@ std::map<std::string, std::function<std::string(std::unique_ptr<Node>)>>
 class Tree : public Translator {
  public:
   virtual ~Tree() = default;
-  std::string Translate(const std::string& input,
-                        const std::string& options_string) override {
+  TranslatorResult Translate(const std::string& input,
+                             const std::string& options_string) override {
     auto options = SerializeOption(options_string);
 
     // Style.

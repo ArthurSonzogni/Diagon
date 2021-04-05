@@ -129,7 +129,9 @@ target_link_libraries(diagon_lib
 target_set_common(diagon_lib)
 
 add_executable(diagon src/main.cpp)
-target_link_libraries(diagon PRIVATE diagon_lib)
+target_link_libraries(diagon
+  PRIVATE nlohmann_json::nlohmann_json
+  PRIVATE diagon_lib)
 target_set_common(diagon)
 
 if (EMSCRIPTEN)
@@ -138,6 +140,7 @@ if (EMSCRIPTEN)
   string(APPEND CMAKE_CXX_FLAGS " -s WASM=1")
   string(APPEND CMAKE_CXX_FLAGS " --closure 1")
   string(APPEND CMAKE_CXX_FLAGS " -fexceptions")
+  string(APPEND CMAKE_CXX_FLAGS " --bind")
   #string(APPEND CMAKE_CXX_FLAGS " -s STANDALONE_WASM")
   #string(APPEND CMAKE_CXX_FLAGS " -s WASM_ASYNC_COMPILATION=0")
   #string(APPEND CMAKE_CXX_FLAGS " -s SIDE_MODULE=1")

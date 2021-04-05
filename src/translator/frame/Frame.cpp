@@ -18,8 +18,8 @@ class Frame : public Translator {
   }
   std::vector<Translator::OptionDescription> Options() final;
   std::vector<Translator::Example> Examples() final;
-  std::string Translate(const std::string& input,
-                        const std::string& options_string) final;
+  TranslatorResult Translate(const std::string& input,
+                             const std::string& options_string) final;
 };
 
 std::vector<Translator::OptionDescription> Frame::Options() {
@@ -63,7 +63,7 @@ std::vector<Translator::Example> Frame::Examples() {
   };
 }
 
-std::string Frame::Translate(const std::string& input,
+TranslatorResult Frame::Translate(const std::string& input,
 
                              const std::string& options_string) {
   auto options = SerializeOption(options_string);

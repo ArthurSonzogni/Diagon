@@ -126,8 +126,8 @@ class GraphPlanar : public Translator {
   }
   std::vector<Translator::OptionDescription> Options() final;
   std::vector<Translator::Example> Examples() final;
-  std::string Translate(const std::string& input,
-                        const std::string& options_string) final;
+  TranslatorResult Translate(const std::string& input,
+                             const std::string& options_string) final;
 
   void Read(const std::string& input);
   void ReadGraph(GraphPlanarParser::GraphContext* graph);
@@ -182,8 +182,8 @@ std::vector<Translator::Example> GraphPlanar::Examples() {
   };
 }
 
-std::string GraphPlanar::Translate(const std::string& input,
-                                   const std::string& options_string) {
+TranslatorResult GraphPlanar::Translate(const std::string& input,
+                                        const std::string& options_string) {
   *this = GraphPlanar();
   auto options = SerializeOption(options_string);
   ascii_only_ = (options["ascii_only"] == "true");

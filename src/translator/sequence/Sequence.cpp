@@ -247,8 +247,8 @@ std::vector<Translator::Example> Sequence::Examples() {
   };
 }
 
-std::string Sequence::Translate(const std::string& input,
-                                const std::string& options_string) {
+TranslatorResult Sequence::Translate(const std::string& input,
+                                     const std::string& options_string) {
   *this = Sequence();
 
   auto options = SerializeOption(options_string);

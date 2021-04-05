@@ -6,22 +6,38 @@
 #include "api.hpp"
 #include "environment.h"
 #include "translator/Factory.h"
+#include "translator/Translator.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 extern "C" const char* translate(const char* translator_name,
                                  const char* input,
                                  const char* options) {
+  TranslatorResult result;
   auto* translator = FindTranslator(translator_name);
-  if (!translator)
-    std::cerr << "Translator not found" << std::endl;
+  if (!translator) {
+    result = TranslatorError(0, 0, "Translator not found");
+  } else {
+    result = translator->Translate(input, options);
+  }
+
+  auto json = json::object();
+  json["output"] = result.output;
+  json["errors"] = json::array();
+  for(const auto& it : result.errors) {
+    auto error = json::object();
+    error["line"] = it.line;
+    error["column"] = it.column;
+    error["description"] = it.description;
+    json["errors"].push_back(std::move(error));
+  }
 
   static std::string out;
-  try {
-    out = translator->Translate(input, options);
-  } catch (...) {
-    std::cerr << "Error" << std::endl;
-  }
+  out = json.dump(2);
   return out.c_str();
 }
 #endif
@@ -122,21 +138,20 @@ int PrintTranslatorExamples(Translator* translator) {
     return EXIT_SUCCESS;
   }
 
-  
   std::cout << "EXAMPLES:" << std::endl;
   int i = 0;
   for (auto& it : translator->Examples()) {
-    std::string input =
+    TranslatorResult input =
         FindTranslator("Frame")->Translate(it.input, "line_number\nfalse");
-    replaceAll(input, "\n", "\n     ");
+    replaceAll(input.output, "\n", "\n     ");
     std::cout << "  " << (++i) << ") input" << std::endl;
-    std::cout << "     " << input;
+    std::cout << "     " << input.output;
 
-    std::string output = translator->Translate(it.input, "");
-    output = FindTranslator("Frame")->Translate(output, "line_number\nfalse");
-    replaceAll(output, "\n", "\n     ");
+    TranslatorResult output = translator->Translate(it.input, "");
+    output = FindTranslator("Frame")->Translate(output.output, "line_number\nfalse");
+    replaceAll(output.output, "\n", "\n     ");
     std::cout << " output" << std::endl;
-    std::cout << "     " << output << std::endl;
+    std::cout << "     " << output.output << std::endl;
   }
 
   return EXIT_SUCCESS;
@@ -257,8 +272,8 @@ int Translate(Translator* translator,
     input = read_stdin();
   }
 
-  std::string output = translator->Translate(input, option_list);
-  std::cout << output << std::endl;
+  TranslatorResult output = translator->Translate(input, option_list);
+  std::cout << output.output << std::endl;
   return EXIT_SUCCESS;
 }
 
