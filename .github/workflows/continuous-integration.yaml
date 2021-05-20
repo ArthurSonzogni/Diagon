@@ -18,14 +18,14 @@ jobs:
             #cxx: "cl"
           - name: "Ubuntu Latest - GCC"
             os: ubuntu-latest
-            cc: "gcc-9"
-            cxx: "g++-9"
+            cc: "gcc"
+            cxx: "g++"
             cmake: "cmake"
 
           - name: "Ubuntu Latest - Clang"
             os: ubuntu-latest
-            cc: "clang-9"
-            cxx: "clang++-9"
+            cc: "clang"
+            cxx: "clang++"
             cmake: "cmake"
 
           - name: "Ubuntu Latest - Emscripten"
