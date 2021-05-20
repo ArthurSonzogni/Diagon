@@ -27,8 +27,14 @@ parts:
     - uuid-dev
     - openjdk-8-jdk
     - libboost-graph-dev
+    build-snaps: [cmake/latest/edge] # We need a modern cmake.
     override-build: |
-      snapcraftctl build
+      /snap/bin/cmake \
+        -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL/usr/local \
+        -DCMAKE_BUILD_TYPE=Release \
+        $SNAPCRAFT_PART_SRC
+      make -j 4
+      make install
       snapcraftctl set-version "$(git rev-list --count HEAD)"
 
 passthrough:
