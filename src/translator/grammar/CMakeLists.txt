@@ -1,6 +1,7 @@
 add_library(translator_grammar STATIC Grammar.cpp)
 set_property(TARGET translator_grammar PROPERTY CXX_STANDARD 17)
 target_link_libraries(translator_grammar PRIVATE diagon_base)
+target_set_common(translator_grammar)
 
 if (MSVC)
 else()

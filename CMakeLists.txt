@@ -92,6 +92,7 @@ add_library(diagon_base STATIC
   src/translator/Translator.cpp
   src/translator/Translator.h
 )
+target_set_common(diagon_base)
 
 add_subdirectory(src/screen)
 add_subdirectory(src/translator/frame)
@@ -110,6 +111,7 @@ add_library(diagon_lib STATIC
   src/translator/Factory.cpp
   src/translator/Factory.h
 )
+target_set_common(diagon_lib)
 
 target_link_libraries(diagon_lib
   PRIVATE diagon_base
