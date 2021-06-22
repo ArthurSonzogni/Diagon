@@ -357,7 +357,7 @@ Output (Unicode)
 Diagon is also usable as a command line tool.
 For instance:
 ```bash
-echo ""1+1/2 + sum(i,0,10) = 112/2" | diagon Math
+echo "1+1/2 + sum(i,0,10) = 112/2" | diagon Math
             10         
           ___        
       1   ╲       112
