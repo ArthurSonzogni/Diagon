@@ -2,10 +2,11 @@ div {
   margin: 0px;
   padding: 0px;
 }
+
 /* Theme */
 :root {
-  --bg-color: #fff;
-  --fg-color: #000;
+  --bg-color: white;
+  --fg-color: black;
   --begin-button-hover: #3cb0ff;
   --code-area-bg-color: #AAA;
   --select-bg-color: #EEE;
@@ -15,15 +16,17 @@ div {
 }
 
 [data-theme="dark"] {
-  --bg-color: #000;
-  --fg-color: #fff;
+  --bg-color: black;
+  --fg-color: white;
   --begin-button-hover: green;
   --code-area-bg-color: #222;
   --select-bg-color: #111;
 }
+
 [data-display-latex="true"] {
   --displaylatex: block;
 }
+
 [data-display-html="true"] {
   --displayhtml: block;
 }
@@ -37,6 +40,7 @@ html {
   font-family: 'Arial';
   scroll-behavior: smooth;
 }
+
 html, body {
   margin: 0;
   padding: 0;
@@ -48,27 +52,32 @@ html, body {
   overflow: auto;
   min-height: 0
 }
+
 .displayhtml {
   display: var(--displayhtml) !important;
   overflow: auto;
   min-height: 0;
-  background-color: #fff;
+  background-color: white;
 }
+
 .gutter {
   min-width: 12px;
   min-height: 4px;
 }
+
 /* Containers */
 .container {
   /* overflow: hidden; */
   min-height: 0
 }
+
 .container.vertical {
   display: flex;
   flex-direction: column;
   margin: 0;
   padding: 0;
 }
+
 .container.horizontal {
   display: flex;
   flex-direction: row;
@@ -81,29 +90,35 @@ html, body {
     flex-direction: column;
   }
 }
+
 @media all and (orientation:landscape) {
   .container.device-orientation {
     display: flex;
     flex-direction: row;
   }
 }
+
 .flex {
   flex-grow: 1;
   flex-shrink: 1;
 }
+
 .nonflex {
   flex-grow: 0;
   flex-shrink: 0;
 }
+
 .y-scrollable {
   overflow-x: auto;
 }
+
 .fullscreen {
   width: 100%;
   height: 100vh;
   margin: 0;
   padding: 0;
 }
+
 .fill_space {
   width: 100%;
   height: 100%;
@@ -115,18 +130,21 @@ html, body {
 #landing_page {
   position: relative
 }
+
 #landing_page_content {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
 #landing_page_content h1 {
   font-size: 20vmin;
   margin: 0;
   padding: 0;
   transition: text-shadow 1s ease-in-out 1s;
 }
+
 #landing_page_content h1:hover {
   text-shadow:
 							 +0px     0px   15px   var(--bg-color),
@@ -143,13 +161,16 @@ html, body {
   margin-top: -4vmin;
   margin-left: 1vmin;
 }
+
 #landing_page_content p {
   font-size: 5vmin;
   white-space: nowrap;
 }
+
 #landing_page_content a {
   font-size: 10vmin;
 }
+
 #version {
   font-size: 4vmin;
   margin: 1vmin;
@@ -163,6 +184,7 @@ html, body {
   padding: 1.5vmin;
   text-decoration: none;
 }
+
 #begin_button:hover {
   text-decoration: none;
 }
@@ -179,10 +201,12 @@ html, body {
   border-radius: 0.5vmin;
   opacity: 0.8;
 }
+
 #style_button:hover {
   opacity: 1;
   cursor: pointer;
 }
+
 #style_button, #links a {
   background-color: var(--fg-color);
   color: var(--bg-color);
@@ -194,6 +218,7 @@ html, body {
   left: 0;
   top: 0;
 }
+
 #links a {
   display: block;
   margin: 1vmin;
@@ -207,6 +232,7 @@ html, body {
   border-radius: 0 0.5vmin 0.5vmin 0;
   opacity: 0.8;
 }
+
 #links a:hover {
   opacity: 1.0;
 }
@@ -228,37 +254,44 @@ textarea {
 #menu_bar {
   display: flex;
 }
+
 .menu_bar_submenu {
   margin: 0px;
   padding: 12px;
   display: inline-block;
-  border-right: 1px solid #000;
+  border-right: 1px solid black;
   vertical-align: center;
   white-space: nowrap;
 }
+
 select {
   font: inherit;
   size: 50px;
 }
+
 .option {
   margin: auto;
   padding: auto;
   padding-right: 3px;
   padding-left: 3px;
 }
+
 select {
   border: 0;
   padding: 7px;
 }
+
 option {
   border: 0;
   padding: 7px;
   margin: 7px;
 }
+
 #input, #output, #latex, #html{
   padding: 1vh;
   margin: 1vh;
 }
+
 #input, #output, #errors, #menu_bar, #latex {
   color:var(--fg-color);
   background-color:var(--bg-color);
@@ -269,12 +302,14 @@ option {
   white-space: pre;
   overflow: auto;
 }
+
 /* Begin Button */
 #begin_button {
   border: 1vmin var(--fg-color) solid;
   color: var(--fg-color);
   padding: 10px;
 }
+
 #begin_button:hover {
   background-color: var(--begin-button-hover);
 }
@@ -283,23 +318,27 @@ option {
   background-color: var(--code-area-bg-color);
   tab-size: 2;
 }
+
 #menu_bar {
   margin-bottom: 1vmin;
 }
+
 select, option {
   color: var(--fg-color);
   background-color: var(--select-bg-color);
 }
+
 /* Copy */
 .copy-wrapper {
   position: relative;
 }
+
 .copy {
   display: block;
   position: absolute;
-  color: #fff;
-  background-color: #000;
-  color: #fff;
+  color: white;
+  background-color: black;
+  color: white;
   opacity: 0.7;
   right: 0;
   top: 0;
@@ -309,10 +348,12 @@ select, option {
   transition: opacity 0.3s, background-color 0.3s;
   box-shadow: x 0.5vmin 0.5vmin 0 inset rgba(0,0,0,0.4);
 }
+
 .copy:hover, .copy[data-active=true] {
   opacity: 1.0;
   cursor: pointer;
 }
+
 .copy[data-active=true] {
   background-color: green;
 }
