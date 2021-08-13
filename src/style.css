@@ -147,10 +147,10 @@ html, body {
 
 #landing_page_content h1:hover {
   text-shadow:
-							 +0px     0px   15px   var(--bg-color),
-						   +0px   -15px   20px   rgba(255,0,0,0.5),
-							-15px   +10px   20px   rgba(0,255,0,0.5),
-							+10px   +15px   20px   rgba(0,0,255,0.5);
+            +0px   0px   15px   var(--bg-color),
+            +0px   -15px   20px   rgba(255,0,0,0.5),
+           -15px   +10px   20px   rgba(0,255,0,0.5),
+           +10px   +15px   20px   rgba(0,0,255,0.5);
 }
 
 #landing_page_content h2 {
