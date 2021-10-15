@@ -8,23 +8,41 @@ into an ascii-art representation.
 It is written in C++ and use WebAssembly, HTML and CSS to make a Web
 Application.
 
-### [https://arthursonzogni.com/Diagon/](https://arthursonzogni.com/Diagon/)
+# Web application
 
-**Table of content**
- * [Diagon](#diagon)
- * [Generators](#generators)
-    * [Mathematic Expression](#mathematic-expression)
-    * [Sequence Diagram](#sequence-diagram)
-    * [Tree](#tree)
-    * [Frame](#frame)
-    * [Table](#table)
-    * [Planar graph](#planar-graph)
- * [Command line interface](#command-line-interface)
- * [Thanks](#thanks)
+[https://arthursonzogni.com/Diagon/](https://arthursonzogni.com/Diagon/)
+
+
+# Command line interface
+
+Diagon is also usable as a command line tool.
+For instance:
+```bash
+echo "1+1/2 + sum(i,0,10) = 112/2" | diagon Math
+            10         
+          ___        
+      1   ╲       112
+  1 + ─ + ╱   i = ───
+      2   ‾‾‾      2 
+           0         
+```
+To use it, you can either compile it from source or use the precompiled binaries published on the snapstore:
+~~~bash
+sudo snap install diagon
+~~~
+[![snapstore](https://snapcraft.io/diagon/badge.svg)](https://snapcraft.io/diagon)
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/diagon) 
+
+# IDE plugins
+
+Make diagon easy to use inside your IDE. Thanks to contributors:
+- [vim-diagon](https://github.com/willchao612/vim-diagon)
+- [vscode-diagon](https://github.com/ElmouradiAmine/vscode-diagon)
 
 # Generators
 
-## Mathematic Expression
+<details>
+   <summary>Mathematic Expression</summary>
 
 input:
 ~~~
@@ -118,6 +136,10 @@ input:
 ⎝3 4⎠   ⎝y⎠   ⎝3 ⋅ x + 4 ⋅ y⎠
 ~~~
 
+</details>
+
+<details>
+   <summary> Sequence Diagram </summary>
 
 ## Sequence Diagram
 
@@ -203,8 +225,11 @@ Output (Unicode)
  │Renderer││Browser│
  └────────┘└───────┘
 ~~~
-
-## Tree
+   
+</details>
+   
+<details>
+   <summary>Tree</summary>
 
 Input
 ~~~
@@ -275,8 +300,9 @@ Output (Style Unicode right center)
          └─Fedora
 ~~~
 
-
-## Frame
+</details>
+<details>
+   <summary>Frame</summary>
 
 Input
 ~~~
@@ -304,7 +330,9 @@ Output
 └─┴────────────────────────────┘
 ~~~
 
-## Table
+</details>
+<details>
+   <summary>Table</summary>
 
 Input
 ~~~
@@ -324,7 +352,10 @@ Output (Style Unicode)
 └──────────┴────────┴────────┘
 ~~~
 
-## Planar graph
+</details>
+
+<details>
+   <summary>GraphPlanar</summary>
 
 Input
 ~~~
@@ -351,27 +382,209 @@ Output (Unicode)
 │loop│           
 └────┘           
 ~~~
+   
+</details>
+   
+<details>
+   <summary>GraphDAG</summary>
 
-# Command line interface
-
-Diagon is also usable as a command line tool.
-For instance:
-```bash
-echo "1+1/2 + sum(i,0,10) = 112/2" | diagon Math
-            10         
-          ___        
-      1   ╲       112
-  1 + ─ + ╱   i = ───
-      2   ‾‾‾      2 
-           0         
+Input:
 ```
-To use it, you can either compile it from source or use the precompiled binaries published on the snapstore:
-~~~bash
-sudo snap install diagon
-~~~
-[![snapstore](https://snapcraft.io/diagon/badge.svg)](https://snapcraft.io/diagon)
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/diagon)  
+socks -> shoes    
+underwear -> shoes
+underwear -> pants
+pants -> shoes    
+pants -> belt     
+belt -> jacket    
+shirt -> belt     
+shirt -> tie      
+tie -> jacket     
+```
 
+Output:
+```
+┌─────┐┌─────────┐┌─────┐     
+│socks││underwear││shirt│     
+└┬────┘└┬─┬──────┘└┬─┬──┘     
+ │      │┌▽─────┐  │┌▽───────┐
+ │      ││pants │  ││tie     │
+ │      │└┬──┬──┘  │└┬───────┘
+┌▽──────▽─▽┐┌▽─────▽┐│        
+│shoes     ││belt   ││        
+└──────────┘└┬──────┘│        
+┌────────────▽───────▽┐       
+│jacket               │       
+└─────────────────────┘       
+```
+     
+Input:
+```
+chrome -> content  
+chrome -> blink    
+chrome -> base     
+                   
+content -> blink   
+content -> net     
+content -> base    
+                   
+blink -> v8        
+blink -> CC        
+blink -> WTF       
+blink -> skia      
+blink -> base      
+blink -> net       
+                   
+weblayer -> content
+weblayer -> chrome 
+weblayer -> base   
+                   
+net -> base        
+WTF -> base        
+```
+
+Output
+```
+┌────────┐                     
+│weblayer│                     
+└┬─┬─┬───┘                     
+ │ │┌▽────────────────────────┐
+ │ ││chrome                   │
+ │ │└┬─────┬─────────────────┬┘
+ │┌▽─▽────┐│                 │ 
+ ││content││                 │ 
+ │└┬─┬─┬──┘│                 │ 
+ │ │ │┌▽───▽──────────────┐  │ 
+ │ │ ││blink              │  │ 
+ │ │ │└┬──┬───┬─┬───┬───┬─┘  │ 
+ │ │┌▽─▽┐┌▽──┐│┌▽─┐┌▽─┐┌▽───┐│ 
+ │ ││net││WTF│││v8││CC││skia││ 
+ │ │└┬──┘└┬──┘│└──┘└──┘└────┘│ 
+┌▽─▽─▽────▽───▽──────────────▽┐
+│base                         │
+└─────────────────────────────┘
+```
+
+Input:
+```
+random -> pool_urbg              
+random -> nonsecure_base         
+random -> seed_sequence          
+random -> distribution           
+                                 
+nonsecure_base -> pool_urbg      
+nonsecure_base -> salted_seed_seq
+                                 
+seed_sequence -> pool_urbg       
+seed_sequence -> salted_seed_seq 
+seed_sequence -> seed_material   
+                                 
+distribution -> strings          
+                                 
+pool_urbg -> seed_material       
+                                 
+salted_seed_seq -> seed_material 
+                                 
+seed_material -> strings         
+```
+
+Output:
+```
+┌───────────────────────────────┐             
+│random                         │             
+└┬─────────────┬─────────────┬─┬┘             
+┌▽───────────┐┌▽────────────┐│┌▽─────────────┐
+│distribution││seed_sequence│││nonsecure_base│
+└┬───────────┘└┬───┬───────┬┘│└┬┬────────────┘
+ │             │  ┌│───────│─│─│┘             
+ │ ┌───────────┘  ││       │ │┌┘              
+ │ │┌─────────────▽▽┐┌─────▽─▽▽┐              
+ │ ││salted_seed_seq││pool_urbg│              
+ │ │└┬──────────────┘└┬────────┘              
+ │┌▽─▽────────────────▽┐                      
+ ││seed_material       │                      
+ │└┬───────────────────┘                      
+┌▽─▽────┐                                     
+│strings│                                     
+└───────┘                                     
+```
+   
+</details>
+
+<details>
+   <summary>Flowchart</summary>
+
+Input:
+```
+if ("DO YOU UNDERSTAND FLOW CHARTS?")                
+  "GOOD!";                                           
+else if ("OKAY, YOU SEE THE LINE LABELED 'YES'?") {  
+  if ("... AND YOU CAN SEE THE ONES LABELED 'NO'?") {
+    "GOOD";                                          
+  } else {                                           
+    if ("BUT YOU JUST FOLLOWED THEM TWICE?")         
+      noop;                                          
+    else                                             
+      noop;                                          
+    "(THAT WASN'T A QUESTION)";                      
+    "SCREW IT"                                       
+  }                                                  
+} else {                                             
+  if ("BUT YOU SEE THE ONES LABELED 'NO'?") {        
+    return "WAIT, WHAT?";                            
+  } else {                                           
+    "LISTEN.";                                       
+    return "I HATE YOU";                             
+  }                                                  
+}                                                    
+                                                     
+"LET'S GO DRING";                                    
+"HEY, I SHOULD TRY INSTALLING FREEBSD!"              
+```
+
+Output:
+```
+   _________________                                                              
+  ╱                 ╲                                                     ┌─────┐ 
+ ╱ DO YOU UNDERSTAND ╲____________________________________________________│GOOD!│ 
+ ╲ FLOW CHARTS?      ╱yes                                                 └──┬──┘ 
+  ╲_________________╱                                                        │    
+           │no                                                               │    
+  _________▽_________                    ______________________              │    
+ ╱                   ╲                  ╱                      ╲    ┌────┐   │    
+╱ OKAY, YOU SEE THE   ╲________________╱ ... AND YOU CAN SEE    ╲___│GOOD│   │    
+╲ LINE LABELED 'YES'? ╱yes             ╲ THE ONES LABELED 'NO'? ╱yes└──┬─┘   │    
+ ╲___________________╱                  ╲______________________╱       │     │    
+           │no                                     │no                 │     │    
+   ________▽_________                     _________▽__________         │     │    
+  ╱                  ╲    ┌───────────┐  ╱                    ╲        │     │    
+ ╱ BUT YOU SEE THE    ╲___│WAIT, WHAT?│ ╱ BUT YOU JUST         ╲___    │     │    
+ ╲ ONES LABELED 'NO'? ╱yes└───────────┘ ╲ FOLLOWED THEM TWICE? ╱yes│   │     │    
+  ╲__________________╱                   ╲____________________╱    │   │     │    
+           │no                                     │no             │   │     │    
+       ┌───▽───┐                                   │               │   │     │    
+       │LISTEN.│                                   └───────┬───────┘   │     │    
+       └───┬───┘                                    ┌──────▽─────┐     │     │    
+     ┌─────▽────┐                                   │(THAT WASN'T│     │     │    
+     │I HATE YOU│                                   │A QUESTION) │     │     │    
+     └──────────┘                                   └──────┬─────┘     │     │    
+                                                      ┌────▽───┐       │     │    
+                                                      │SCREW IT│       │     │    
+                                                      └────┬───┘       │     │    
+                                                           └─────┬─────┘     │    
+                                                                 │           │    
+                                                                 └─────┬─────┘    
+                                                               ┌───────▽──────┐   
+                                                               │LET'S GO DRING│   
+                                                               └───────┬──────┘   
+                                                             ┌─────────▽─────────┐
+                                                             │HEY, I SHOULD TRY  │
+                                                             │INSTALLING FREEBSD!│
+                                                             └───────────────────┘
+```
+
+
+   
+</details>
 
 # Thanks
 
