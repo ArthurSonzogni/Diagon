@@ -7,11 +7,11 @@ into an ascii-art representation.
 
 It is written in C++ and use WebAssembly, HTML and CSS to make a Web
 Application.
+We also expose a command line interface, for personal and 3rd party tools.
 
 # Web application
 
 [https://arthursonzogni.com/Diagon/](https://arthursonzogni.com/Diagon/)
-
 
 # Command line interface
 
@@ -38,6 +38,27 @@ sudo snap install diagon
 Make diagon easy to use inside your IDE. Thanks to contributors:
 - [vim-diagon](https://github.com/willchao612/vim-diagon)
 - [vscode-diagon](https://github.com/ElmouradiAmine/vscode-diagon)
+
+### [https://arthursonzogni.com/Diagon/](https://arthursonzogni.com/Diagon/)
+
+**Table of content**
+ * [Diagon](#diagon)
+ * [Build dependencies](#build-dependencies)
+ * [Generators](#generators)
+    * [Mathematic Expression](#mathematic-expression)
+    * [Sequence Diagram](#sequence-diagram)
+    * [Tree](#tree)
+    * [Frame](#frame)
+    * [Table](#table)
+    * [Planar graph](#planar-graph)
+ * [Command line interface](#command-line-interface)
+ * [Thanks](#thanks)
+
+# Build dependencies
+
+As every C++ projects, this build using cmake.
+
+On Linux, if it isn't already installed, this depends on `uuid-dev`.
 
 # Generators
 
