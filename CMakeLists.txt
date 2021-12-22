@@ -1,13 +1,31 @@
 cmake_minimum_required (VERSION 3.11)
-project(Diagon LANGUAGES C CXX)
+
+set(git_version 0)
+find_package(Git)
+if (Git_FOUND)
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} rev-list --count HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE git_version
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+endif()
+
+project(Diagon
+  LANGUAGES C CXX
+  VERSION ${git_version}
+)
 
 include(FetchContent)
+set(FETCHCONTENT_QUIET FALSE)
 
 #-------------------------------------------------------------------------------
 
 FetchContent_Declare(json
   GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent
-  GIT_TAG v3.9.1)
+  GIT_TAG v3.9.1
+  GIT_PROGRESS TRUE
+)
 
 FetchContent_GetProperties(json)
 if(NOT json_POPULATED)
@@ -19,7 +37,9 @@ endif()
 
 FetchContent_Declare(antlr
   GIT_REPOSITORY https://github.com/antlr/antlr4
-  GIT_TAG 4.8)
+  GIT_TAG 4.8
+  GIT_PROGRESS TRUE
+)
 
 FetchContent_GetProperties(antlr)
 if(NOT antlr_POPULATED)
@@ -44,7 +64,10 @@ endif()
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
 function(target_set_common target)
-  set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)
+  set_target_properties(${target} PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    CXX_STANDARD 17
+  )
   if (EMSCRIPTEN)
     # Nothing
   elseif (MSVC)
@@ -70,16 +93,6 @@ set(test_directory ${CMAKE_CURRENT_SOURCE_DIR}/test)
 #-------------------------------------------------------------------------------
 # Environment variable available in C++ source
 #-------------------------------------------------------------------------------
-
-execute_process(
-  COMMAND 
-    git rev-list --count HEAD
-  WORKING_DIRECTORY
-    ${CMAKE_SOURCE_DIR}
-  OUTPUT_VARIABLE
-    git_version
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/environment.h.in
@@ -177,21 +190,33 @@ else()
   target_set_common(input_output_test)
 endif()
 
-set(CPACK_GENERATOR "DEB")
+if (UNIX AND NOT APPLE)
+  set(CPACK_GENERATOR "DEB;External;RPM;STGZ;TBZ2;TGZ;TXZ;TZ;TZST;ZIP")
+elseif (UNIX AND APPLE)
+  set(CPACK_GENERATOR "DragNDrop;NuGet;TGZ;ZIP")
+elseif (WIN32)
+  set(CPACK_GENERATOR "DEB;NuGet;TGZ;ZIP")
+else()
+  set(CPACK_GENERATOR "ZIP")
+endif()
+
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Generate beautiful ASCII art diagrams. Diagon is a collection of interactive generators. Math formulas, sequences diagrams, graph, border, ... This is written in C++, available online with WebAssembly.")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://arthursonzogni.com/Diagon/")
 set(CPACK_PACKAGE_NAME "diagon")
 set(CPACK_PACKAGE_VENDOR "Arthur Sonzogni")
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Arthur Sonzogni")
-set(CPACK_PACKAGE_VERSION_MAJOR ${git_version})
-set(CPACK_PACKAGE_VERSION_MINOR "")
-set(CPACK_PACKAGE_VERSION_PATCH "")
-set(CPACK_DEBIAN_PACKAGE_VERSION ${git_version})
-set(CPACK_PACKAGE_HOMEPAGE_URL "https://arthursonzogni.com/Diagon/")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "
-  Generate beautiful ASCII art diagrams.
-  Diagon is a collection of interactive generators. Math formulas, sequences diagrams, graph,
-  border, ... This is written in C++, available online with WebAssembly.
-")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+
 set(CPACK_DEBIAN_PACKAGE_DEPENDS " ")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://arthursonzogni.com/Diagon/")
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE_URL "https://github.com/ArthurSonzogni/FTXUI/")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Arthur Sonzogni")
+set(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
+
+set(CPACK_RPM_PACKAGE_LICENSE MIT)
 
 include(CPack)

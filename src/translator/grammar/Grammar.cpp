@@ -54,10 +54,8 @@ struct StringReader {
 using AstRulePtr = kgt::ast_rule*;
 using Opaque = void*;
 using OpaqueRead = int(Opaque);
-using InputFunction = AstRulePtr(OpaqueRead, Opaque);
+using InputFunction = AstRulePtr(OpaqueRead, Opaque, kgt::parsing_error_queue*);
 using OutputFunction = int(const struct kgt::ast_rule*);
-
-InputFunction* f = kgt::abnf_input;
 
 std::map<std::string, InputFunction*> input_function_map = {
     {"abnf", kgt::abnf_input},         {"bnf", kgt::bnf_input},
@@ -297,14 +295,25 @@ std::string Grammar::Translate(const std::string& input,
                              ? output_function_map[option_output]
                              : kgt::rrutf8_output;
 
-  auto* model = input_function(StringReader::Read, &string_reader);
-  int error = output_function(model);
+  int error_count = 0;
+  kgt::parsing_error_queue parsing_errors = NULL;
+  auto* model =
+      input_function(StringReader::Read, &string_reader, &parsing_errors);
 
-  // Restore stdout
+  while (parsing_errors) {
+    error_count++;
+    kgt::parsing_error error;
+    parsing_error_queue_pop(&parsing_errors, &error);
+    std::cout << error.line << ":" << error.column << ":" << error.description
+              << std::endl;
+  }
+
+  int error = output_function(model);
+  (void)error;
   dup2(old_stdout, 1);
   close(old_stdout);
-
   fclose(file_write);
+
 
   auto file_read = std::ifstream("/tmp/diagon_grammer.txt");
   return std::string((std::istreambuf_iterator<char>(file_read)),
