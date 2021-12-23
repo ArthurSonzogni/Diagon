@@ -13,7 +13,7 @@ endif()
 
 project(Diagon
   LANGUAGES C CXX
-  VERSION ${git_version}
+  VERSION 1.0.124
 )
 
 include(FetchContent)
