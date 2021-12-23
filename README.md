@@ -54,11 +54,22 @@ Make diagon easy to use inside your IDE. Thanks to contributors:
  * [Command line interface](#command-line-interface)
  * [Thanks](#thanks)
 
+# Release
+
+Binaries using multiple formats are provided in the [release](https://github.com/ArthurSonzogni/Diagon/releases) section.
+
 # Build dependencies
 
-As every C++ projects, this build using cmake.
-
-On Linux, if it isn't already installed, this depends on `uuid-dev`.
+This depends on cmake, uuid-dev and libboost-graph-dev
+On Linux:
+```sh
+sudo make install uuid-dev libboost-graph-dev cmake;
+mkdir build;
+cd build;
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j
+sudo make install 
+```
 
 # Generators
 
