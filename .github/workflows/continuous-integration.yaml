@@ -203,7 +203,7 @@ jobs:
           cd build;
           mkdir -p diagon-Web;
           cp diagon.js diagon-Web;
-          cp diagon.wasm diagon-Web;
+          cp diagon*wasm diagon-Web;
           cp index.html diagon-Web;
           cp style.css diagon-Web;
           cp run_diagon.sh diagon-Web;
