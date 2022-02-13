@@ -38,9 +38,9 @@ std::vector<Node> FindTopologicalOrder(const Graph& graph) {
   int iteration = 0;
   while (work_to_do) {
     work_to_do = false;
-    for (const auto& vertex : graph) {
-      if (weight[vertex.to] <= weight[vertex.from]) {
-        weight[vertex.to] = weight[vertex.from] + 1;
+    for (const auto& edge : graph) {
+      if (weight[edge.to] <= weight[edge.from]) {
+        weight[edge.to] = weight[edge.from] + 1;
         work_to_do = true;
       }
     }
