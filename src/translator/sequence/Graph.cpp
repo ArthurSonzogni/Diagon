@@ -10,8 +10,8 @@
 
 namespace graph {
 
-Vertex::Vertex(const Node& from, const Node& to) : from(from), to(to) {}
-Vertex::Vertex(const Message& message)
+Edge::Edge(const Node& from, const Node& to) : from(from), to(to) {}
+Edge::Edge(const Message& message)
     : from({message.from, message.id}), to({message.to, message.id}) {}
 
 bool operator<(const Node& a, const Node& b) {
@@ -22,7 +22,7 @@ bool operator<(const Node& a, const Node& b) {
   return a.message < b.message;
 }
 
-bool operator<(const Vertex& a, const Vertex& b) {
+bool operator<(const Edge& a, const Edge& b) {
   if (a.from < b.from)
     return true;
   if (b.from < a.from)
@@ -30,7 +30,7 @@ bool operator<(const Vertex& a, const Vertex& b) {
   return a.to < b.to;
 }
 
-using Graph = std::set<Vertex>;
+using Graph = std::set<Edge>;
 
 std::vector<Node> FindTopologicalOrder(const Graph& graph) {
   std::map<Node, int> weight;
@@ -38,9 +38,9 @@ std::vector<Node> FindTopologicalOrder(const Graph& graph) {
   int iteration = 0;
   while (work_to_do) {
     work_to_do = false;
-    for (const auto& vertex : graph) {
-      if (weight[vertex.to] <= weight[vertex.from]) {
-        weight[vertex.to] = weight[vertex.from] + 1;
+    for (const auto& edge : graph) {
+      if (weight[edge.to] <= weight[edge.from]) {
+        weight[edge.to] = weight[edge.from] + 1;
         work_to_do = true;
       }
     }

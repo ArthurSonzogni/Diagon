@@ -591,7 +591,7 @@ void Sequence::LayoutComputeMessagesPositions() {
       if (cut.count(message.id)) {
         graph::Node from = {actor_index[message.from], message.id};
         graph::Node to = {actor_index[message.to], message.id};
-        graph.insert(graph::Vertex(from, to));
+        graph.insert(graph::Edge(from, to));
       }
     }
     std::set<int> started_message;
