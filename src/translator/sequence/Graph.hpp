@@ -19,18 +19,18 @@ struct Node {
   int message;
 };
 
-struct Vertex {
+struct Edge {
   Node from;
   Node to;
 
-  Vertex(const Node& from, const Node& to);
-  Vertex(const Message& message);
+  Edge(const Node& from, const Node& to);
+  Edge(const Message& message);
 };
 
-using Graph = std::set<Vertex>;
+using Graph = std::set<Edge>;
 
 bool operator<(const Node& a, const Node& b);
-bool operator<(const Vertex& a, const Vertex& b);
+bool operator<(const Edge& a, const Edge& b);
 std::vector<Node> FindTopologicalOrder(const Graph& graph);
 
 }  // namespace graph
