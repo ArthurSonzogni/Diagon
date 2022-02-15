@@ -443,51 +443,51 @@ class Table : public Translator {
     }
 
     // Compute row/line count.
-    int line_count = data.size();
-    int row_count = 0;
+    int row_count = data.size();
+    int column_count = 0;
     for (const auto& line : data) {
-      row_count = std::max(row_count, (int)line.size());
+      column_count = std::max(column_count, (int)line.size());
     }
 
     // Uniformize the number of cells per lines.
     for (auto& line : data) {
-      line.resize(row_count);
+      line.resize(column_count);
     }
 
-    // Compute row_width;
-    std::vector<int> row_width(row_count, 0);
+    // Compute column_width;
+    std::vector<int> column_width(column_count, 0);
     for (const auto& line : data) {
       for (int i = 0; i < line.size(); ++i) {
-        row_width[i] = std::max(row_width[i], (int)line[i].size());
+        column_width[i] = std::max(column_width[i], (int)line[i].size());
       }
     }
 
-    // Compute sum_row_width;
-    int row_width_global = 0;
-    for (const auto it : row_width) {
-      row_width_global += it;
+    // Compute sum_column_width;
+    int column_width_global = 0;
+    for (const auto it : column_width) {
+      column_width_global += it;
     }
 
     // Compute screen dimension.
-    int width = style.width[0] + style.width[1] * (row_count - 1) +
-                style.width[2] + row_width_global;
+    int width = style.width[0] + style.width[1] * (column_count - 1) +
+                style.width[2] + column_width_global;
     int height = style.height[0] + style.height[1] +
-                 style.height[2] * (line_count - 2) + style.height[3] +
-                 line_count;
+                 style.height[2] * (row_count - 2) + style.height[3] +
+                 row_count;
 
     Screen screen(width, height);
 
     // Draw table.
     int Y = 0;
-    for (int y = 0; y < line_count; ++y) {
-      bool last_line = (y == line_count - 1);
+    for (int y = 0; y < row_count; ++y) {
+      bool last_line = (y == row_count - 1);
       int X = 0;
 
       const int cell_top = Y + style.height[std::min(2, y)];
       const int cell_bottom = cell_top + 1;
 
       for (int x = 0; x < data[y].size(); ++x) {
-        bool last_row = (x == row_count - 1);
+        bool last_row = (x == column_count - 1);
         // clang-format off
         const int top_char = 
           y == 0 ? 1 :
@@ -514,7 +514,7 @@ class Table : public Translator {
         const int bottom_right_char = 21;
 
         const int cell_left = X + style.width[std::min(1,x)];
-        const int cell_right = cell_left + row_width[x];
+        const int cell_right = cell_left + column_width[x];
 
         // clang-format on
 
@@ -593,8 +593,6 @@ class Table : public Translator {
               ++i;
             }
           }
-        }
-        if (false) {
         }
 
         // Draw Text.
