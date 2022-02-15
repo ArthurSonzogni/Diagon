@@ -594,8 +594,6 @@ class Table : public Translator {
             }
           }
         }
-        if (false) {
-        }
 
         // Draw Text.
         screen.DrawText(cell_left, cell_top, data[y][x]);
