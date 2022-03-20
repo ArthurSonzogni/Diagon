@@ -1,4 +1,5 @@
 #include "translator/Factory.h"
+#include <algorithm>
 
 // List of exported translator.
 TranslatorPtr FrameTranslator();
@@ -25,6 +26,10 @@ std::vector<TranslatorPtr>& TranslatorList() {
   out.push_back(GraphDAGTranslator());
   out.push_back(GraphPlanarTranslator());
   out.push_back(FlowchartTranslator());
+
+  auto is_null = [](const TranslatorPtr& t) { return t == nullptr; };
+  out.erase(std::remove_if(out.begin(), out.end(), is_null), out.end());
+
   return out;
 }
 
