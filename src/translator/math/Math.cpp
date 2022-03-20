@@ -599,6 +599,105 @@ std::wstring ParseFunctionMultLatex(MathParser::FunctionContext* context,
   return out + L" " + ParseLatex(context->equation(0), style);
 }
 
+Draw ParseFunctionMathBB(MathParser::FunctionContext* context, Style* style) {
+  static const std::map<std::string, std::string> known = {
+      {"0", "𝟘"},      //
+      {"1", "𝟙"},      //
+      {"2", "𝟚"},      //
+      {"3", "𝟛"},      //
+      {"4", "𝟜"},      //
+      {"5", "𝟝"},      //
+      {"6", "𝟞"},      //
+      {"7", "𝟟"},      //
+      {"8", "𝟠"},      //
+      {"9", "𝟡"},      //
+      {"A", "𝔸"},      //
+      {"B", "𝔹"},      //
+      {"C", "ℂ"},      //
+      {"D", "𝔻"},      //
+      {"E", "𝔼"},      //
+      {"F", "𝔽"},      //
+      {"G", "𝔾"},      //
+      {"H", "ℍ"},      //
+      {"I", "𝕀"},      //
+      {"J", "𝕁"},      //
+      {"K", "𝕂"},      //
+      {"L", "𝕃"},      //
+      {"M", "𝕄"},      //
+      {"N", "ℕ"},      //
+      {"O", "𝕆"},      //
+      {"P", "ℙ"},      //
+      {"PI", "ℿ"},     //
+      {"Q", "ℚ"},      //
+      {"R", "ℝ"},      //
+      {"S", "𝕊"},      //
+      {"T", "𝕋"},      //
+      {"U", "𝕌"},      //
+      {"V", "𝕍"},      //
+      {"W", "𝕎"},      //
+      {"X", "𝕏"},      //
+      {"Y", "𝕐"},      //
+      {"Z", "ℤ"},      //
+      {"a", "𝕒"},      //
+      {"b", "𝕓"},      //
+      {"c", "𝕔"},      //
+      {"d", "𝕕"},      //
+      {"e", "𝕖"},      //
+      {"f", "𝕗"},      //
+      {"g", "𝕘"},      //
+      {"h", "𝕙"},      //
+      {"i", "ⅈ"},      //
+      {"i", "𝕚"},      //
+      {"j", "𝕛"},      //
+      {"k", "𝕜"},      //
+      {"l", "𝕝"},      //
+      {"m", "𝕞"},      //
+      {"n", "𝕟"},      //
+      {"o", "𝕠"},      //
+      {"p", "𝕡"},      //
+      {"pi", "ℼ"},     //
+      {"q", "𝕢"},      //
+      {"r", "𝕣"},      //
+      {"s", "𝕤"},      //
+      {"t", "𝕥"},      //
+      {"u", "𝕦"},      //
+      {"v", "𝕧"},      //
+      {"w", "𝕨"},      //
+      {"x", "𝕩"},      //
+      {"y", "𝕪"},      //
+      {"z", "𝕫"},      //
+  };
+
+  std::string name;
+  for (int i = 0; i < context->equation().size(); ++i)
+    name += context->equation(i)->getText();
+  Draw draw;
+  while (name.size() > 0) {
+    bool found = false;
+    for (const auto& it : known) {
+      if (name.rfind(it.first) == 0) {
+        name = name.substr(it.first.size());
+        draw = ComposeHorizontal(draw, Draw(to_wstring(it.second)), 0);
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      name = name.substr(1);
+      draw = ComposeHorizontal(draw, Draw(L"?"), 0);
+    }
+  }
+  return draw;
+}
+
+std::wstring ParseFunctionMathBBLatex(MathParser::FunctionContext* context,
+                                      Style* style) {
+  std::string name = context->equation(0)->getText();
+  for (int i = 1; i < context->equation().size(); ++i)
+    name += context->equation(i)->getText();
+  return L"\\mathbb{" + to_wstring(name) + L"}";
+}
+
 bool CheckFunctionIntegral(MathParser::FunctionContext* context) {
   int num_arguments = context->equation().size();
   if (num_arguments > 3) {
@@ -703,18 +802,32 @@ Draw Parse(MathParser::FunctionContext* context, Style* style) {
     return ParseFunctionIntegral(context, style);
   if (function_name == "mult")
     return ParseFunctionMult(context, style);
+  if (function_name == "mathbb" || function_name == "bb")
+    return ParseFunctionMathBB(context, style);
   return ParseFunctionCommon(context, style);
 }
 
 std::wstring ParseLatex(MathParser::FunctionContext* context, Style* style) {
   static const std::map<std::string, std::wstring> known = {
-      {"sin", L"\\sin"},       {"cos", L"\\cos"},       {"tan", L"\\tan"},
-      {"cot", L"\\cot"},       {"arcsin", L"\\arcsin"}, {"arccos", L"\\arccos"},
-      {"arctan", L"\\arctan"}, {"sinh", L"\\sinh"},     {"cosh", L"\\cosh"},
-      {"tanh", L"\\tanh"},     {"coth", L"\\coth"},     {"ln", L"\\ln"},
-      {"log", L"\\log"},       {"exp ", L"\\exp "},     {"max", L"\\max"},
-      {"min", L"\\min"},       {"ker", L"\\ker"},
+      {"arccos", L"\\arccos"},  //
+      {"arcsin", L"\\arcsin"},  //
+      {"arctan", L"\\arctan"},  //
+      {"cos", L"\\cos"},        //
+      {"cosh", L"\\cosh"},      //
+      {"cot", L"\\cot"},        //
+      {"coth", L"\\coth"},      //
+      {"exp ", L"\\exp "},      //
+      {"ker", L"\\ker"},        //
+      {"ln", L"\\ln"},          //
+      {"log", L"\\log"},        //
+      {"max", L"\\max"},        //
+      {"min", L"\\min"},        //
+      {"sin", L"\\sin"},        //
+      {"sinh", L"\\sinh"},      //
+      {"tan", L"\\tan"},        //
+      {"tanh", L"\\tanh"},      //
   };
+
   std::string function_name = context->variable()->VARIABLE()->getText();
   if (function_name == "sqrt")
     return ParseFunctionSqrtLatex(context, style);
@@ -726,6 +839,8 @@ std::wstring ParseLatex(MathParser::FunctionContext* context, Style* style) {
     return ParseFunctionMultLatex(context, style);
   if (const auto it = known.find(function_name); it != known.end())
     return ParseFunctionKnownLatex(context, style, it->second);
+  if (function_name == "mathbb" || function_name == "bb")
+    return ParseFunctionMathBBLatex(context, style);
   return ParseFunctionCommonLatex(context, style);
 }
 
@@ -976,6 +1091,9 @@ class Math : public Translator {
          "Rho + rho + Chi + chi + Delta + delta + Theta + theta + Nu + nu \n"
          "Sigma + sigma + Psi + psi + Epsilon + epsilon + Iota + iota + Xi\n"
          "xi + Tau + tau + Omega + omega"},
+        {"14-mathbb",
+         "mathbb(R)\n\nbb(R)\n\nbb(ABCDEFGHIJKLMNOPQRSTUVWXYZ)\n\nbb("
+         "abcdefghijklmnopqrstuvwxyz)\n\nbb(0123456789)"},
         {"100-continued-fraction", "psi = 1 + 1/(1+1/(1+1/(1+1/(1+...))))"},
     };
   }
