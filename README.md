@@ -605,7 +605,7 @@ Binaries using multiple formats are provided in the [release](https://github.com
 This depends on cmake, uuid-dev and libboost-graph-dev
 On Linux:
 ```sh
-sudo make install uuid-dev libboost-graph-dev cmake;
+sudo apt install make uuid-dev libboost-graph-dev cmake default-jdk;
 mkdir build;
 cd build;
 cmake .. -DCMAKE_BUILD_TYPE=Release
