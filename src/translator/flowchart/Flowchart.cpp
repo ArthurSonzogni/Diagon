@@ -7,8 +7,8 @@
 #include <string_view>
 #include <vector>
 #include "screen/Screen.h"
-
 #include "translator/Translator.h"
+#include "translator/antlr_error_listener.h"
 #include "translator/flowchart/FlowchartLexer.h"
 #include "translator/flowchart/FlowchartParser.h"
 #include "util.hpp"
@@ -636,8 +636,20 @@ std::string Flowchart::Translate(const std::string& input,
   antlr4::CommonTokenStream tokens(&lexer);
   tokens.fill();
 
+  // Parser:
   FlowchartParser parser(&tokens);
-  return Parse(parser.program(), true).screen.ToString();
+
+  AntlrErrorListener error_listener;
+  parser.addErrorListener(&error_listener);
+
+  FlowchartParser::ProgramContext* context = nullptr;
+  try {
+    context = parser.program();
+  } catch (...) {
+    return "";
+  }
+
+  return Parse(context, true).screen.ToString();
 }
 
 }  // namespace

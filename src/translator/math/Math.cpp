@@ -8,6 +8,7 @@
 #include "translator/Translator.h"
 #include "translator/math/MathLexer.h"
 #include "translator/math/MathParser.h"
+#include "translator/antlr_error_listener.h"
 
 class Screen;
 
@@ -1291,7 +1292,6 @@ class Math : public Translator {
       };
     }
 
-    //
     antlr4::ANTLRInputStream input_stream(input);
 
     // Lexer.
@@ -1300,8 +1300,16 @@ class Math : public Translator {
     tokens.fill();
 
     // Parser.
+    AntlrErrorListener error_listener;
     MathParser parser(&tokens);
-    auto* content = parser.multilineEquation();
+    parser.addErrorListener(&error_listener);
+
+    MathParser::MultilineEquationContext* content = nullptr;
+    try {
+      content = parser.multilineEquation();
+    } catch (...) {
+      return "";
+    }
 
     if (options["style"] == "Latex")
       return to_string(ParseLatex(content, &style)) + '\n';
