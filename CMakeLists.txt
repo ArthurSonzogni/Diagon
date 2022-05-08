@@ -105,6 +105,11 @@ configure_file(
 add_library(diagon_base STATIC
   src/translator/Translator.cpp
   src/translator/Translator.h
+  src/translator/antlr_error_listener.cpp
+  src/translator/antlr_error_listener.h
+)
+target_link_libraries(diagon_base
+  PRIVATE antlr4_static
 )
 target_set_common(diagon_base)
 

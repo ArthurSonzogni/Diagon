@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include "screen/Screen.h"
+#include "translator/antlr_error_listener.h"
 #include "translator/sequence/Graph.hpp"
 
 void Actor::Draw(Screen& screen, int height) {
@@ -269,10 +270,16 @@ void Sequence::ComputeInternalRepresentation(const std::string& input) {
   tokens.fill();
 
   // Parser.
+  AntlrErrorListener error_listener;
   SequenceParser parser(&tokens);
+  parser.addErrorListener(&error_listener);
 
-  // Print the tree.
-  auto program = parser.program();
+  SequenceParser::ProgramContext* program = nullptr;
+  try {
+    program = parser.program();
+  } catch (...) {
+    return;
+  }
 
   for (SequenceParser::CommandContext* command : program->command()) {
     AddCommand(command);

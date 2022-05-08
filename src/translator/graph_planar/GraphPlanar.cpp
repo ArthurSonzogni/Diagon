@@ -10,6 +10,7 @@
 #include <vector>
 #include "screen/Screen.h"
 #include "translator/Translator.h"
+#include "translator/antlr_error_listener.h"
 #include "translator/graph_planar/GraphPlanarLexer.h"
 #include "translator/graph_planar/GraphPlanarParser.h"
 
@@ -201,8 +202,18 @@ void GraphPlanar::Read(const std::string& input) {
   antlr4::CommonTokenStream tokens(&lexer);
   tokens.fill();
 
+  // Parser:
+  AntlrErrorListener error_listener;
   GraphPlanarParser parser(&tokens);
-  ReadGraph(parser.graph());
+  parser.addErrorListener(&error_listener);
+  GraphPlanarParser::GraphContext* context = nullptr;
+  try {
+    context = parser.graph();
+  } catch (...) {
+    return;
+  }
+
+  ReadGraph(context);
 }
 
 void GraphPlanar::ReadGraph(GraphPlanarParser::GraphContext* graph) {
