@@ -14,6 +14,23 @@
 #include "translator/antlr_error_listener.h"
 #include "translator/sequence/Graph.hpp"
 
+namespace {
+
+void SplitString(std::wstring input,
+                 const std::wstring& delimiter,
+                 std::vector<std::wstring>* out) {
+  size_t start = 0U;
+  size_t end = input.find(delimiter);
+  while (end != std::wstring::npos) {
+    out->push_back(input.substr(start, end - start));
+    start = end + delimiter.length();
+    end = input.find(delimiter, start);
+  }
+  out->push_back(input.substr(start));
+}
+
+}  // namespace
+
 void Actor::Draw(Screen& screen, int height) {
   screen.DrawBoxedText(left, 0, name);
   screen.DrawVerticalLine(3, height - 4, center);
@@ -211,6 +228,17 @@ std::vector<Translator::OptionDescription> Sequence::Options() {
           "Use the full unicode charset or only ASCII.",
           Widget::Checkbox,
       },
+      {
+          "interpret_backslash_n",
+          {
+              "false",
+              "true",
+          },
+          "true",
+          "Insert new lines at every occurence of '\\n' (backslash n) in the "
+          "message field.",
+          Widget::Checkbox,
+      },
   };
 }
 
@@ -254,11 +282,25 @@ std::string Sequence::Translate(const std::string& input,
 
   auto options = SerializeOption(options_string);
   ascii_only_ = (options["ascii_only"] == "true");
+  interpret_backslash_n_ = (options["interpret_backslash_n"] == "true");
 
   ComputeInternalRepresentation(input);
   UniformizeInternalRepresentation();
+  SplitByBackslashN();
   Layout();
   return Draw();
+}
+
+void Sequence::SplitByBackslashN() {
+  if (!interpret_backslash_n_) {
+    return;
+  }
+  for (auto& message : messages) {
+    std::vector<std::wstring> old = std::move(message.messages);
+    for(auto& it : old) {
+      SplitString(it, L"\\n", &message.messages);
+    }
+  }
 }
 
 void Sequence::ComputeInternalRepresentation(const std::string& input) {

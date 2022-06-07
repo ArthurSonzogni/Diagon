@@ -1,0 +1,18 @@
+┌─┐               ┌─┐
+│A│               │B│
+└┬┘               └┬┘
+ │                 │ 
+ │This is a        │ 
+ │multiline string.│ 
+ │────────────────>│ 
+ │                 │ 
+ │This is another  │ 
+ │multiline string.│ 
+ │────────────────>│ 
+ │                 │ 
+ │  This is the    │ 
+ │  last one.      │ 
+ │<────────────────│ 
+┌┴┐               ┌┴┐
+│A│               │B│
+└─┘               └─┘
