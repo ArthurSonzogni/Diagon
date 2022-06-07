@@ -211,6 +211,17 @@ std::vector<Translator::OptionDescription> Sequence::Options() {
           "Use the full unicode charset or only ASCII.",
           Widget::Checkbox,
       },
+      {
+          "new_lines_at_bsn",
+          {
+              "false",
+              "true",
+          },
+          "false",
+          "Insert new lines at every occurence of '\\n' (backslash n)\n"
+          "      in the message field.",
+          Widget::Checkbox,
+      },
   };
 }
 
@@ -254,11 +265,53 @@ std::string Sequence::Translate(const std::string& input,
 
   auto options = SerializeOption(options_string);
   ascii_only_ = (options["ascii_only"] == "true");
+  new_lines_at_bsn_ = (options["new_lines_at_bsn"] == "true");
 
   ComputeInternalRepresentation(input);
   UniformizeInternalRepresentation();
+  SplitMessagesAtBackslashNIfRequested();
   Layout();
   return Draw();
+}
+
+void Sequence::SplitMessagesAtBackslashNIfRequested() {
+  if (false == new_lines_at_bsn_) {
+    return;
+  }
+
+  auto const split_at_bslash_n_single = [](std::wstring const& input) {
+    std::vector<std::wstring> result{};
+
+    std::wstring const bslash_n = L"\\n";
+
+    std::decay_t<decltype(std::wstring::npos)> begin = 0;
+
+    while (true) {
+      auto end = input.find(bslash_n, begin);
+      if (std::wstring::npos == end) {
+        result.push_back(input.substr(begin, input.size() - begin));
+        break;
+      }
+      result.push_back(input.substr(begin, end - begin));
+      begin = end + 2;
+    }
+
+    return result;
+  };
+  auto const split_at_bslash_n = [&](std::vector<std::wstring> const& input) {
+    std::vector<std::wstring> result{};
+
+    for (auto const& e : input) {
+      auto const splitted = split_at_bslash_n_single(e);
+      result.insert(std::end(result), std::begin(splitted), std::end(splitted));
+    }
+
+    return result;
+  };
+
+  for (auto& message : messages) {
+    message.messages = split_at_bslash_n(message.messages);
+  }
 }
 
 void Sequence::ComputeInternalRepresentation(const std::string& input) {
