@@ -282,7 +282,7 @@ std::string Sequence::Translate(const std::string& input,
 
   auto options = SerializeOption(options_string);
   ascii_only_ = (options["ascii_only"] == "true");
-  interpret_backslash_n_ = (options["interpret_backslash_n"] == "true");
+  interpret_backslash_n_ = (options["interpret_backslash_n"] != "false");
 
   ComputeInternalRepresentation(input);
   UniformizeInternalRepresentation();
