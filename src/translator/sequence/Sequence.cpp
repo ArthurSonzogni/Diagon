@@ -14,6 +14,23 @@
 #include "translator/antlr_error_listener.h"
 #include "translator/sequence/Graph.hpp"
 
+namespace {
+
+void SplitString(std::wstring input,
+                 const std::wstring& delimiter,
+                 std::vector<std::wstring>* out) {
+  size_t start = 0U;
+  size_t end = input.find(delimiter);
+  while (end != std::wstring::npos) {
+    out->push_back(input.substr(start, end - start));
+    start = end + delimiter.length();
+    end = input.find(delimiter, start);
+  }
+  out->push_back(input.substr(start));
+}
+
+}  // namespace
+
 void Actor::Draw(Screen& screen, int height) {
   screen.DrawBoxedText(left, 0, name);
   screen.DrawVerticalLine(3, height - 4, center);
@@ -212,14 +229,14 @@ std::vector<Translator::OptionDescription> Sequence::Options() {
           Widget::Checkbox,
       },
       {
-          "new_lines_at_bsn",
+          "interpret_backslash_n",
           {
               "false",
               "true",
           },
-          "false",
-          "Insert new lines at every occurence of '\\n' (backslash n)\n"
-          "      in the message field.",
+          "true",
+          "Insert new lines at every occurence of '\\n' (backslash n) in the "
+          "message field.",
           Widget::Checkbox,
       },
   };
@@ -265,52 +282,24 @@ std::string Sequence::Translate(const std::string& input,
 
   auto options = SerializeOption(options_string);
   ascii_only_ = (options["ascii_only"] == "true");
-  new_lines_at_bsn_ = (options["new_lines_at_bsn"] == "true");
+  interpret_backslash_n_ = (options["interpret_backslash_n"] == "true");
 
   ComputeInternalRepresentation(input);
   UniformizeInternalRepresentation();
-  SplitMessagesAtBackslashNIfRequested();
+  SplitByBackslashN();
   Layout();
   return Draw();
 }
 
-void Sequence::SplitMessagesAtBackslashNIfRequested() {
-  if (false == new_lines_at_bsn_) {
+void Sequence::SplitByBackslashN() {
+  if (!interpret_backslash_n_) {
     return;
   }
-
-  auto const split_at_bslash_n_single = [](std::wstring const& input) {
-    std::vector<std::wstring> result{};
-
-    std::wstring const bslash_n = L"\\n";
-
-    std::decay_t<decltype(std::wstring::npos)> begin = 0;
-
-    while (true) {
-      auto end = input.find(bslash_n, begin);
-      if (std::wstring::npos == end) {
-        result.push_back(input.substr(begin, input.size() - begin));
-        break;
-      }
-      result.push_back(input.substr(begin, end - begin));
-      begin = end + 2;
-    }
-
-    return result;
-  };
-  auto const split_at_bslash_n = [&](std::vector<std::wstring> const& input) {
-    std::vector<std::wstring> result{};
-
-    for (auto const& e : input) {
-      auto const splitted = split_at_bslash_n_single(e);
-      result.insert(std::end(result), std::begin(splitted), std::end(splitted));
-    }
-
-    return result;
-  };
-
   for (auto& message : messages) {
-    message.messages = split_at_bslash_n(message.messages);
+    std::vector<std::wstring> old = std::move(message.messages);
+    for(auto& it : old) {
+      SplitString(it, L"\\n", &message.messages);
+    }
   }
 }
 

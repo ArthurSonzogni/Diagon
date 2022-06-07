@@ -1,0 +1,3 @@
+A -> B: This is a\nmultiline string.
+A -> B: This is another\nmultiline string.
+B -> A: This is the \nlast one.

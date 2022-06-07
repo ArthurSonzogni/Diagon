@@ -100,7 +100,7 @@ class Sequence : public Translator {
   void UniformizeActors();
   void UniformizeMessageID();
 
-  void SplitMessagesAtBackslashNIfRequested();
+  void SplitByBackslashN();
 
   // 3) Layout.
   void Layout();
@@ -127,5 +127,5 @@ class Sequence : public Translator {
   std::map<int, int> message_index;
 
   bool ascii_only_;
-  bool new_lines_at_bsn_ = false;
+  bool interpret_backslash_n_ = false;
 };
