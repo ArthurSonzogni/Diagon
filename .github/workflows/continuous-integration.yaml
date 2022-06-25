@@ -38,12 +38,12 @@ jobs:
             test: false
             cmake: "emcmake cmake"
 
-          #- name: "MacOS clang"
-            #os: macos-latest
-            #cc: clang
-            #cxx: clang++
-            #test: true
-            #cmake: cmake
+          - name: "MacOS GCC"
+            os: macos-latest
+            cc: /usr/local/opt/gcc/bin/gcc-11
+            cxx: /usr/local/opt/gcc/bin/g++-11
+            test: true
+            cmake: cmake
 
           #- name: "Windows MSVC"
             #os: windows-latest
@@ -74,9 +74,11 @@ jobs:
         with:
           boost_version: 1.73.0
 
-      - name: "Install boost for macOS"
+      - name: "Install dependencies for macOS"
         if: runner.os == 'macOS'
-        run: brew install boost
+        run: |
+          brew install gcc
+          brew install boost
 
       - name: "Setup Emscripten"
         if: ${{ matrix.cc  == 'emcc' }}
