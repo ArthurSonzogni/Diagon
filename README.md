@@ -18,10 +18,10 @@ We also expose a command line interface, for personal and 3rd party tools.
 Diagon is also usable as a command line tool.
 For instance:
 ```bash
-echo "1+1/2 + sum(i,0,10) = 112/2" | diagon Math
+echo "1+1/2 + sum(i,0,10) = 113/2" | diagon Math
             10         
           ___        
-      1   ╲       112
+      1   ╲       113
   1 + ─ + ╱   i = ───
       2   ‾‾‾      2 
            0         
