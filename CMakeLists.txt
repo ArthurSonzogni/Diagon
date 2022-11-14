@@ -187,9 +187,6 @@ if (EMSCRIPTEN)
   #set_target_properties(diagon PROPERTIES SUFFIX ".wasm")
 
 else()
-  target_link_libraries(diagon_lib PRIVATE -static-libstdc++)
-  target_link_libraries(diagon_lib PRIVATE stdc++fs)
-
   install(TARGETS diagon RUNTIME DESTINATION "bin")
 
   add_executable(input_output_test src/input_output_test.cpp)
