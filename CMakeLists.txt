@@ -1,21 +1,11 @@
 cmake_minimum_required (VERSION 3.11)
 
-set(git_version 0)
-find_package(Git)
-if (Git_FOUND)
-  execute_process(
-    COMMAND ${GIT_EXECUTABLE} rev-list --count HEAD
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    OUTPUT_VARIABLE git_version
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-endif()
-message(STATUS "diagon git_version: ${git_version}")
-
 project(Diagon
   LANGUAGES C CXX
   VERSION 1.0.127
 )
+
+option(DIAGON_BUILD_TESTS_FUZZER "Set to ON to enable fuzzing" OFF)
 
 include(FetchContent)
 set(FETCHCONTENT_QUIET FALSE)
@@ -224,3 +214,7 @@ set(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_RPM_PACKAGE_LICENSE MIT)
 
 include(CPack)
+
+if (DIAGON_BUILD_TESTS_FUZZER)
+  include(cmake/diagon_fuzzer.cmake)
+endif()

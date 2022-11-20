@@ -286,6 +286,8 @@ std::string Sequence::Translate(const std::string& input,
 
   ComputeInternalRepresentation(input);
   UniformizeInternalRepresentation();
+  if (actors.size() == 0)
+    return "";
   SplitByBackslashN();
   Layout();
   return Draw();
@@ -537,7 +539,8 @@ void Sequence::LayoutComputeActorsPositions() {
     spaces.push_back(space);
   }
 
-  actors[0].center = actors[0].name.size() / 2 + 1;
+  if (actors.size() != 0)
+    actors[0].center = actors[0].name.size() / 2 + 1;
 
   bool modified = true;
   int i = 0;
