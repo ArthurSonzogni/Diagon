@@ -1,12 +1,12 @@
-set(DIAGON_TOOLS_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "")
-
 # ┌─────────────────────────────────────────────────┐
 # │ ANTLR                                           │
 # └─────────────────────────────────────────────────┘
-execute_process(
-  COMMAND bash download_and_patch.sh
-  WORKING_DIRECTORY ${DIAGON_TOOLS_DIR}
-)
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/antlr.jar")
+  execute_process(
+    COMMAND curl http://www.antlr.org/download/antlr-4.11.1-complete.jar -L -o antlr.jar
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+endif()
 
 # Function
 #   ANTLR(<file.g4>)
@@ -26,20 +26,20 @@ function(ANTLR source)
   get_filename_component(source_gen_dir  ${CMAKE_CURRENT_BINARY_DIR}/${source} DIRECTORY)
   add_custom_command(
     OUTPUT
-      ${source_gen_dir}/${source_filename}Lexer.cpp
-      ${source_gen_dir}/${source_filename}Parser.cpp
-      ${source_gen_dir}/${source_filename}Lexer.h
-      ${source_gen_dir}/${source_filename}Parser.h
+    ${source_gen_dir}/${source_filename}Lexer.cpp
+    ${source_gen_dir}/${source_filename}Parser.cpp
+    ${source_gen_dir}/${source_filename}Lexer.h
+    ${source_gen_dir}/${source_filename}Parser.h
     COMMAND
-      java
+    java
     ARGS
-      -jar ${DIAGON_TOOLS_DIR}/antlr.jar
-      -Dlanguage=Cpp
-      -no-listener
-      -no-visitor
-      -o ${source_gen_dir}
-      ${source_src_dir}/${source_filename}.g4
+    -jar ${CMAKE_BINARY_DIR}/antlr.jar
+    -Dlanguage=Cpp
+    -no-listener
+    -no-visitor
+    -o ${source_gen_dir}
+    ${source_src_dir}/${source_filename}.g4
     MAIN_DEPENDENCY
-      ${source_src_dir}/${source_filename}.g4
-  )
+    ${source_src_dir}/${source_filename}.g4
+    )
 endfunction()

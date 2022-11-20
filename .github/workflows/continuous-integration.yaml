@@ -15,87 +15,93 @@ jobs:
   test:
     name: "Tests"
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: "Linux GCC"
             os: ubuntu-latest
-            cc: gcc
-            cxx: g++
+            compiler: gcc
             test: true
-            cmake: cmake
 
           - name: "Linux Clang"
             os: ubuntu-latest
-            cc: clang
-            cxx: clang++
+            compiler: llvm
             test: true
-            cmake: cmake
 
           - name: "Linux emscripten"
             os: ubuntu-latest
-            cc: emcc
-            cxx: "em++"
-            test: false
-            cmake: "emcmake cmake"
+            emscripten: true
 
-          - name: "MacOS GCC"
+          - name: "MacOS clang"
             os: macos-latest
-            cc: /usr/local/opt/gcc/bin/gcc-11
-            cxx: /usr/local/opt/gcc/bin/g++-11
-            test: true
-            cmake: cmake
-
-          #- name: "Windows MSVC"
-            #os: windows-latest
-            #cc: cl
-            #cxx: cl
-            #test: false
-            #cmake: cmake
+            compiler: llvm
 
     runs-on: ${{ matrix.os }}
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v2
 
-      - name: "Enable MSVC command prompt"
-        if: matrix.os == 'windows-latest'
-        uses: ilammy/msvc-dev-cmd@v1
+      - name: "Setup Cpp"
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          vcvarsall: ${{ contains(matrix.os, 'windows' )}}
+          cmake: true
+          ninja: true
+          clangtidy: false
+          cppcheck: false
+          gcovr: "5.0"
+          opencppcoverage: false
 
-      - name: "Install cmake"
-        uses: lukka/get-cmake@latest
+      - name: "Setup Java"
+        uses: actions/setup-java@v3
+        if: ${{ runner.os == 'macOS' }}
+        with:
+          distribution: "temurin"
+          java-version: '17'
+          check-latest: true
 
       - name: "Install Linux Dependencies"
-        if: runner.os == 'Linux'
+        if: ${{ runner.os == 'Linux' }}
         run: sudo apt install libboost-graph-dev uuid-dev
 
       - name: "Install boost for windows"
-        if: runner.os == 'Windows'
+        if: ${{ runner.os == 'Windows' }}
         uses: MarkusJx/install-boost@v1.0.1
         with:
           boost_version: 1.73.0
 
       - name: "Install dependencies for macOS"
-        if: runner.os == 'macOS'
+        if: ${{ runner.os == 'macOS' }}
         run: |
           brew install gcc
           brew install boost
 
       - name: "Setup Emscripten"
-        if: ${{ matrix.cc  == 'emcc' }}
+        if: ${{ matrix.emscripten }}
         uses: mymindstorm/setup-emsdk@v7
 
-      - name: "Build debug mode"
+      - name: "Configure cmake with emscripten"
+        if: ${{ matrix.emscripten }}
         run: >
-          mkdir build;
-          cd build;
-          ${{ matrix.cmake }} ..
-          -DCMAKE_BUILD_TYPE=Debug
-          -DCMAKE_C_COMPILER=${{ matrix.cc }}
-          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }};
-          cmake --build . --config Release
+          emcmake cmake -S .
+          -B ./build
+          -DCMAKE_BUILD_TYPE:STRING=Debug;
+
+      - name: "Configure CMake"
+        if: ${{ !matrix.emscripten }}
+        run: >
+          cmake -S .
+          -B ./build
+          -DCMAKE_BUILD_TYPE:STRING=Debug;
+
+      - name: "Build"
+        run: >
+          cmake
+          --build ./build
 
       - name: "Run tests"
-        if: matrix.test
+        if: ${{ matrix.test }}
         run: >
           cd build;
           ./input_output_test
@@ -126,81 +132,100 @@ jobs:
         include:
           - name: "Linux Clang"
             os: ubuntu-latest
-            cc: clang
-            cxx: clang++
-            cmake: cmake
+            compiler: llvm
             asset_path: build/diagon*Linux*
 
           - name: "Linux emscripten"
             os: ubuntu-latest
-            cc: emcc
-            cxx: em++
-            cmake: "emcmake cmake"
+            compiler: llvm
+            emscripten: true
             asset_path: build/diagon-Web.zip
 
-          #- name: "MacOS clang"
-            #os: macos-latest
-            #cc: clang
-            #cxx: clang++
-            #test: true
-            #cmake: cmake
-            #asset_path: build/diagon*Darwin*
+          - name: "MacOS"
+            os: macos-latest
+            compiler: llvm
+            asset_path: build/ftxui*Darwin*
 
-          #- name: "Windows MSVC"
-            #os: windows-latest
-            #cc: cl
-            #cxx: cl
-            #test: false
-            #cmake: cmake
-            #asset_path: build/diagon*Win64*
+          - name: "Windows"
+            os: windows-latest
+            compiler: cl
+            asset_path: build/ftxui*Win64*
 
     runs-on: ${{ matrix.os }}
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v2
 
-      - name: "Enable MSVC command prompt"
-        if: matrix.os == 'windows-latest'
-        uses: ilammy/msvc-dev-cmd@v1
+      - name: "Setup Cpp"
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          vcvarsall: ${{ contains(matrix.os, 'windows' )}}
+          cmake: true
+          ninja: true
+          clangtidy: false
+          cppcheck: false
+          gcovr: "5.0"
+          opencppcoverage: false
 
-      - name: "Install cmake"
-        uses: lukka/get-cmake@latest
+      - name: "Setup Java"
+        uses: actions/setup-java@v3
+        if: ${{ runner.os == 'macOS' }}
+        with:
+          distribution: "temurin"
+          java-version: '17'
+          check-latest: true
 
       - name: "Install Linux Dependencies"
-        if: runner.os == 'Linux'
-        run: sudo apt install libboost-graph-dev uuid-dev zip
+        if: ${{ runner.os == 'Linux' }}
+        run: sudo apt install libboost-graph-dev uuid-dev
 
       - name: "Install boost for windows"
-        if: runner.os == 'Windows'
+        if: ${{ runner.os == 'Windows' }}
         uses: MarkusJx/install-boost@v1.0.1
         with:
           boost_version: 1.73.0
 
+      - name: "Install dependencies for macOS"
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          brew install gcc
+          brew install boost
+
       - name: "Setup Emscripten"
-        if: ${{ matrix.cc  == 'emcc' }}
+        if: ${{ matrix.emscripten }}
         uses: mymindstorm/setup-emsdk@v7
 
-      - name: "Build release mode"
+      - name: "Configure cmake with emscripten"
+        if: ${{ matrix.emscripten }}
         run: >
-          mkdir build;
-          cd build;
-          ${{ matrix.cmake }} ..
-          -DCMAKE_BUILD_TYPE=Release
-          -DCMAKE_C_COMPILER=${{ matrix.cc }}
-          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }};
-          cmake --build . --config Release;
-          make package;
+          emcmake cmake -S .
+          -B ./build
+          -DCMAKE_BUILD_TYPE:STRING=Release;
+
+      - name: "Configure CMake"
+        if: ${{ !matrix.emscripten }}
+        run: >
+          cmake -S .
+          -B ./build
+          -DCMAKE_BUILD_TYPE:STRING=Release;
+
+      - name: "Build"
+        run: >
+          cmake
+          --build ./build
+          --target package;
 
       - name: "Upload native binaries"
         uses: shogo82148/actions-upload-release-asset@v1
-        if: ${{ matrix.cc != 'emcc'}}
+        if: ${{ !matrix.emscripten }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ${{ matrix.asset_path }}
           overwrite: true
 
       - name: "Make webAssembly distribution"
-        if: ${{ matrix.cc  == 'emcc' }}
+        if: ${{ matrix.emscripten }}
         run: >
           cd build;
           mkdir -p diagon-Web;
@@ -213,7 +238,7 @@ jobs:
           zip -r diagon-Web.zip diagon-Web;
 
       - name: "Upload WebAssembly distribution"
-        if: ${{ matrix.cc  == 'emcc' }}
+        if: ${{ matrix.emscripten }}
         uses: shogo82148/actions-upload-release-asset@v1
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}

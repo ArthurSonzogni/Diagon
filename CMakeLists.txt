@@ -1,8 +1,9 @@
 cmake_minimum_required (VERSION 3.11)
 
+set(git_version 139)
 project(Diagon
   LANGUAGES C CXX
-  VERSION 1.0.127
+  VERSION 1.0.${git_version}
 )
 
 option(DIAGON_BUILD_TESTS_FUZZER "Set to ON to enable fuzzing" OFF)
@@ -28,7 +29,7 @@ endif()
 
 FetchContent_Declare(antlr
   GIT_REPOSITORY https://github.com/antlr/antlr4
-  GIT_TAG 4.8
+  GIT_TAG 4.11.1
   GIT_PROGRESS TRUE
 )
 
