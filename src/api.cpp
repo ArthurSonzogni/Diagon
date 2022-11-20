@@ -20,6 +20,8 @@ std::string API(const Translator::Widget& type) {
     case Translator::Widget::Checkbox:
       return "checkbox";
   }
+  // NOTREACHED
+  return "combobox";
 }
 
 json API(const Translator::OptionDescription& option) {

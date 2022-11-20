@@ -1,10 +1,12 @@
 cmake_minimum_required (VERSION 3.11)
 
+set(git_version 139)
 project(Diagon
   LANGUAGES C CXX
-  VERSION 1.0.127
+  VERSION 1.0.${git_version}
 )
 
+option(DIAGON_BUILD_TESTS "Set to ON to build tests" OFF)
 option(DIAGON_BUILD_TESTS_FUZZER "Set to ON to enable fuzzing" OFF)
 
 include(FetchContent)
@@ -28,7 +30,7 @@ endif()
 
 FetchContent_Declare(antlr
   GIT_REPOSITORY https://github.com/antlr/antlr4
-  GIT_TAG 4.8
+  GIT_TAG 4.11.1
   GIT_PROGRESS TRUE
 )
 
@@ -78,8 +80,6 @@ set(test_directory ${CMAKE_CURRENT_SOURCE_DIR}/test)
 # Include source files and the generated files
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-
-set(test_directory ${CMAKE_CURRENT_SOURCE_DIR}/test)
 
 #-------------------------------------------------------------------------------
 # Environment variable available in C++ source
@@ -178,10 +178,6 @@ if (EMSCRIPTEN)
 
 else()
   install(TARGETS diagon RUNTIME DESTINATION "bin")
-
-  add_executable(input_output_test src/input_output_test.cpp)
-  target_link_libraries(input_output_test diagon_lib)
-  target_set_common(input_output_test)
 endif()
 
 if (UNIX AND NOT APPLE)
@@ -214,6 +210,10 @@ set(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_RPM_PACKAGE_LICENSE MIT)
 
 include(CPack)
+
+if (DIAGON_BUILD_TESTS)
+  include(cmake/diagon_test.cmake)
+endif()
 
 if (DIAGON_BUILD_TESTS_FUZZER)
   include(cmake/diagon_fuzzer.cmake)

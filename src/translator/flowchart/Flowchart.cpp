@@ -282,7 +282,7 @@ std::vector<std::wstring_view> Split(std::wstring_view str,
 std::vector<std::wstring_view> Broke(std::wstring_view content, int size) {
   std::vector<std::wstring_view> words = Split(content, L" ");
   std::vector<std::wstring_view> lines;
-  int last_line_size = 0;
+  size_t last_line_size = 0;
   for (auto& word : words) {
     if (last_line_size == 0 && word.size() >= size) {
       lines.push_back(word);
@@ -295,9 +295,10 @@ std::vector<std::wstring_view> Broke(std::wstring_view content, int size) {
         lines.push_back(word);
         last_line_size = word.size();
       } else {
-        int size = std::distance(lines.back().begin(), word.end());
-        auto concat = std::wstring_view(lines.back().begin(), size);
-        lines.back() = concat;
+        std::wstring_view last_line = lines.back();
+        size_t size = std::distance(last_line.begin(), word.end());
+        std::wstring_view new_last_line(&last_line[0], size);
+        lines.back() = new_last_line;
         last_line_size = size;
       }
       continue;
@@ -446,26 +447,26 @@ Draw Boxed(std::string content, bool is_final) {
   return draw;
 }
 
-Draw Text(std::string content, bool is_final) {
-  Draw draw;
-  draw.screen.Resize(content.size() + 5, 3);
-  draw.screen.DrawText(2, 1, to_wstring(content));
+//Draw Text(std::string content, bool is_final) {
+  //Draw draw;
+  //draw.screen.Resize(content.size() + 5, 3);
+  //draw.screen.DrawText(2, 1, to_wstring(content));
 
-  draw.up.x = draw.screen.width() / 2;
-  draw.up.y = 0;
+  //draw.up.x = draw.screen.width() / 2;
+  //draw.up.y = 0;
 
-  draw.down.x = draw.screen.width() / 2;
-  draw.down.y = draw.screen.height() - 1;
+  //draw.down.x = draw.screen.width() / 2;
+  //draw.down.y = draw.screen.height() - 1;
 
-  draw.left.x = 0;
-  draw.left.y = draw.screen.height() / 2;
+  //draw.left.x = 0;
+  //draw.left.y = draw.screen.height() / 2;
 
-  draw.right.x = draw.screen.width() - 1;
-  draw.right.y = draw.screen.height() / 2;
+  //draw.right.x = draw.screen.width() - 1;
+  //draw.right.y = draw.screen.height() / 2;
 
-  draw.returned = is_final;
-  return draw;
-}
+  //draw.returned = is_final;
+  //return draw;
+//}
 
 Draw Unimplemented(bool is_final) {
   return Boxed("Unimplemented", is_final);

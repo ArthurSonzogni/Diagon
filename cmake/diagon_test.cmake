@@ -1,0 +1,3 @@
+add_executable(input_output_test src/input_output_test.cpp)
+target_link_libraries(input_output_test diagon_lib)
+target_set_common(input_output_test)
