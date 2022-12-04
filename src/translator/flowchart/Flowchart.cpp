@@ -128,22 +128,20 @@ Draw ConnectVertically(Draw a,
   if (height == 0)
     return b;
 
-  if (a.returned) {
-    Draw out;
-
+  if (a.bottom.size() == 0 || b.top.size() == 0) {
     a_shift = Point{0, 0};
-    b_shift = Point{0, a.screen.height()};
+    b_shift = Point{0, height};
 
+    Draw out;
     out.screen.Append(a.screen, a_shift.x, a_shift.y);
     out.screen.Append(b.screen, b_shift.x, b_shift.y);
-    Shift(a, a_shift);
-    Shift(b, b_shift);
 
     out.left = Merge(a.left, b.left);
     out.right = Merge(a.right, b.right);
     out.top = a.top;
     out.bottom = b.bottom;
     out.returned = b.returned;
+    
     return out;
   }
 
@@ -173,8 +171,14 @@ Draw ConnectVertically(Draw a,
   auto& top = out.screen.Pixel(a.bottom[0].x, a.bottom[0].y);
   if (top == L'─')
     top = L'┬';
+
   auto& bottom = out.screen.Pixel(b.top[0].x, b.top[0].y);
-  bottom = L'▽';
+  if (bottom == L'─')
+    bottom = L'▽';
+  if (bottom == L'-')
+    bottom = L'▽';
+  if (bottom == L' ')
+    bottom = L'│';
 
   out.returned = b.returned;
   return out;
@@ -189,26 +193,14 @@ Draw ConnectHorizontally(Draw a,
     return b;
   }
 
-  if (a.returned) {
-    Draw out;
-    a_shift = Point{0, 0};
-    b_shift = Point{a.screen.width(), 0};
-    out.screen.Append(a.screen, 0, 0);
-    out.screen.Append(b.screen, a.screen.width(), 0);
-    Shift(a, a_shift);
-    Shift(b, b_shift);
-
-    out.top = Merge(a.top, b.top);
-    out.left = a.left;
-    out.right = b.right;
-    out.bottom = Merge(a.bottom, b.bottom);
-
-    out.returned = b.returned;
-    return out;
-  }
-
-  a_shift = Point{0, 0};
-  b_shift = Point{width, a_shift.y + a.right[0].y - b.left[0].y};
+  a_shift = Point{
+      0,
+      0,
+  };
+  b_shift = Point{
+      width,
+      a_shift.y + a.right[0].y - b.left[0].y,
+  };
 
   int shifting = std::max(0, a_shift.y - b_shift.y);
   a_shift.y += shifting;
@@ -226,7 +218,7 @@ Draw ConnectHorizontally(Draw a,
   out.right = b.right;
   out.bottom = Merge(a.bottom, b.bottom);
 
-  out.returned = b.returned;
+  out.returned = a.returned || b.returned;
 
   out.screen.DrawHorizontalLine(a.right[0].x + 1, b.left[0].x - 1, a.right[0].y,
                                 L'_');
@@ -277,11 +269,10 @@ Draw ParseUnmerged(FlowchartParser::ConditionContext* condition, bool is_final);
 
 Draw Noop() {
   Draw draw;
-  draw.screen.Resize(1,1);
-  // draw.screen.Pixel(0,0) = L'─';
+  draw.screen.Resize(1, 1);
   draw.left = {{0, 0}};
   draw.right = {{0, 0}};
-  draw.bottom = {{0, 1}};
+  draw.bottom = {{0, 0}};
   draw.top = {{0, 0}};
   return draw;
 }
@@ -558,6 +549,8 @@ Draw Parse(FlowchartParser::ConditionContext* condition, bool is_final) {
 
 Draw Parse(FlowchartParser::ReturninstructionContext* instruction) {
   Draw draw = Parse(instruction->instruction(), true);
+  draw.bottom = {};
+  draw.right = {};
   draw.returned = true;
   return draw;
 }

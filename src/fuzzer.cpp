@@ -25,6 +25,7 @@ std::string GeneratorString(const char*& data, size_t& size) {
 
 extern "C" int LLVMFuzzerTestOneInput(const char* data, size_t size) {
   auto& translators = TranslatorList();
+  //auto* translator = FindTranslator("Flowchart");
   auto& translator = translators[GeneratorInt(data, size) % translators.size()];
   std::string input = GeneratorString(data, size);
   std::string options = GeneratorString(data, size);
