@@ -71,78 +71,110 @@ struct Point {
   int y;
 };
 
+Point operator+(const Point& a, const Point& b) {
+  return Point{
+      a.x + b.x,
+      a.y + b.y,
+  };
+}
+
+void operator+=(Point& a, const Point& b) {
+  a.x += b.x;
+  a.y += b.y;
+}
+
 struct Draw {
-  Point up;
-  Point down;
-  Point left;
-  Point right;
   Screen screen;
+  std::vector<Point> top;
+  std::vector<Point> left;
+  std::vector<Point> bottom;
+  std::vector<Point> right;
   bool returned = false;
 };
 
+std::vector<Point> Merge(const std::vector<Point> a,
+                         const std::vector<Point> b) {
+  std::vector<Point> out;
+  for (Point it : a)
+    out.push_back(it);
+  for (Point it : b)
+    out.push_back(it);
+  return out;
+}
+
+void Shift(std::vector<Point>& out, Point shift) {
+  for (auto& it : out) {
+    it += shift;
+  }
+}
+
+void Shift(Draw& out, Point shift) {
+  Shift(out.top, shift);
+  Shift(out.left, shift);
+  Shift(out.bottom, shift);
+  Shift(out.right, shift);
+}
+
+
 Point static_point;
+Point static_point_1;
+Point static_point_2;
 
 Draw ConnectVertically(Draw a,
                        Draw b,
-                       Point& a_right = static_point,
-                       Point& b_left = static_point) {
+                       Point& a_shift = static_point_1,
+                       Point& b_shift = static_point_2) {
   int height = a.screen.height();
   if (height == 0)
     return b;
 
   if (a.returned) {
     Draw out;
-    out.screen.Append(a.screen, 0, 0);
-    out.screen.Append(b.screen, 0, a.screen.height());
 
-    out.left = a.left;
-    out.up = a.up;
-    a_right = a.right;
+    a_shift = Point{0, 0};
+    b_shift = Point{0, a.screen.height()};
 
-    out.right = b.right;
-    out.down = b.down;
-    b_left = b.left;
+    out.screen.Append(a.screen, a_shift.x, a_shift.y);
+    out.screen.Append(b.screen, b_shift.x, b_shift.y);
+    Shift(a, a_shift);
+    Shift(b, b_shift);
 
-    out.right.y += a.screen.height();
-    out.down.y += a.screen.height();
-    b_left.y += a.screen.height();
-
+    out.left = Merge(a.left, b.left);
+    out.right = Merge(a.right, b.right);
+    out.top = a.top;
+    out.bottom = b.bottom;
     out.returned = b.returned;
     return out;
   }
 
-  int a_x = 0;
-  int a_y = 0;
-  int b_x = a_x + a.down.x - b.up.x;
-  int b_y = height;
-  int shifting = std::max(0, a_x - b_x);
-  a_x += shifting;
-  b_x += shifting;
+  a_shift = Point{0, 0};
+  b_shift = Point{a_shift.x + a.bottom[0].x - b.top[0].x, height};
+
+  int shifting = std::max(0, a_shift.x - b_shift.x);
+  a_shift.x += shifting;
+  b_shift.x += shifting;
 
   Draw out;
-  out.screen.Append(a.screen, a_x, a_y);
-  out.screen.Append(b.screen, b_x, b_y);
+  out.screen.Append(a.screen, a_shift.x, a_shift.y);
+  out.screen.Append(b.screen, b_shift.x, b_shift.y);
 
-  out.up.x = a_x + a.up.x;
-  out.up.y = 0;
-  out.down.x = b_x + b.down.x;
-  out.down.y = out.screen.height() - 1;
+  Shift(a, a_shift);
+  Shift(b, b_shift);
 
-  out.left.x = a_x + a.left.x;
-  out.left.y = a.left.y;
+  out.left = Merge(a.left, b.left);
+  out.right = Merge(a.right, b.right);
+  out.top = a.top;
+  out.bottom = b.bottom;
+  out.returned = b.returned;
 
-  out.right.x = b_x + b.right.x;
-  out.right.y = height + b.right.y;
+  out.screen.DrawVerticalLineComplete(a.bottom[0].y + 1, b.top[0].y - 1,
+                                      a.bottom[0].x);
 
-  a_right.x = a_x + a.right.x;
-  a_right.y = a_y + a.right.y;
-
-  b_left.x = b_x + b.left.x;
-  b_left.y = b_y + b.left.y;
-
-  int edge_x = a_x + a.down.x;
-  out.screen.DrawVerticalLineComplete(a_y + a.down.y, b_y + b.up.y, edge_x);
-  out.screen.Pixel(edge_x, height) = L'▽';
+  auto& top = out.screen.Pixel(a.bottom[0].x, a.bottom[0].y);
+  if (top == L'─')
+    top = L'┬';
+  auto& bottom = out.screen.Pixel(b.top[0].x, b.top[0].y);
+  bottom = L'▽';
 
   out.returned = b.returned;
   return out;
@@ -150,110 +182,116 @@ Draw ConnectVertically(Draw a,
 
 Draw ConnectHorizontally(Draw a,
                          Draw b,
-                         Point& a_down = static_point,
-                         Point& b_up = static_point) {
+                         Point& a_shift = static_point_1,
+                         Point& b_shift = static_point_2) {
   int width = a.screen.width();
-  if (width == 0)
+  if (width == 0) {
     return b;
+  }
 
   if (a.returned) {
     Draw out;
+    a_shift = Point{0, 0};
+    b_shift = Point{a.screen.width(), 0};
     out.screen.Append(a.screen, 0, 0);
     out.screen.Append(b.screen, a.screen.width(), 0);
+    Shift(a, a_shift);
+    Shift(b, b_shift);
 
-    out.up = a.up;
+    out.top = Merge(a.top, b.top);
     out.left = a.left;
-    a_down = a.down;
-
-    out.down = b.down;
     out.right = b.right;
-    b_up = b.up;
-
-    out.down.x += a.screen.width();
-    out.right.x += a.screen.width();
-    b_up.x += a.screen.width();
+    out.bottom = Merge(a.bottom, b.bottom);
 
     out.returned = b.returned;
     return out;
   }
 
-  int a_x = 0;
-  int a_y = 0;
-  int b_y = a_y + a.right.y - b.left.y;
-  int b_x = width;
+  a_shift = Point{0, 0};
+  b_shift = Point{width, a_shift.y + a.right[0].y - b.left[0].y};
 
-  int shifting = std::max(0, a_y - b_y);
-  a_y += shifting;
-  b_y += shifting;
+  int shifting = std::max(0, a_shift.y - b_shift.y);
+  a_shift.y += shifting;
+  b_shift.y += shifting;
 
   Draw out;
-  out.screen.Append(a.screen, a_x, a_y);
-  out.screen.Append(b.screen, b_x, b_y);
+  out.screen.Append(a.screen, a_shift.x, a_shift.y);
+  out.screen.Append(b.screen, b_shift.x, b_shift.y);
 
-  out.left.x = 0;
-  out.left.y = a_y + a.left.y;
+  Shift(a, a_shift);
+  Shift(b, b_shift);
 
-  out.right.x = out.screen.width() - 1;
-  out.right.y = b_y + b.right.y;
+  out.top = Merge(a.top, b.top);
+  out.left = a.left;
+  out.right = b.right;
+  out.bottom = Merge(a.bottom, b.bottom);
 
-  out.up.x = a_x + a.up.x;
-  out.up.y = a_y + a.up.y;
-
-  out.down.x = b_x + b.down.x;
-  out.down.y = b_y + b.down.y;
-
-  b_up = b.up;
-  b_up.x += width;
-  b_up.y += b_y;
-
-  a_down = a.down;
-  a_down.x += 0;
-  a_down.y += a_y;
-
-  int edge_y = a_y + a.right.y;
-
-  //auto& left = out.screen.Pixel(width - 1, edge_y);
-  //auto& right = out.screen.Pixel(width, edge_y);
-
-  ////if (left == L'│')
-    ////left = L'├';
-  ////else
-    ////left = L'─';
-
-  ////right = L'>';
-
-  out.screen.DrawHorizontalLine(a_x + a.right.x + 1, b_x + b.left.x - 1,
-                                edge_y, L'_');
   out.returned = b.returned;
+
+  out.screen.DrawHorizontalLine(a.right[0].x + 1, b.left[0].x - 1, a.right[0].y,
+                                L'_');
   return out;
+}
+
+Draw MergeBottoms(Draw draw) {
+  if (draw.bottom.size() <= 1) {
+    return draw;
+  }
+  draw.screen.Resize(draw.screen.width(), draw.screen.height() + 1);
+
+  int left = draw.bottom.front().x;
+  int right = draw.bottom.back().x;
+  draw.screen.DrawHorizontalLine(left, right, draw.screen.height() - 1, L'─');
+
+  for(auto& it : draw.bottom) {
+    draw.screen.DrawVerticalLine(it.y + 1, draw.screen.height() - 2, it.x,
+                                 L'│');
+    auto& top = draw.screen.Pixel(it.x, it.y);
+    if (top == L'─')
+      top = L'┬';
+
+    auto& bottom = draw.screen.Pixel(it.x, draw.screen.height() - 1);
+    if (bottom == L'─')
+      bottom = L'┴';
+  }
+
+  draw.screen.Pixel(left, draw.screen.height() - 1) = L'└';
+  draw.screen.Pixel(right, draw.screen.height() - 1) = L'┘';
+
+  draw.bottom = {{(5 * left + 2 * right) / 7, draw.screen.height() - 1}};
+  return draw;
 }
 
 Draw Boxed(std::string content, bool is_final);
 Draw Unimplemented(bool is_final);
 Draw Parse(FlowchartParser::ElementContext* element, bool is_final);
 Draw Parse(FlowchartParser::ConditionContext* condition, bool is_final);
-// std::string Parse(FlowchartParser::WhileloopContext* whileloop);
-// std::string Parse(FlowchartParser::DoloopContext* doloop);
 Draw Parse(FlowchartParser::GroupContext* group, bool is_final);
 Draw Parse(FlowchartParser::InstructionContext* instruction, bool is_final);
 Draw Parse(FlowchartParser::ProgramContext* program, bool is_final);
 Draw Parse(FlowchartParser::NoopContext* instruction, bool is_final);
+// std::string Parse(FlowchartParser::WhileloopContext* whileloop);
+// std::string Parse(FlowchartParser::DoloopContext* doloop);
+
+Draw ParseUnmerged(FlowchartParser::ConditionContext* condition, bool is_final);
 
 Draw Noop() {
   Draw draw;
   draw.screen.Resize(1,1);
-  //draw.screen.Pixel(0,0) = L'─';
-  draw.left = {0, 0};
-  draw.right = {0, 0};
-  draw.down= {0, 0};
-  draw.up = {0, 0};
-  draw.down.y++;
+  // draw.screen.Pixel(0,0) = L'─';
+  draw.left = {{0, 0}};
+  draw.right = {{0, 0}};
+  draw.bottom = {{0, 1}};
+  draw.top = {{0, 0}};
   return draw;
 }
 
 Draw Parse(FlowchartParser::NoopContext* instruction, bool is_final) {
   Draw draw = Noop();
   draw.returned = is_final;
+  if (is_final) {
+    draw.bottom = {};
+  }
   return draw;
 }
 
@@ -399,18 +437,10 @@ Draw Diamond(std::string content, bool is_final) {
   width = out.screen.width();
   height = out.screen.height();
 
-  out.up.x = width / 2 - 1 + width%2;
-  out.up.y = 0;
-
-  out.down.x = width / 2 - 1 + width%2;
-  out.down.y = height - 1;
-
-  out.left.x = 0;
-  out.left.y = height / 2;
-
-  out.right.x = width - 1;
-  out.right.y = height / 2;
-
+  out.top = {{width / 2 - 1 + width % 2, 0}};
+  out.bottom = {{width / 2 - 1 + width%2, height - 1}};
+  out.left = {{0, height / 2}};
+  out.right = {{width - 1, height / 2}};
   out.returned = is_final;
 
   return out;
@@ -431,17 +461,10 @@ Draw Boxed(std::string content, bool is_final) {
   for (int i = 0; i < lines.size(); ++i)
     draw.screen.DrawText(1, 1 + i, lines[i]);
 
-  draw.up.x = width / 2;
-  draw.up.y = 0;
-
-  draw.down.x = width / 2;
-  draw.down.y = height - 1;
-
-  draw.left.x = 0;
-  draw.left.y = height / 2;
-
-  draw.right.x = width - 1;
-  draw.right.y = height / 2;
+  draw.top = {{width / 2, 0}};
+  draw.bottom = {{width / 2, height - 1}};
+  draw.left = {{0,height / 2}};
+  draw.right = {{width - 1, height / 2}};
 
   draw.returned = is_final;
   return draw;
@@ -452,11 +475,11 @@ Draw Boxed(std::string content, bool is_final) {
   //draw.screen.Resize(content.size() + 5, 3);
   //draw.screen.DrawText(2, 1, to_wstring(content));
 
-  //draw.up.x = draw.screen.width() / 2;
-  //draw.up.y = 0;
+  //draw.top.x = draw.screen.width() / 2;
+  //draw.top.y = 0;
 
-  //draw.down.x = draw.screen.width() / 2;
-  //draw.down.y = draw.screen.height() - 1;
+  //draw.bottom.x = draw.screen.width() / 2;
+  //draw.bottom.y = draw.screen.height() - 1;
 
   //draw.left.x = 0;
   //draw.left.y = draw.screen.height() / 2;
@@ -500,78 +523,28 @@ void AddLabel(Screen& screen, Point point, std::wstring_view label) {
   screen.Append(label_screen, point.x + 1, point.y + 1);
 }
 
-Draw Parse(FlowchartParser::ConditionContext* condition, bool is_final) {
-  if (condition->instruction().size() == 1) {
-    //Point if_right;
-    Draw if_ = Diamond(Parse(condition->string()), /*is_final=*/false);
-    Draw then_ = Parse(condition->instruction()[0], is_final);
-    Draw all = ConnectHorizontally(if_, then_);
-    if (is_final)
-      return all;
-    all.screen.Resize(all.screen.width(), all.screen.height() + 1);
-    all.screen.DrawHorizontalLine(if_.down.x, all.down.x,
-                                  all.screen.height() - 1);
-    all.screen.DrawVerticalLineComplete(if_.down.y, all.screen.height() - 1,
-                                        if_.down.x);
-    all.screen.DrawVerticalLineComplete(all.down.y, all.screen.height() - 1,
-                                        all.down.x);
-    all.right.x = all.down.x;
-    all.right.y = all.screen.height() - 1;
-
-    all.down.x = if_.down.x;
-    all.down.y = all.screen.height() - 1;
-    return all;
-  }
-
-  Point if_right;
+Draw ParseUnmerged(FlowchartParser::ConditionContext* condition,
+                     bool is_final) {
   Draw if_ = Diamond(Parse(condition->string()), /*is_final=*/false);
-  AddLabel(if_.screen, if_.down, L"no");
-  AddLabel(if_.screen, if_.right, L"yes");
-  if_.down.y++;
-
+  AddLabel(if_.screen, if_.bottom[0], L"no");
+  AddLabel(if_.screen, if_.right[0], L"yes");
   Draw then_ = Parse(condition->instruction()[0], is_final);
+
+  // An 'if' without an 'else':
+  if (condition->instruction().size() == 1) {
+    return ConnectHorizontally(std::move(if_), std::move(then_));
+  }
+
   Draw else_ = Parse(condition->instruction()[1], is_final);
-  Draw left = ConnectVertically(if_, else_, if_right);
-  left.returned = false;
-  left.right = if_right;
-  Draw all = ConnectHorizontally(left, then_);
-  if (is_final || (then_.returned && else_.returned)) {
-    all.returned = true;
-    return all;
-  }
-  all.returned = false;
+  else_.right = {};
+  Draw if_else_ = ConnectVertically(std::move(if_), std::move(else_));
+  Draw if_then_else_ =
+      ConnectHorizontally(std::move(if_else_), std::move(then_));
+  return if_then_else_;
+}
 
-  all.screen.Resize(all.screen.width(), all.screen.height() + 1);
-
-  if (else_.returned) {
-    all.screen.DrawVerticalLineComplete(all.down.y, all.screen.height() - 1,
-                                        all.down.x);
-    all.down.y = all.screen.height() - 1;
-    return all;
-  }
-
-  if (then_.returned) {
-    all.screen.DrawVerticalLineComplete(left.down.y, all.screen.height() - 1,
-                                        left.down.x);
-    all.down.x = left.down.x;
-    all.down.y = all.screen.height() - 1;
-    all.right.x = left.down.x;
-    all.right.y = all.screen.height() - 1;
-    return all;
-  }
-
-  all.screen.DrawHorizontalLine(left.down.x, all.down.x,
-                                all.screen.height() - 1);
-  all.screen.DrawVerticalLineComplete(left.down.y, all.screen.height() - 1,
-                                      left.down.x);
-  all.screen.DrawVerticalLineComplete(all.down.y, all.screen.height() - 1,
-                                      all.down.x);
-  all.right.x = all.down.x;
-  all.right.y = all.screen.height() - 1;
-
-  all.down.x = (left.down.x + all.down.x) / 2;
-  all.down.y = all.screen.height() - 1;
-  return all;
+Draw Parse(FlowchartParser::ConditionContext* condition, bool is_final) {
+  return ParseUnmerged(condition, is_final);
 }
 
 // std::string Parse(FlowchartParser::WhileloopContext* whileloop) {
@@ -622,6 +595,7 @@ Draw Parse(FlowchartParser::ProgramContext* program, bool is_final) {
   Draw out;
   int n = program->instruction().size();
   for (int i = 0; i < n; ++i) {
+    out = MergeBottoms(std::move(out));
     out = ConnectVertically(std::move(out), Parse(program->instruction()[i],
                                                   is_final && (i == n - 1)));
   }
