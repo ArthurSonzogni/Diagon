@@ -44,6 +44,7 @@ int main(int, const char**) {
   int result = EXIT_SUCCESS;
   std::string path = test_directory;
   std::cout << "test_directory = " << test_directory << std::endl;
+
   for (auto& dir : std::filesystem::directory_iterator(path)) {
     std::string translator_name;
     std::string options;
@@ -72,7 +73,7 @@ int main(int, const char**) {
         std::cout << output << std::endl;
         std::cout << "---------------------" << std::endl;
 
-        std::ofstream(test.path() / "output") << output_computed;
+        //std::ofstream(test.path() / "output") << output_computed;
 
         result = EXIT_FAILURE;
       }

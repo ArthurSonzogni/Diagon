@@ -1,2 +1,6 @@
-while("arthur")
-  "chocolat"
+while("arthur") {
+  "chocolat 1"
+  "chocolat 2"
+}
+
+"then"

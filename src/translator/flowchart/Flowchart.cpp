@@ -262,7 +262,7 @@ Draw Parse(FlowchartParser::GroupContext* group, bool is_final);
 Draw Parse(FlowchartParser::InstructionContext* instruction, bool is_final);
 Draw Parse(FlowchartParser::ProgramContext* program, bool is_final);
 Draw Parse(FlowchartParser::NoopContext* instruction, bool is_final);
-// std::string Parse(FlowchartParser::WhileloopContext* whileloop);
+Draw Parse(FlowchartParser::WhileloopContext* whileloop, bool is_final);
 // std::string Parse(FlowchartParser::DoloopContext* doloop);
 
 Draw ParseUnmerged(FlowchartParser::ConditionContext* condition, bool is_final);
@@ -562,8 +562,8 @@ Draw Parse(FlowchartParser::InstructionContext* instruction, bool is_final) {
   if (instruction->condition())
     return Parse(instruction->condition(), is_final);
 
-  // if (instruction->whileloop())
-  // return Parse(instruction->whileloop());
+  if (instruction->whileloop())
+    return Parse(instruction->whileloop(), is_final);
 
   // if (instruction->doloop())
   // return Parse(instruction->doloop());
@@ -618,6 +618,74 @@ std::string Flowchart::Translate(const std::string& input,
   }
 
   return Parse(context, true).screen.ToString();
+}
+
+Draw Parse(FlowchartParser::WhileloopContext* whileloop, bool is_final) {
+  Draw if_ = Diamond(Parse(whileloop->string()), /*is_final=*/false);
+  Screen if_screen;
+  std::swap(if_.screen, if_screen);
+  if_.screen.Append(std::move(if_screen), 4, 0);
+  Shift(if_, Point{4, 0});
+
+  AddLabel(if_.screen, if_.bottom[0], L"yes");
+
+  Point no_position = if_.left[0];
+  no_position.x -= 4;
+  AddLabel(if_.screen, no_position, L"no");
+
+  Draw instruction = Parse(whileloop->instruction(), is_final);
+  instruction = MergeBottoms(instruction);
+
+  Point if_left = if_.left[0];
+  Point if_right = if_.right[0];
+
+  Point if_shift;
+  Point instruction_shift;
+  Draw merged = ConnectVertically(std::move(if_), std::move(instruction),
+                                  if_shift, instruction_shift);
+  if_left += if_shift;
+  if_right += if_shift;
+
+  Draw out;
+  out.screen.Append(merged.screen, 1, 0);
+  out.screen.Resize(out.screen.width()+2, out.screen.height() + 1);
+
+
+  //  --- if_left                   if_right ----
+  //                                            |
+  //             instruction_bottom             |
+  //                     |                      |
+  //                     |                      |
+  //                     -----------------------
+
+
+  out.screen.DrawHorizontalLine(1, if_left.x, if_left.y, '_');
+
+  if (merged.bottom.size()) {
+    out.screen.DrawHorizontalLine(if_right.x + 2, out.screen.width() - 2,
+                                  if_right.y, '_');
+    out.screen.DrawHorizontalLine(merged.bottom[0].x + 2, out.screen.width() - 1,
+                                  out.screen.height() - 1, L'─');
+    out.screen.DrawVerticalLineComplete(
+        merged.bottom[0].y + 1, out.screen.height() - 2, merged.bottom[0].x + 1);
+    out.screen.DrawVerticalLineComplete(if_right.y+1, out.screen.height() - 1,
+                                        out.screen.width() - 1);
+    out.screen.Pixel(merged.bottom[0].x + 1, out.screen.height() - 1) = L'└';
+    out.screen.Pixel(out.screen.width()-1, out.screen.height() - 1) = L'┘';
+    auto& connector =
+        out.screen.Pixel(merged.bottom[0].x + 1, merged.bottom[0].y);
+    if (connector == L'─')
+      connector = L'┬';
+  }
+
+  out.top = {merged.top[0] + if_shift};
+  out.left = {};
+  out.right = {};
+  out.bottom = {Point{0, if_left.y}};
+
+  out.returned = false;
+
+  return out;
 }
 
 }  // namespace
