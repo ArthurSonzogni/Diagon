@@ -103,6 +103,7 @@ target_link_libraries(diagon_base
 )
 target_set_common(diagon_base)
 
+set(Boost_USE_STATIC_LIBS   ON)
 add_subdirectory(src/screen)
 add_subdirectory(src/translator/frame)
 add_subdirectory(src/translator/grammar)

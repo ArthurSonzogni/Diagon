@@ -54,7 +54,6 @@ int main(int, const char**) {
       if (!translator) {
         std::cout << "Translator " << translator_name << " not found."
                   << std::endl;
-        result = EXIT_FAILURE;
         continue;
       }
 

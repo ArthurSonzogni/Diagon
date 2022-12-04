@@ -1,6 +1,6 @@
 find_package(Boost COMPONENTS graph)
 
-if (Boost_FOUND OR EMSCRIPTEN)
+if (NOT APPLE AND (Boost_FOUND OR EMSCRIPTEN))
   ANTLR(GraphPlanar.g4)
   add_library(translator_graph_planar STATIC
     GraphPlanarLexer.cpp
