@@ -1,0 +1,8 @@
+while("Hungry") {
+  "eat";
+  while("Thursty") {
+    "drink"
+  }
+}
+
+"Sleep"

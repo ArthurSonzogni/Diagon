@@ -35,7 +35,7 @@ std::vector<Translator::Example> Flowchart::Examples() {
   return {
       {
           "xkcd - Flowchart explained by flowchart",
-R"source(
+          R"source(
 if ("DO YOU UNDERSTAND FLOW CHARTS?")
   "GOOD!";
 else if ("OKAY, YOU SEE THE LINE LABELED 'YES'?") {
@@ -61,6 +61,30 @@ else if ("OKAY, YOU SEE THE LINE LABELED 'YES'?") {
 "LET'S GO DRING";
 "HEY, I SHOULD TRY INSTALLING FREEBSD!"
 
+)source",
+      },
+      {
+          "xkcd - local computer expert",
+          R"source(
+"START";
+
+do {
+  if ("FIND A MENU ITEM OR BUTTON WHICH LOOKS RELATED TO WHAT YOU WANT TO DO.") {
+    "CLICK IT.";
+  } else {
+    if ("PICK ON AT RANDOM.") {
+      "CLICK IT.";
+    } else {
+      "GOOGLE THE NAME OF THE PROGRAM PLUS A FEW WORDS RELATED TO WHAT YOU WANT TO DO. FOLLOW ANY INSTRUCTIONS.";
+    }
+  }
+
+  if ("DID IT WORK?")
+    return "YOU'RE DONE!"
+
+} while("HAVE YOU BEEN TRYING THIS FOR LESS THAN AN HOUR?")
+
+"ASK SOMEONE FOR HELP OR GIVE UP."
 )source",
       },
   };
@@ -115,8 +139,6 @@ void Shift(Draw& out, Point shift) {
   Shift(out.right, shift);
 }
 
-
-Point static_point;
 Point static_point_1;
 Point static_point_2;
 
@@ -141,7 +163,7 @@ Draw ConnectVertically(Draw a,
     out.top = a.top;
     out.bottom = b.bottom;
     out.returned = b.returned;
-    
+
     return out;
   }
 
@@ -176,6 +198,8 @@ Draw ConnectVertically(Draw a,
   if (bottom == L'─')
     bottom = L'▽';
   if (bottom == L'-')
+    bottom = L'▽';
+  if (bottom == L'_')
     bottom = L'▽';
   if (bottom == L' ')
     bottom = L'│';
@@ -235,7 +259,7 @@ Draw MergeBottoms(Draw draw) {
   int right = draw.bottom.back().x;
   draw.screen.DrawHorizontalLine(left, right, draw.screen.height() - 1, L'─');
 
-  for(auto& it : draw.bottom) {
+  for (auto& it : draw.bottom) {
     draw.screen.DrawVerticalLine(it.y + 1, draw.screen.height() - 2, it.x,
                                  L'│');
     auto& top = draw.screen.Pixel(it.x, it.y);
@@ -263,7 +287,7 @@ Draw Parse(FlowchartParser::InstructionContext* instruction, bool is_final);
 Draw Parse(FlowchartParser::ProgramContext* program, bool is_final);
 Draw Parse(FlowchartParser::NoopContext* instruction, bool is_final);
 Draw Parse(FlowchartParser::WhileloopContext* whileloop, bool is_final);
-// std::string Parse(FlowchartParser::DoloopContext* doloop);
+Draw Parse(FlowchartParser::DoloopContext* doloop, bool is_final);
 
 Draw ParseUnmerged(FlowchartParser::ConditionContext* condition, bool is_final);
 
@@ -357,7 +381,7 @@ std::vector<std::wstring_view> Broke(std::wstring_view content) {
 
   do {
     right--;
-  } while (Broke(content, right).size() == lines_number);
+  } while (Broke(content, right).size() == lines_number && right >= 0);
   right++;
 
   return Broke(content, right);
@@ -395,7 +419,7 @@ Draw Diamond(std::string content, bool is_final) {
   std::vector<std::wstring_view> lines = Broke(content_ws);
   if (lines.size() % 2) {
     lines.push_back(L"");
-    std::rotate(lines.rbegin(), lines.rbegin() + 1, lines.rend());
+    // std::rotate(lines.rbegin(), lines.rbegin() + 1, lines.rend());
   }
 
   int width = 0;
@@ -407,29 +431,29 @@ Draw Diamond(std::string content, bool is_final) {
   width = width + height + 2;
 
   Draw out;
-  out.screen.Resize(width, height+3);
+  out.screen.Resize(width, height + 3);
 
-  for (int x = height / 2+1; x < width - height / 2-1; ++x) {
+  for (int x = height / 2 + 1; x < width - height / 2 - 1; ++x) {
     out.screen.Pixel(x, 0) = L'_';
-    out.screen.Pixel(x, height+2) = L'_';
+    out.screen.Pixel(x, height + 2) = L'_';
   }
 
-  for (int i = 0; i < height/2+1; ++i) {
-    int I = width-i-1;
-    out.screen.Pixel(i,1+height/2-i+0) = L'╱';
-    out.screen.Pixel(i,1+height/2+i+1) = L'╲';
-    out.screen.Pixel(I,1+height/2-i+0) = L'╲';
-    out.screen.Pixel(I,1+height/2+i+1) = L'╱';
+  for (int i = 0; i < height / 2 + 1; ++i) {
+    int I = width - i - 1;
+    out.screen.Pixel(i, 1 + height / 2 - i + 0) = L'╱';
+    out.screen.Pixel(i, 1 + height / 2 + i + 1) = L'╲';
+    out.screen.Pixel(I, 1 + height / 2 - i + 0) = L'╲';
+    out.screen.Pixel(I, 1 + height / 2 + i + 1) = L'╱';
   }
 
-  for(int i = 0; i<lines.size(); ++i)
-    out.screen.DrawText(height/2+1, i+2, lines[i]);
+  for (int i = 0; i < lines.size(); ++i)
+    out.screen.DrawText(height / 2 + 1, i + 2, lines[i]);
 
   width = out.screen.width();
   height = out.screen.height();
 
   out.top = {{width / 2 - 1 + width % 2, 0}};
-  out.bottom = {{width / 2 - 1 + width%2, height - 1}};
+  out.bottom = {{width / 2 - 1 + width % 2, height - 1}};
   out.left = {{0, height / 2}};
   out.right = {{width - 1, height / 2}};
   out.returned = is_final;
@@ -454,32 +478,32 @@ Draw Boxed(std::string content, bool is_final) {
 
   draw.top = {{width / 2, 0}};
   draw.bottom = {{width / 2, height - 1}};
-  draw.left = {{0,height / 2}};
+  draw.left = {{0, height / 2}};
   draw.right = {{width - 1, height / 2}};
 
   draw.returned = is_final;
   return draw;
 }
 
-//Draw Text(std::string content, bool is_final) {
-  //Draw draw;
-  //draw.screen.Resize(content.size() + 5, 3);
-  //draw.screen.DrawText(2, 1, to_wstring(content));
+// Draw Text(std::string content, bool is_final) {
+// Draw draw;
+// draw.screen.Resize(content.size() + 5, 3);
+// draw.screen.DrawText(2, 1, to_wstring(content));
 
-  //draw.top.x = draw.screen.width() / 2;
-  //draw.top.y = 0;
+// draw.top.x = draw.screen.width() / 2;
+// draw.top.y = 0;
 
-  //draw.bottom.x = draw.screen.width() / 2;
-  //draw.bottom.y = draw.screen.height() - 1;
+// draw.bottom.x = draw.screen.width() / 2;
+// draw.bottom.y = draw.screen.height() - 1;
 
-  //draw.left.x = 0;
-  //draw.left.y = draw.screen.height() / 2;
+// draw.left.x = 0;
+// draw.left.y = draw.screen.height() / 2;
 
-  //draw.right.x = draw.screen.width() - 1;
-  //draw.right.y = draw.screen.height() / 2;
+// draw.right.x = draw.screen.width() - 1;
+// draw.right.y = draw.screen.height() / 2;
 
-  //draw.returned = is_final;
-  //return draw;
+// draw.returned = is_final;
+// return draw;
 //}
 
 Draw Unimplemented(bool is_final) {
@@ -515,7 +539,7 @@ void AddLabel(Screen& screen, Point point, std::wstring_view label) {
 }
 
 Draw ParseUnmerged(FlowchartParser::ConditionContext* condition,
-                     bool is_final) {
+                   bool is_final) {
   Draw if_ = Diamond(Parse(condition->string()), /*is_final=*/false);
   AddLabel(if_.screen, if_.bottom[0], L"no");
   AddLabel(if_.screen, if_.right[0], L"yes");
@@ -565,8 +589,8 @@ Draw Parse(FlowchartParser::InstructionContext* instruction, bool is_final) {
   if (instruction->whileloop())
     return Parse(instruction->whileloop(), is_final);
 
-  // if (instruction->doloop())
-  // return Parse(instruction->doloop());
+  if (instruction->doloop())
+    return Parse(instruction->doloop(), is_final);
 
   if (instruction->group())
     return Parse(instruction->group(), is_final);
@@ -648,8 +672,7 @@ Draw Parse(FlowchartParser::WhileloopContext* whileloop, bool is_final) {
 
   Draw out;
   out.screen.Append(merged.screen, 1, 0);
-  out.screen.Resize(out.screen.width()+2, out.screen.height() + 1);
-
+  out.screen.Resize(out.screen.width() + 2, out.screen.height() + 1);
 
   //  --- if_left                   if_right ----
   //                                            |
@@ -658,20 +681,21 @@ Draw Parse(FlowchartParser::WhileloopContext* whileloop, bool is_final) {
   //                     |                      |
   //                     -----------------------
 
-
   out.screen.DrawHorizontalLine(1, if_left.x, if_left.y, '_');
 
   if (merged.bottom.size()) {
     out.screen.DrawHorizontalLine(if_right.x + 2, out.screen.width() - 2,
                                   if_right.y, '_');
-    out.screen.DrawHorizontalLine(merged.bottom[0].x + 2, out.screen.width() - 1,
+    out.screen.DrawHorizontalLine(merged.bottom[0].x + 2,
+                                  out.screen.width() - 1,
                                   out.screen.height() - 1, L'─');
-    out.screen.DrawVerticalLineComplete(
-        merged.bottom[0].y + 1, out.screen.height() - 2, merged.bottom[0].x + 1);
-    out.screen.DrawVerticalLineComplete(if_right.y+1, out.screen.height() - 1,
+    out.screen.DrawVerticalLineComplete(merged.bottom[0].y + 1,
+                                        out.screen.height() - 2,
+                                        merged.bottom[0].x + 1);
+    out.screen.DrawVerticalLineComplete(if_right.y + 1, out.screen.height() - 1,
                                         out.screen.width() - 1);
     out.screen.Pixel(merged.bottom[0].x + 1, out.screen.height() - 1) = L'└';
-    out.screen.Pixel(out.screen.width()-1, out.screen.height() - 1) = L'┘';
+    out.screen.Pixel(out.screen.width() - 1, out.screen.height() - 1) = L'┘';
     auto& connector =
         out.screen.Pixel(merged.bottom[0].x + 1, merged.bottom[0].y);
     if (connector == L'─')
@@ -686,6 +710,53 @@ Draw Parse(FlowchartParser::WhileloopContext* whileloop, bool is_final) {
   out.returned = false;
 
   return out;
+}
+
+Draw Parse(FlowchartParser::DoloopContext* doloop, bool is_final) {
+  Draw instruction = MergeBottoms(Parse(doloop->instruction(), is_final));
+  instruction.left = {};
+  instruction.right = {};
+  Draw if_ = Diamond(Parse(doloop->string()), /*is_final=*/false);
+  Point instruction_position;
+  Point if_position;
+  Draw merged = ConnectVertically(std::move(instruction), std::move(if_),
+                                  instruction_position, if_position);
+  //                     |_______________
+  //                     |               |
+  //                  [     ]            |
+  //                     |               |
+  //                    / \   if_right --
+  //                    \ /
+  //                     |
+  //                     |
+  merged.left = {};
+  merged.right = {};
+
+  AddLabel(merged.screen, merged.bottom[0], L"no");
+  AddLabel(merged.screen, merged.right[0], L"yes");
+
+  // |___
+  // |
+  // Add 2 empty line above
+  Screen merged_screen;
+  std::swap(merged.screen, merged_screen);
+  merged.screen.Resize(merged_screen.width() + 1, merged_screen.height() + 2);
+  merged.screen.Append(std::move(merged_screen), 0, 2);
+  Shift(merged, Point{0, 2});
+
+  merged.screen.DrawHorizontalLine(merged.right[0].x + 1,
+                                   merged.screen.width() - 1,
+                                   merged.right[0].y + 2, L'_');
+  merged.screen.DrawHorizontalLine(merged.top[0].x + 1,
+                                   merged.screen.width() - 1, 1, L'─');
+  merged.screen.DrawVerticalLineComplete(1, merged.right[0].y + 2,
+                                         merged.screen.width() - 1);
+
+  merged.screen.DrawVerticalLineComplete(0, 2, merged.top[0].x);
+
+  merged.screen.Pixel(merged.screen.width() - 1, 1) = L'╮';
+  merged.screen.Pixel(merged.top[0].x + 1, 1) = L'◁';
+  return merged;
 }
 
 }  // namespace
