@@ -1,0 +1,7 @@
+while("arthur") {
+  "chocolat 1";
+  "chocolat 2";
+  return "coucou";
+}
+
+"else"
