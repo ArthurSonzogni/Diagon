@@ -458,13 +458,13 @@ void Sequence::AddMessageCommand(
   Message message;
   if (auto dependency_id = message_command->dependencyID()) {
     message.id =
-        std::stoi(dependency_id->number()->Number()->getSymbol()->getText());
+        std::stoi(dependency_id->number()->NUMBER()->getSymbol()->getText());
   }
 
   message.from = GetText(message_command->text(0));
   message.to = GetText(message_command->text(1));
 
-  if (message_command->arrow()->NormalLeftArrow()) {
+  if (message_command->arrow()->ARROW_LEFT()) {
     std::swap(message.from, message.to);
   }
 
@@ -486,9 +486,9 @@ void Sequence::AddDependencyCommand(
     auto numbers = dependency->number();
     auto comparison = dependency->comparison();
     for (int i = 0; i < comparison.size(); ++i) {
-      int left = std::stoi(numbers[i]->Number()->getSymbol()->getText());
-      int right = std::stoi(numbers[i + 1]->Number()->getSymbol()->getText());
-      if (comparison[i]->More()) {
+      int left = std::stoi(numbers[i]->NUMBER()->getSymbol()->getText());
+      int right = std::stoi(numbers[i + 1]->NUMBER()->getSymbol()->getText());
+      if (comparison[i]->GREATER()) {
         std::swap(left, right);
       }
       actor.dependencies.insert(Dependency{left, right});
@@ -501,7 +501,7 @@ std::wstring Sequence::GetText(SequenceParser::TextContext* text) {
 }
 
 int Sequence::GetNumber(SequenceParser::NumberContext* number) {
-  return std::stoi(number->Number()->getSymbol()->getText());
+  return std::stoi(number->NUMBER()->getSymbol()->getText());
 }
 
 void Sequence::Layout() {
@@ -698,4 +698,40 @@ std::string Sequence::Draw() {
 
 std::unique_ptr<Translator> SequenceTranslator() {
   return std::make_unique<Sequence>();
+}
+
+std::string Sequence::Highlight(const std::string& input) {
+  std::stringstream out;
+
+  antlr4::ANTLRInputStream input_stream(input);
+
+  // Lexer.
+  SequenceLexer lexer(&input_stream);
+  antlr4::CommonTokenStream tokens(&lexer);
+
+  try {
+    tokens.fill();
+  }
+  catch (...) {  // Ignore
+  }
+
+  size_t matched = 0;
+  out << "<span class='Sequence'>";
+  for(antlr4::Token* token : tokens.getTokens()) {
+    std::string text = token->getText();
+    if (text == "<EOF>") {
+      continue;
+    }
+    out << "<span class='";
+    out << lexer.getVocabulary().getSymbolicName(token->getType());
+    out << "'>";
+    matched += text.size();
+    out << std::move(text);
+    out << "</span>";
+  }
+
+  out << input.substr(matched);
+  out << "</span>";
+
+  return out.str();
 }

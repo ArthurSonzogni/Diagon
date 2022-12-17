@@ -12,6 +12,7 @@
     <meta name="robots" content="index, follow">
 
     <link rel="canonical" href="https://arthursonzogni.com/Diagon/" />
+
     <link rel="stylesheet" type="text/css" href="./style.css">
 
     <link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
@@ -85,15 +86,20 @@
 
         <!--2 Input / Output -->
         <div class="container device-orientation flex">
-          <textarea
-            aria-label="input"
-            id="input"
-            class="flex"
-            placeholder='input'
-            wrap="soft"
-            ></textarea>
 
-          <div class="container vertical flex">
+          <div id="input" class="highlight-container flex-equal">
+            <textarea
+              autofocus
+              spellcheck="false"
+              aria-label="input"
+              placeholder='input'
+              wrap="soft"
+              ></textarea>
+            <div id="highlights" aria-hidden="true"></div>
+          </div>
+
+
+          <div class="container flex-equal vertical">
             <div id="latex" class="flex displaylatex"></div>
             <iframe id="html" class="flex displayhtml"></iframe>
             <div class="copy-wrapper">
@@ -101,384 +107,398 @@
                 Copy
               </div>
             </div>
-            <textarea
-              aria-label="output"
-              id="output"
-              class="flex"
-              placeholder='output'
-              readonly
-              wrap="soft"
-            ></textarea>
+
+            <div id="output" class="highlight-container flex">
+              <textarea
+                spellcheck="false"
+                aria-label="output"
+                class="flex"
+                placeholder='output'
+                readonly
+                wrap="soft"
+                ></textarea>
+            </div>
           </div>
 
         </div>
 
-        <div class="gutter"></div>
-
         <!--3 Errors-->
-        <textarea
-          aria-label="Errors"
-          id="errors"
-          placeholder='errors'
-          readonly
-          rows=3
-          class="nonflex"></textarea>
+        <div id="errors" class="highlight-container nonflex">
+          <textarea
+            spellcheck="false"
+            aria-label="Errors"
+            placeholder='errors'
+            readonly
+            rows=3
+          ></textarea>
+        </div>
 
       </div>
     </div>
-<script>
+    <script>
 
-const tools = document.querySelector('#tools');
-const examples = document.querySelector('#examples');
-const options = document.querySelector('#options');
-const input = document.querySelector('#input');
-const output = document.querySelector('#output');
-const errors = document.querySelector('#errors');
-let tools_data = [];
-const style_button = document.querySelector("#style_button");
-const theme_style = document.querySelector("#theme_style");
-const latex = document.querySelector('#latex');
-const html = document.querySelector('#html');
+      const tools = document.querySelector('#tools');
+      const examples = document.querySelector('#examples');
+      const options = document.querySelector('#options');
+      const input = document.querySelector('#input > textarea');
+      const highlights = document.querySelector('#input > #highlights');
+      const output = document.querySelector('#output > textarea');
+      const errors = document.querySelector('#errors > textarea');
+      let tools_data = [];
+      const style_button = document.querySelector("#style_button");
+      const theme_style = document.querySelector("#theme_style");
+      const latex = document.querySelector('#latex');
+      const html = document.querySelector('#html');
 
-errors.value = ''; 
-function ClearSelectBox(select_box) {
-  while(select_box.options.length > 0)
-    select_box.options[0] = null;
-}
-
-function UpdateTools() {
-  ClearSelectBox(tools);
-  for(let i in tools_data) {
-    let tool = tools_data[i];
-    tools.options[i] = new Option(tool.description, i);
-  }
-}
-
-function UpdateExamples() {
-  let index = tools.value;
-  let tool = tools_data[index];
-  ClearSelectBox(examples);
-  examples.options = [];
-  examples.options.add(new Option("---------", -1));
-  for(let i in tool.examples)
-    examples.options.add(new Option(tool.examples[i].title, i));
-}
-
-let nextInstance = 0;
-function UpdateOptions() {
-  while(options.firstChild)
-    options.removeChild(options.firstChild);
-
-  let index = tools.value;
-  let tool = tools_data[index];
-  for(let i in tool.options) {
-    let option = tool.options[i];
-
-    let option_box = document.createElement('p');
-    option_box.className = "option";
-
-    let instance = "instance-" + nextInstance;
-    nextInstance++;
-
-    let label = document.createElement('label');
-    label.innerText = option.label + " : ";
-    label.htmlFor = instance;
-    option_box.appendChild(label);
-
-    if (option.type == "checkbox") {
-      let checkbox = document.createElement("input");
-      checkbox.id = instance;
-      checkbox.type = "checkbox";
-      checkbox.data = option.name;
-      checkbox.checked = option.default == "true";
-      checkbox.addEventListener("change", UpdateOutput);
-      option_box.appendChild(checkbox);
-    }
-
-    if (option.type == "combobox") {
-      let select = document.createElement('select');
-      select.id = instance;
-      select.data = option.name
-      select.type = "text";
-      for(let i in option.values) {
-        select.options[i] = new Option(option.values[i]);
+      errors.value = ''; 
+      function ClearSelectBox(select_box) {
+        while(select_box.options.length > 0)
+          select_box.options[0] = null;
       }
-      select.addEventListener("change", UpdateOutput);
-      option_box.appendChild(select);
-    }
 
-    options.appendChild(option_box);
-  }
-}
+      function UpdateTools() {
+        ClearSelectBox(tools);
+        for(let i in tools_data) {
+          let tool = tools_data[i];
+          tools.options[i] = new Option(tool.description, i);
+        }
+      }
 
-function GetOptions() {
-  let output = "";
-  let index = tools.value;
-  let tool = tools_data[index];
-  for(let i in tool.options) {
-    let option = tool.options[i];
-    let name;
-    let value;
-    if (option.type == "checkbox") {
-      name = options.childNodes[i].childNodes[1].data;
-      value = options.childNodes[i].childNodes[1].checked;
-    }
-    if (option.type == "combobox") {
-      name = options.childNodes[i].childNodes[1].data;
-      value = options.childNodes[i].childNodes[1].value;
-    }
-    output += name + "\n";
-    output += value + "\n";
-  }
-  return output;
-}
+      function UpdateExamples() {
+        let index = tools.value;
+        let tool = tools_data[index];
+        ClearSelectBox(examples);
+        examples.options = [];
+        examples.options.add(new Option("---------", -1));
+        for(let i in tool.examples)
+          examples.options.add(new Option(tool.examples[i].title, i));
+      }
 
-function UpdateInput() {
-  let tool_index = tools.value;
-  let example_index = examples.value;
-  if (example_index == -1)
-    return;
-  let example = tools_data[tool_index].examples[example_index];
-  input.value = example.content;
-  UpdateOutput();
-}
+      let nextInstance = 0;
+      function UpdateOptions() {
+        while(options.firstChild)
+          options.removeChild(options.firstChild);
 
-window.MathJax = {
-  tex: { },
-  svg: {
-    fontCache: 'global'
-  },
-};
+        let index = tools.value;
+        let tool = tools_data[index];
+        for(let i in tool.options) {
+          let option = tool.options[i];
 
-let withKatex = f => {
-  if (window.myKatex != undefined) {
-    window.myKatex.execute(f);
-    return;
-  }
+          let option_box = document.createElement('p');
+          option_box.className = "option";
 
-  window.myKatex = {
-    onloaded: f,
-    execute: f => {
-      let ff = window.myKatex.onloaded;
-      window.myKatex.onloaded = () => {
-        ff();
-        f();
+          let instance = "instance-" + nextInstance;
+          nextInstance++;
+
+          let label = document.createElement('label');
+          label.innerText = option.label + " : ";
+          label.htmlFor = instance;
+          option_box.appendChild(label);
+
+          if (option.type == "checkbox") {
+            let checkbox = document.createElement("input");
+            checkbox.id = instance;
+            checkbox.type = "checkbox";
+            checkbox.data = option.name;
+            checkbox.checked = option.default == "true";
+            checkbox.addEventListener("change", UpdateOutput);
+            option_box.appendChild(checkbox);
+          }
+
+          if (option.type == "combobox") {
+            let select = document.createElement('select');
+            select.id = instance;
+            select.data = option.name
+            select.type = "text";
+            for(let i in option.values) {
+              select.options[i] = new Option(option.values[i]);
+            }
+            select.addEventListener("change", UpdateOutput);
+            option_box.appendChild(select);
+          }
+
+          options.appendChild(option_box);
+        }
+      }
+
+      function GetOptions() {
+        let output = "";
+        let index = tools.value;
+        let tool = tools_data[index];
+        for(let i in tool.options) {
+          let option = tool.options[i];
+          let name;
+          let value;
+          if (option.type == "checkbox") {
+            name = options.childNodes[i].childNodes[1].data;
+            value = options.childNodes[i].childNodes[1].checked;
+          }
+          if (option.type == "combobox") {
+            name = options.childNodes[i].childNodes[1].data;
+            value = options.childNodes[i].childNodes[1].value;
+          }
+          output += name + "\n";
+          output += value + "\n";
+        }
+        return output;
+      }
+
+      function UpdateInput() {
+        let tool_index = tools.value;
+        let example_index = examples.value;
+        if (example_index == -1)
+          return;
+        let example = tools_data[tool_index].examples[example_index];
+        input.value = example.content;
+        UpdateOutput();
+      }
+
+      window.MathJax = {
+        tex: { },
+        svg: {
+          fontCache: 'global'
+        },
       };
-    }
-  };
 
-  let katex_css = document.createElement("link");
-  katex_css.rel = "stylesheet";
-  katex_css.href = "https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css"
-  katex_css.integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq"
-  katex_css.crossOrigin="anonymous";
-  katex_css.defer = "true";
+      let withKatex = f => {
+        if (window.myKatex != undefined) {
+          window.myKatex.execute(f);
+          return;
+        }
 
-  let katex_js = document.createElement("script");
-  katex_js.src = "https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js";
-  katex_js.integrity = "sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz";
-  katex_js.crossOrigin = "anonymous";
-  katex_js.defer = "true";
-  katex_js.onload = () => {
-    window.myKatex.onloaded();
-    window.myKatex.execute = f => f();
-  }
+        window.myKatex = {
+          onloaded: f,
+          execute: f => {
+            let ff = window.myKatex.onloaded;
+            window.myKatex.onloaded = () => {
+              ff();
+              f();
+            };
+          }
+        };
 
-  document.head.appendChild(katex_css);
-  document.head.appendChild(katex_js);
-}
+        let katex_css = document.createElement("link");
+        katex_css.rel = "stylesheet";
+        katex_css.href = "https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css"
+        katex_css.integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq"
+        katex_css.crossOrigin="anonymous";
+        katex_css.defer = "true";
 
-let diagon = {
-  translate: () => {},
-  API: () => {},
-}
+        let katex_js = document.createElement("script");
+        katex_js.src = "https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js";
+        katex_js.integrity = "sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz";
+        katex_js.crossOrigin = "anonymous";
+        katex_js.defer = "true";
+        katex_js.onload = () => {
+          window.myKatex.onloaded();
+          window.myKatex.execute = f => f();
+        }
 
-let push_state = () => {};
+        document.head.appendChild(katex_css);
+        document.head.appendChild(katex_js);
+      }
 
-function UpdateOutput() {
-  push_state();
+      const diagon = {
+        translate: () => {},
+        highlight: () => {},
+        API: () => {},
+      }
 
-  errors.value = '';
-  output.value =
-    diagon.translate(tools_data[tools.value].tool, input.value, GetOptions());
+      let push_state = () => {};
 
-  if (GetOptions().includes("Latex")) {
-    document.documentElement.setAttribute("data-display-latex", "true");
+      function UpdateOutput() {
 
-    withKatex(() => {
-      katex.render(output.value, latex, {
-        throwOnError: false,
-        displayMode: true,
-        fleqn: true,
+        push_state();
+
+        errors.value = '';
+        document.querySelector("#highlights").innerHTML =
+          diagon.highlight(tools_data[tools.value].tool, input.value);
+        output.value =
+          diagon.translate(tools_data[tools.value].tool, input.value, GetOptions());
+
+        if (GetOptions().includes("Latex")) {
+          document.documentElement.setAttribute("data-display-latex", "true");
+
+          withKatex(() => {
+            katex.render(output.value, latex, {
+              throwOnError: false,
+              displayMode: true,
+              fleqn: true,
+            });
+          })
+        } else {
+          document.documentElement.setAttribute("data-display-latex", "false");
+        }
+
+        if (GetOptions().includes("html") ||
+          GetOptions().includes("svg")) {
+          document.documentElement.setAttribute("data-display-html", "true");
+          html.srcdoc = output.value;
+        } else {
+          document.documentElement.setAttribute("data-display-html", "false");
+        }
+      }
+
+      let OnToolsChanged = function() {
+        UpdateOptions();
+        UpdateExamples();
+        UpdateOutput();
+      }
+
+      function OnRuntimeInitialized() {
+        diagon.translate = Module.cwrap('translate', 'string', ['string', 'string', 'string']);
+        diagon.highlight = Module.cwrap('highlight', 'string', ['string', 'string']);
+        diagon.API = Module.cwrap('API', 'string', []);
+
+        tools.addEventListener("input", OnToolsChanged);
+        examples.addEventListener("input", UpdateInput);
+        input.addEventListener('input', UpdateOutput);
+        input.addEventListener('scroll', () => {
+          highlights.scroll({
+            top: input.scrollTop,
+            left: input.scrollLeft,
+          });
+        });
+
+        let api = diagon.API();
+        tools_data = JSON.parse(api);
+        setTimeout(PullState, 0);
+        UpdateTools();
+        UpdateExamples()
+        UpdateOptions();
+        UpdateInput();
+        UpdateOutput();
+      }
+
+      function print(text) {
+        if (arguments.length > 1)
+          text = Array.prototype.slice.call(arguments).join(' ');
+        errors.value += text + '\n';
+      };
+
+      window.Module = {
+        preRun: [],
+        postRun: [],
+        print: print,
+        printErr: print,
+        canvas: undefined,
+        onRuntimeInitialized: OnRuntimeInitialized,
+      };
+
+      // Theme ---
+
+      function getColorScheme() {
+        if(localStorage.getItem("theme"))
+          return localStorage.getItem("theme");
+
+        if(!window.matchMedia)
+          return "light";
+
+        if(window.matchMedia("(prefers-color-scheme: dark)").matches)
+          return "dark";
+        else
+          return "light";
+      }
+
+      //determines if the user has a set theme
+      function setColorScheme(scheme){
+        document.documentElement.setAttribute("data-theme", scheme);
+      }
+
+      let scheme = getColorScheme();
+      setColorScheme(scheme);
+      if (scheme == "dark")
+        style_button.innerText = "Light theme";
+      else
+        style_button.innerText = "Dark theme";
+
+      style_button.addEventListener("click", function() {
+        setTheme(style_button.innerText == "Dark theme");
       });
-    })
-  } else {
-    document.documentElement.setAttribute("data-display-latex", "false");
-  }
 
-  if (GetOptions().includes("html") ||
-      GetOptions().includes("svg")) {
-    document.documentElement.setAttribute("data-display-html", "true");
-    html.srcdoc = output.value;
-  } else {
-    document.documentElement.setAttribute("data-display-html", "false");
-  }
-}
+      function setTheme(is_dark) {
+        if (is_dark) {
+          localStorage.setItem('theme', 'dark');
+          style_button.innerText = "Light theme";
+        } else {
+          localStorage.setItem('theme', 'light');
+          style_button.innerText = "Dark theme";
+        }
+        setColorScheme(getColorScheme());
+      };
 
-let OnToolsChanged = function() {
-  UpdateOptions();
-  UpdateExamples();
-  UpdateOutput();
-}
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)')
+          .addEventListener('change', e => setTheme(e.matches));
+      }
 
-function OnRuntimeInitialized() {
-  diagon.translate = Module.cwrap('translate', 'string', ['string','string', 'string']);
-  diagon.API = Module.cwrap('API', 'string', []);
+      setTimeout(() => {
+        let style = document.documentElement.style;
+        style.setProperty("--transition-time", "0.5s");
+      }, 500);
 
-  tools.addEventListener("input", OnToolsChanged);
-  examples.addEventListener("input", UpdateInput);
-  input.addEventListener('input', UpdateOutput);
+      function clearSelection() {
+        if (window.getSelection)
+          window.getSelection().removeAllRanges();
+        else if (document.selection) 
+          document.selection.empty();
+      }
 
-  let api = diagon.API();
-  tools_data = JSON.parse(api);
-  setTimeout(PullState, 0);
-  UpdateTools();
-  UpdateExamples()
-  UpdateOptions();
-  UpdateInput();
-  UpdateOutput();
-}
+      const copyOutput = document.querySelector('#copy-output');
+      let copying_output = false;
+      copyOutput.addEventListener("click", async function() {
+        if (copyOutput.getAttribute("data-active") == "true")
+          return;
 
-function print(text) {
-  if (arguments.length > 1)
-    text = Array.prototype.slice.call(arguments).join(' ');
-  errors.value += text + '\n';
-};
+        copyOutput.setAttribute("data-active", "true");
 
-window.Module = {
-  preRun: [],
-  postRun: [],
-  print: print,
-  printErr: print,
-  canvas: undefined,
-  onRuntimeInitialized: OnRuntimeInitialized,
-};
+        let length = output.value.length;
+        output.select();
+        output.setSelectionRange(0, 99999); /*For mobile devices*/
+        document.execCommand("copy");
+        clearSelection()
 
-// Theme ---
+        copyOutput.innerText = "Copied " + length + " letters";
 
-function getColorScheme() {
-  if(localStorage.getItem("theme"))
-    return localStorage.getItem("theme");
+        await new Promise(r => setTimeout(r, 5000));
 
-  if(!window.matchMedia)
-    return "light";
-  
-  if(window.matchMedia("(prefers-color-scheme: dark)").matches)
-    return "dark";
-  else
-    return "light";
-}
+        copyOutput.innerText = "Copy";
+        copyOutput.setAttribute("data-active", "false")
+      });
 
-//determines if the user has a set theme
-function setColorScheme(scheme){
-  document.documentElement.setAttribute("data-theme", scheme);
-}
+      const PushState = async function() {
+        await new Promise(r => setTimeout(r, 0));
 
-let scheme = getColorScheme();
-setColorScheme(scheme);
-if (scheme == "dark")
-  style_button.innerText = "Light theme";
-else
-  style_button.innerText = "Dark theme";
+        let data = tools_data[tools.value].tool;
+        history.pushState({},'Flowchart', '#' + data);
+      }
 
-style_button.addEventListener("click", function() {
-  setTheme(style_button.innerText == "Dark theme");
-});
+      const PullState = async function() {
+        push_state = PushState;
 
-function setTheme(is_dark) {
-  if (is_dark) {
-    localStorage.setItem('theme', 'dark');
-    style_button.innerText = "Light theme";
-  } else {
-    localStorage.setItem('theme', 'light');
-    style_button.innerText = "Dark theme";
-  }
-  setColorScheme(getColorScheme());
-};
+        if (!location.hash || location.hash == "#landing_page") {
+          document.querySelector("#landing_page").scrollIntoView();
+          return;
+        }
 
-if (window.matchMedia) {
-  window.matchMedia('(prefers-color-scheme: dark)')
-    .addEventListener('change', e => setTheme(e.matches));
-}
+        let data = location.hash.substr(1);
+        for(let i in tools_data) {
+          if (tools_data[i].tool !== data)
+            continue;
+          tools.selectedIndex = i;
+          document.querySelector("#code_area").scrollIntoView();
+          OnToolsChanged();
+        }
+      }
+      window.onpopstate = PullState;
 
-setTimeout(() => {
-  let style = document.documentElement.style;
-  style.setProperty("--transition-time", "0.5s");
-}, 500);
-
-function clearSelection() {
-  if (window.getSelection)
-    window.getSelection().removeAllRanges();
-  else if (document.selection) 
-    document.selection.empty();
-}
-
-const copyOutput = document.querySelector('#copy-output');
-let copying_output = false;
-copyOutput.addEventListener("click", async function() {
-  if (copyOutput.getAttribute("data-active") == "true")
-    return;
-
-  copyOutput.setAttribute("data-active", "true");
-
-  let length = output.value.length;
-  output.select();
-  output.setSelectionRange(0, 99999); /*For mobile devices*/
-  document.execCommand("copy");
-  clearSelection()
-
-  copyOutput.innerText = "Copied " + length + " letters";
-
-  await new Promise(r => setTimeout(r, 5000));
-
-  copyOutput.innerText = "Copy";
-  copyOutput.setAttribute("data-active", "false")
-});
-
-const PushState = async function() {
-  await new Promise(r => setTimeout(r, 0));
-
-  let data = tools_data[tools.value].tool;
-  history.pushState({},'Flowchart', '#' + data);
-}
-
-const PullState = async function() {
-  push_state = PushState;
-
-  if (!location.hash || location.hash == "#landing_page") {
-    document.querySelector("#landing_page").scrollIntoView();
-    return;
-  }
-
-  let data = location.hash.substr(1);
-  for(let i in tools_data) {
-    if (tools_data[i].tool !== data)
-      continue;
-    console.log(i);
-    tools.selectedIndex = i;
-    document.querySelector("#code_area").scrollIntoView();
-    OnToolsChanged();
-  }
-}
-window.onpopstate = PullState;
-
-</script>
-<script src="diagon.js"></script>
-<link
-  rel="preload"
-  as="style"
-  onload="this.rel=stylesheet"
-  type="text/css"
-  href="https://fontlibrary.org/face/dejavu-sans-mono"
-/>
+    </script>
+    <script src="diagon.js"></script>
+    <link
+      rel="preload"
+      as="style"
+      onload="this.rel=stylesheet"
+      type="text/css"
+      href="https://fontlibrary.org/face/dejavu-sans-mono"
+      />
 </html>

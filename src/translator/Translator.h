@@ -12,6 +12,7 @@ class Translator {
   // Main API implemented by translator. ---------------------------------------
   virtual std::string Translate(const std::string& input,
                                 const std::string& option) = 0;
+  virtual std::string Highlight(const std::string& input) { return input; }
   virtual ~Translator() = default;
 
   // Reflection API ------------------------------------------------------------

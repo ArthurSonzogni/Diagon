@@ -5,6 +5,12 @@
 
 using json = nlohmann::json;
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#else
+#define EMSCRIPTEN_KEEPALIVE
+#endif
+
 template <class T>
 json API(const std::vector<T>& container) {
   auto json = json::array();
@@ -50,6 +56,7 @@ json API(const TranslatorPtr& translator) {
   return json;
 }
 
+EMSCRIPTEN_KEEPALIVE
 extern "C" const char* API() {
   static std::string out;
   if (out.size() == 0)

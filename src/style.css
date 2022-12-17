@@ -1,26 +1,46 @@
-div {
+html, body, div {
   margin: 0px;
   padding: 0px;
 }
 
 /* Theme */
-:root {
-  --bg-color: white;
-  --fg-color: black;
-  --begin-button-hover: #3cb0ff;
-  --code-area-bg-color: #AAA;
-  --select-bg-color: #EEE;
+html {
   --transition-time: 0s; /* Modified via JS */
   --displaylatex: none;
   --displayhtml: none;
+
+  --code-blue-color:blue;
+  --code-red-color:red;
+  --code-green-color:green;
+
+  --begin-button-hover: #3cb0ff;
+
+  --bg-color: white;
+  --fg-color: black;
+  --input-bg-color: #fff;
+  --output-bg-color: #fff;
+  --errors-bg-color: #fff;
+
+  --menu-bar-bg-color: #EEE;
+  --select-bg-color: #DDD;
+  --select-fg-color: #000;
 }
 
 [data-theme="dark"] {
+  --code-blue-color:lightblue;
+  --code-red-color:#FFCCCB;
+  --code-green-color:lightgreen;
+
+  --begin-button-hover: green;
+
   --bg-color: black;
   --fg-color: white;
-  --begin-button-hover: green;
-  --code-area-bg-color: #222;
-  --select-bg-color: #111;
+  --input-bg-color: #000;
+  --output-bg-color: #000;
+  --errors-bg-color: #000;
+  --menu-bar-bg-color: #111;
+  --select-bg-color: #222;
+  --select-fg-color: #FFF;
 }
 
 [data-display-latex="true"] {
@@ -41,11 +61,6 @@ html {
   scroll-behavior: smooth;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-}
-
 /* Layout */
 .displaylatex {
   display: var(--displaylatex) !important;
@@ -57,7 +72,7 @@ html, body {
   display: var(--displayhtml) !important;
   overflow: auto;
   min-height: 0;
-  background-color: white;
+  background-color:var(--input-bg-color);
 }
 
 .gutter {
@@ -67,7 +82,6 @@ html, body {
 
 /* Containers */
 .container {
-  /* overflow: hidden; */
   min-height: 0
 }
 
@@ -101,6 +115,12 @@ html, body {
 .flex {
   flex-grow: 1;
   flex-shrink: 1;
+}
+
+.flex-equal {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis:0;
 }
 
 .nonflex {
@@ -142,7 +162,7 @@ html, body {
   font-size: 20vmin;
   margin: 0;
   padding: 0;
-  transition: text-shadow 1s ease-in-out 1s;
+  transition: text-shadow 1s cubic-bezier(0.26, -1.23, 0.67, 1.97) 1s
 }
 
 #landing_page_content h1:hover {
@@ -237,29 +257,49 @@ html, body {
   opacity: 1.0;
 }
 
+#highlights {
+  z-index:0;
+}
+
+
+#input > textarea {
+  grid-area: 1 / 1 / 2 / 2;
+  z-index:1;
+  color: transparent;
+  caret-color: var(--fg-color);
+}
+
 /* Application area */
-textarea {
-  font-variant-numeric: tabular-nums lining-nums;
+textarea, #highlights {
+  color: var(--fg-color);
+  background: transparent;
+  overflow: auto;
+  border-radius: 0;
+  border: 0;
+  border: none;
   font-family: 'Dejavu Sans Mono', monospace;
   font-kerning:none;
-  border: none;
-  background-color: transparent;
-  resize: none;
+  font-size: 12pt;
+  font-variant-numeric: tabular-nums lining-nums;
+  margin: 0;
   outline: none;
+  padding:0;
+  resize: none;
   white-space: pre;
-  overflow: auto;
+  word-wrap: break-word;
 }
 
 /* Menu bar */
 #menu_bar {
   display: flex;
+  background-color: var(--menu-bar-bg-color);
+  z-index: 1;
 }
 
 .menu_bar_submenu {
   margin: 0px;
   padding: 12px;
   display: inline-block;
-  border-right: 1px solid black;
   vertical-align: center;
   white-space: nowrap;
 }
@@ -267,6 +307,8 @@ textarea {
 select {
   font: inherit;
   size: 50px;
+  border: 0;
+  padding: 7px;
 }
 
 .option {
@@ -276,31 +318,135 @@ select {
   padding-left: 3px;
 }
 
-select {
-  border: 0;
-  padding: 7px;
-}
-
 option {
   border: 0;
   padding: 7px;
   margin: 7px;
 }
 
-#input, #output, #latex, #html{
-  padding: 1vh;
-  margin: 1vh;
+#highlights {
+  grid-area: 1 / 1 / 2 / 2;
+  overflow: auto;
 }
 
-#input, #output, #errors, #menu_bar, #latex {
+.flowchart > .IF,
+.flowchart > .ELSE,
+.flowchart > .WHILE,
+.flowchart > .DO,
+.flowchart > .SWITCH,
+.flowchart > .RETURN
+{
+  color:var(--code-blue-color);
+}
+.flowchart > .STRING_DOUBLE_QUOTE,
+.flowchart > .STRING_SIMPLE_QUOTE
+{
+  color:var(--code-green-color);
+}
+.flowchart > .COMMENT,
+.flowchart > .LINE_COMMENT
+{
+  color:gray;
+}
+.flowchart > .SEMICOLON
+{
+  font-weight: bold;
+}
+
+.Math > .VARIABLE,
+.Math > .STRING {
   color:var(--fg-color);
-  background-color:var(--bg-color);
-  border:0px solid;
-  box-shadow: 0px 0.5vmin 0.5vmin 0 rgba(0,0,0,0.4);
-  overflow-y: auto;
-  min-height: 0;
-  white-space: pre;
-  overflow: auto;
+}
+
+.Math > .LPAREN ,
+.Math > .RPAREN ,
+.Math > .LBRACE,
+.Math > .RBRACE ,
+.Math > .LBRACKET ,
+.Math > .RBRACKET
+{
+  font-weight: bold
+}
+
+.Math > .PLUS ,
+.Math > .MINUS ,
+.Math > .TIMES ,
+.Math > .BANG,
+.Math > .DIV ,
+.Math > .GT ,
+.Math > .LT ,
+.Math > .GE ,
+.Math > .LE ,
+.Math > .EQ ,
+.Math > .POW ,
+.Math > .SUBSCRIPT,
+.Math > .EOL
+{
+  color:var(--code-red-color);
+  font-weight: bold;
+}
+
+.Sequence > .LOWER,
+.Sequence > .GREATER,
+.Sequence > .COLON,
+.Sequence > .EOL,
+.Sequence > .NUMBER,
+.Sequence > .SPACE,
+.Sequence > .OTHER {
+}
+
+.Sequence > .COMMA,
+.Sequence > .ARROW_RIGHT,
+.Sequence > .ARROW_LEFT {
+  color:var(--code-red-color);
+  font-weight: bold;
+}
+
+.GraphPlanar > .STRING,
+.GraphPlanar > .ID {
+}
+
+.GraphPlanar > .STRING {
+  color:var(--code-green-color);
+}
+.GraphPlanar > .ID {
+  color:var(--code-red-color);
+}
+
+.highlight-container {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 100%;
+
+  color:var(--fg-color);
+
+  overflow: hidden;
+}
+
+#highlights {
+  overflow: hidden;
+}
+
+#input, #output, .highlight-container, .displayhtml, .displaylatex {
+  padding-left: 2vmin;
+  padding-top: 2vmin;
+  padding-right:4px;
+  border-bottom: 1px solid rgba(128,128,128,0.3);
+  border-right: 1px solid rgba(128,128,128,0.3);
+}
+
+#input {
+  background-color:var(--input-bg-color);
+}
+
+#output {
+  background-color:var(--output-bg-color);
+  border-bottom: 1px solid rgba(128,128,128,0.3);
+  border-right: 1px solid rgba(128,128,128,0.3);
+}
+
+#errors {
+  background-color:var(--errors-bg-color);
 }
 
 /* Begin Button */
@@ -315,16 +461,11 @@ option {
 }
 
 #code_area {
-  background-color: var(--code-area-bg-color);
   tab-size: 2;
 }
 
-#menu_bar {
-  margin-bottom: 1vmin;
-}
-
 select, option {
-  color: var(--fg-color);
+  color: var(--select-fg-color);
   background-color: var(--select-bg-color);
 }
 
@@ -336,14 +477,12 @@ select, option {
 .copy {
   display: block;
   position: absolute;
-  color: white;
   background-color: black;
   color: white;
   opacity: 0.7;
   right: 0;
   top: 0;
   z-index: 2;
-  margin: 1vh;
   padding: 1vh;
   transition: opacity 0.3s, background-color 0.3s;
   box-shadow: x 0.5vmin 0.5vmin 0 inset rgba(0,0,0,0.4);
@@ -356,4 +495,39 @@ select, option {
 
 .copy[data-active=true] {
   background-color: green;
+}
+
+textarea::-webkit-scrollbar {
+  width: 3px;
+  height:3px;
+}
+
+textarea:hover::-webkit-scrollbar {
+  width: 8px;
+  height:8px;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: rgba(128,128,128,0.5);
+  border-radius: 8px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(128,128,128,1.0);
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  scrollbar-width: none;  /* Firefox */
+}
+
+iframe {
+  border:0;
 }

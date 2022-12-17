@@ -6,9 +6,9 @@
 #include <vector>
 #include "screen/Screen.h"
 #include "translator/Translator.h"
+#include "translator/antlr_error_listener.h"
 #include "translator/math/MathLexer.h"
 #include "translator/math/MathParser.h"
-#include "translator/antlr_error_listener.h"
 
 class Screen;
 
@@ -602,71 +602,71 @@ std::wstring ParseFunctionMultLatex(MathParser::FunctionContext* context,
 
 Draw ParseFunctionMathBB(MathParser::FunctionContext* context, Style* style) {
   static const std::map<std::string, std::string> known = {
-      {"0", "𝟘"},      //
-      {"1", "𝟙"},      //
-      {"2", "𝟚"},      //
-      {"3", "𝟛"},      //
-      {"4", "𝟜"},      //
-      {"5", "𝟝"},      //
-      {"6", "𝟞"},      //
-      {"7", "𝟟"},      //
-      {"8", "𝟠"},      //
-      {"9", "𝟡"},      //
-      {"A", "𝔸"},      //
-      {"B", "𝔹"},      //
-      {"C", "ℂ"},      //
-      {"D", "𝔻"},      //
-      {"E", "𝔼"},      //
-      {"F", "𝔽"},      //
-      {"G", "𝔾"},      //
-      {"H", "ℍ"},      //
-      {"I", "𝕀"},      //
-      {"J", "𝕁"},      //
-      {"K", "𝕂"},      //
-      {"L", "𝕃"},      //
-      {"M", "𝕄"},      //
-      {"N", "ℕ"},      //
-      {"O", "𝕆"},      //
-      {"P", "ℙ"},      //
-      {"PI", "ℿ"},     //
-      {"Q", "ℚ"},      //
-      {"R", "ℝ"},      //
-      {"S", "𝕊"},      //
-      {"T", "𝕋"},      //
-      {"U", "𝕌"},      //
-      {"V", "𝕍"},      //
-      {"W", "𝕎"},      //
-      {"X", "𝕏"},      //
-      {"Y", "𝕐"},      //
-      {"Z", "ℤ"},      //
-      {"a", "𝕒"},      //
-      {"b", "𝕓"},      //
-      {"c", "𝕔"},      //
-      {"d", "𝕕"},      //
-      {"e", "𝕖"},      //
-      {"f", "𝕗"},      //
-      {"g", "𝕘"},      //
-      {"h", "𝕙"},      //
-      {"i", "ⅈ"},      //
-      {"i", "𝕚"},      //
-      {"j", "𝕛"},      //
-      {"k", "𝕜"},      //
-      {"l", "𝕝"},      //
-      {"m", "𝕞"},      //
-      {"n", "𝕟"},      //
-      {"o", "𝕠"},      //
-      {"p", "𝕡"},      //
-      {"pi", "ℼ"},     //
-      {"q", "𝕢"},      //
-      {"r", "𝕣"},      //
-      {"s", "𝕤"},      //
-      {"t", "𝕥"},      //
-      {"u", "𝕦"},      //
-      {"v", "𝕧"},      //
-      {"w", "𝕨"},      //
-      {"x", "𝕩"},      //
-      {"y", "𝕪"},      //
-      {"z", "𝕫"},      //
+      {"0", "𝟘"},   //
+      {"1", "𝟙"},   //
+      {"2", "𝟚"},   //
+      {"3", "𝟛"},   //
+      {"4", "𝟜"},   //
+      {"5", "𝟝"},   //
+      {"6", "𝟞"},   //
+      {"7", "𝟟"},   //
+      {"8", "𝟠"},   //
+      {"9", "𝟡"},   //
+      {"A", "𝔸"},   //
+      {"B", "𝔹"},   //
+      {"C", "ℂ"},   //
+      {"D", "𝔻"},   //
+      {"E", "𝔼"},   //
+      {"F", "𝔽"},   //
+      {"G", "𝔾"},   //
+      {"H", "ℍ"},   //
+      {"I", "𝕀"},   //
+      {"J", "𝕁"},   //
+      {"K", "𝕂"},   //
+      {"L", "𝕃"},   //
+      {"M", "𝕄"},   //
+      {"N", "ℕ"},   //
+      {"O", "𝕆"},   //
+      {"P", "ℙ"},   //
+      {"PI", "ℿ"},  //
+      {"Q", "ℚ"},   //
+      {"R", "ℝ"},   //
+      {"S", "𝕊"},   //
+      {"T", "𝕋"},   //
+      {"U", "𝕌"},   //
+      {"V", "𝕍"},   //
+      {"W", "𝕎"},   //
+      {"X", "𝕏"},   //
+      {"Y", "𝕐"},   //
+      {"Z", "ℤ"},   //
+      {"a", "𝕒"},   //
+      {"b", "𝕓"},   //
+      {"c", "𝕔"},   //
+      {"d", "𝕕"},   //
+      {"e", "𝕖"},   //
+      {"f", "𝕗"},   //
+      {"g", "𝕘"},   //
+      {"h", "𝕙"},   //
+      {"i", "ⅈ"},   //
+      {"i", "𝕚"},   //
+      {"j", "𝕛"},   //
+      {"k", "𝕜"},   //
+      {"l", "𝕝"},   //
+      {"m", "𝕞"},   //
+      {"n", "𝕟"},   //
+      {"o", "𝕠"},   //
+      {"p", "𝕡"},   //
+      {"pi", "ℼ"},  //
+      {"q", "𝕢"},   //
+      {"r", "𝕣"},   //
+      {"s", "𝕤"},   //
+      {"t", "𝕥"},   //
+      {"u", "𝕦"},   //
+      {"v", "𝕧"},   //
+      {"w", "𝕨"},   //
+      {"x", "𝕩"},   //
+      {"y", "𝕪"},   //
+      {"z", "𝕫"},   //
   };
 
   std::string name;
@@ -1316,6 +1316,41 @@ class Math : public Translator {
 
     // Print th
     return to_string(Parse(content, &style));
+  }
+
+  std::string Highlight(const std::string& input) final {
+    std::stringstream out;
+
+    antlr4::ANTLRInputStream input_stream(input);
+
+    // Lexer.
+    MathLexer lexer(&input_stream);
+    antlr4::CommonTokenStream tokens(&lexer);
+
+    try {
+      tokens.fill();
+    } catch (...) {  // Ignore
+    }
+
+    size_t matched = 0;
+    out << "<span class='Math'>";
+    for (antlr4::Token* token : tokens.getTokens()) {
+      std::string text = token->getText();
+      if (text == "<EOF>") {
+        continue;
+      }
+      out << "<span class='";
+      out << lexer.getVocabulary().getSymbolicName(token->getType());
+      out << "'>";
+      matched += text.size();
+      out << std::move(text);
+      out << "</span>";
+    }
+
+    out << input.substr(matched);
+    out << "</span>";
+
+    return out.str();
   }
 };
 

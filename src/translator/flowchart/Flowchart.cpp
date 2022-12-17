@@ -29,6 +29,7 @@ class Flowchart : public Translator {
   std::vector<Translator::Example> Examples() final;
   std::string Translate(const std::string& input,
                         const std::string& options_string) final;
+  std::string Highlight(const std::string& input) final;
 };
 
 std::vector<Translator::Example> Flowchart::Examples() {
@@ -638,10 +639,46 @@ std::string Flowchart::Translate(const std::string& input,
   try {
     context = parser.program();
   } catch (...) {
-    return "";
+    return "Error";
   }
 
   return Parse(context, true).screen.ToString();
+}
+
+std::string Flowchart::Highlight(const std::string& input) {
+  std::stringstream out;
+
+  antlr4::ANTLRInputStream input_stream(input);
+
+  // Lexer.
+  FlowchartLexer lexer(&input_stream);
+  antlr4::CommonTokenStream tokens(&lexer);
+
+  try {
+    tokens.fill();
+  }
+  catch (...) {  // Ignore
+  }
+
+  size_t matched = 0;
+  out << "<span class='flowchart'>";
+  for(antlr4::Token* token : tokens.getTokens()) {
+    std::string text = token->getText();
+    if (text == "<EOF>") {
+      continue;
+    }
+    out << "<span class='";
+    out << lexer.getVocabulary().getSymbolicName(token->getType());
+    out << "'>";
+    matched += text.size();
+    out << std::move(text);
+    out << "</span>";
+  }
+
+  out << input.substr(matched);
+  out << "</span>";
+
+  return out.str();
 }
 
 Draw Parse(FlowchartParser::WhileloopContext* whileloop, bool is_final) {

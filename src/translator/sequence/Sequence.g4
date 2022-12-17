@@ -2,38 +2,37 @@ grammar Sequence;
 
 // Lexer -----
 
-NormalRightArrow: '->';
-NormalLeftArrow: '<-';
-Comma: ':';
-Less: '<';
-More: '>';
-Colon: ',';
+ARROW_RIGHT: '->';
+ARROW_LEFT: '<-';
+COMMA: ':';
+LOWER: '<';
+GREATER: '>';
+COLON: ',';
 EOL: '\r\n' | '\n';
 
-fragment Digit: [0-9]+;
-Number: Digit+;
+NUMBER: [0-9]+;
 
-Space: ' ' | '\t';
-Other: .;
+SPACE: ' ' | '\t';
+OTHER: .;
 
 // Parser -----
 
 program: (command? (EOL command?)*)  EOF;
 command: messageCommand | dependencyCommand;
 
-messageCommand: dependencyID? text arrow text Comma text;
-dependencyCommand: text Comma dependencies;
+messageCommand: dependencyID? text arrow text COMMA text;
+dependencyCommand: text COMMA dependencies;
 
 dependency: number (comparison number)+;
 dependencyID: number ')';
-dependencies: (dependency (Colon dependency)*)?;
+dependencies: (dependency (COLON dependency)*)?;
 
-text: Space* textInternal Space*;
-textInternal: ~(Space|EOL) (~EOL* ~(Space|EOL))?;
+text: SPACE* textInternal SPACE*;
+textInternal: ~(SPACE|EOL) (~EOL* ~(SPACE|EOL))?;
 
-number: Space* Number Space*;
+number: SPACE* NUMBER SPACE*;
 
-comparison: Less | More;
+comparison: LOWER | GREATER;
 
-arrow: NormalLeftArrow | NormalRightArrow;
-// vim: filetype=antlr
+arrow: ARROW_LEFT | ARROW_RIGHT;
+// vim: filetype=ANTLR
