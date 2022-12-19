@@ -9,6 +9,8 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+
+EMSCRIPTEN_KEEPALIVE
 extern "C" const char* translate(const char* translator_name,
                                  const char* input,
                                  const char* options) {
@@ -21,6 +23,21 @@ extern "C" const char* translate(const char* translator_name,
     out = translator->Translate(input, options);
   } catch (...) {
     std::cerr << "Error" << std::endl;
+  }
+  return out.c_str();
+}
+
+EMSCRIPTEN_KEEPALIVE
+extern "C" const char* highlight(const char* translator_name,
+                                 const char* input) {
+  auto* translator = FindTranslator(translator_name);
+  if (!translator)
+    std::cerr << "Translator not found" << std::endl;
+
+  static std::string out;
+  try {
+    out = translator->Highlight(input);
+  } catch (...) {
   }
   return out.c_str();
 }

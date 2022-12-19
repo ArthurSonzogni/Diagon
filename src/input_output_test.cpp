@@ -73,7 +73,7 @@ int main(int, const char**) {
         std::cout << output << std::endl;
         std::cout << "---------------------" << std::endl;
 
-        std::ofstream(test.path() / "output") << output_computed;
+        //std::ofstream(test.path() / "output") << output_computed;
 
         result = EXIT_FAILURE;
       }

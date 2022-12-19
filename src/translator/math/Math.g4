@@ -85,7 +85,7 @@ EQ : '=' ;
 POW : '^' ;
 SUBSCRIPT: '_' ;
 EOL : '\r\n' | '\n' ;
-WS : [ \t] + -> skip ; 
+WS : [ \t]+ -> channel(HIDDEN);
 
 fragment CHAR : ~[!+-<>=_^(){}[\] \t\r\n"*] | [.0123456789];
 VARIABLE: CHAR+;

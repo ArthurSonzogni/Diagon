@@ -62,6 +62,8 @@ function(target_set_common target)
     CXX_STANDARD 17
   )
   if (EMSCRIPTEN)
+    target_compile_options(${target} PRIVATE "-fwasm-exceptions")
+    target_link_options(${target} PRIVATE "-fwasm-exceptions")
     # Nothing
   elseif (MSVC)
     target_compile_options(${target} PRIVATE "/wd4244")
@@ -155,8 +157,7 @@ if (EMSCRIPTEN)
   #string(APPEND CMAKE_CXX_FLAGS " -s WASM_ASYNC_COMPILATION=0")
   #string(APPEND CMAKE_CXX_FLAGS " -s SIDE_MODULE=1")
   #string(APPEND CMAKE_CXX_FLAGS " -s DISABLE_EXCEPTION_CATCHING=0")
-  string(APPEND CMAKE_CXX_FLAGS " -s EXPORTED_FUNCTIONS='[\"_translate\", \"_main\", \"_API\"]'")
-  string(APPEND CMAKE_CXX_FLAGS " -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"ccall\",\"cwrap\"]'")
+  string(APPEND CMAKE_CXX_FLAGS " -s EXPORTED_RUNTIME_METHODS='[\"ccall\",\"cwrap\"]'")
 
   option(ADD_GOOGLE_ANALYTICS "Build the static library" ON)
   if (ADD_GOOGLE_ANALYTICS)
