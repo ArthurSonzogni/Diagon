@@ -7,13 +7,16 @@ description: |
   It is written in C++ and use WebAssembly, HTML and CSS to make a Web
   Application. It can be used at https://arthursonzogni.com/Diagon.  It can also
   be used in script as a 'normal' application.
+
 grade: stable
 confinement: strict
+base: core20
+
 icon: "./favicon.png"
 apps:
   diagon:
     command: diagon
-base: core18
+
 parts:
   diagon:
     plugin: cmake
