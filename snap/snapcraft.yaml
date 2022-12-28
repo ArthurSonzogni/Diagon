@@ -29,7 +29,7 @@ parts:
       - unzip
       - curl
       - uuid-dev
-      - openjdk-8-jdk
+      - openjdk-11-jdk
       - libboost-graph-dev
     override-build: |
       snapcraftctl build
