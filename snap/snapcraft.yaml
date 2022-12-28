@@ -20,24 +20,21 @@ parts:
     source: https://github.com/ArthurSonzogni/Diagon
     source-type: git
     source-depth: 1
-    build-snaps: [cmake/latest/edge] # We need a modern cmake.
     build-packages:
-    - pkg-config
-    - unzip
-    - curl
-    - uuid-dev
-    - openjdk-8-jdk
-    - libboost-graph-dev
+      - build-essential
+      - pkg-config
+      - unzip
+      - curl
+      - uuid-dev
+      - openjdk-8-jdk
+      - libboost-graph-dev
     override-build: |
-      /snap/bin/cmake \
-        -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL/usr/local \
-        -DCMAKE_BUILD_TYPE=Release \
-        $SNAPCRAFT_PART_SRC
-      make -j 4
-      make install
+      snapcraftctl build
       snapcraftctl set-version "$(git rev-list --count HEAD)"
+    cmake-parameters:
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DCMAKE_BUILD_TYPE=Release
 
 passthrough:
   title: Diagon
   license: MIT
-
