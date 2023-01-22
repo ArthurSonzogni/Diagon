@@ -15,7 +15,7 @@ base: core20
 icon: "./favicon.png"
 apps:
   diagon:
-    command: diagon
+    command: usr/local/bin/diagon
 
 parts:
   diagon:
@@ -31,8 +31,8 @@ parts:
       - uuid-dev
       - openjdk-11-jdk
       - libboost-graph-dev
-    override-build: |
-      snapcraftctl build
+    override-pull: |
+      snapcraftctl pull
       snapcraftctl set-version "$(git rev-list --count HEAD)"
     cmake-parameters:
       - -DCMAKE_INSTALL_PREFIX=/usr

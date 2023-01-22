@@ -1,0 +1,7 @@
+lim(a,b)
+
+lim(x->infinity, x) = infinity
+
+lim(x->∞, sqrt(x+1/x)) = infinity
+
+lim(x->∞, sqrt(x+1/x)) = 1/2
