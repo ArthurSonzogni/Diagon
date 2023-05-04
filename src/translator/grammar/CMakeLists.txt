@@ -9,7 +9,7 @@ else()
   set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
   FetchContent_Declare(kgt
     GIT_REPOSITORY https://github.com/ArthurSonzogni/kgt
-    GIT_TAG c2af649438583e0ec5a97b83b5be6f1824b21a2a
+    GIT_TAG 56c3f46cf286051096d9295118c048219fe0d776
     )
   FetchContent_GetProperties(kgt)
   FetchContent_Populate(kgt)

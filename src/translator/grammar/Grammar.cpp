@@ -304,7 +304,7 @@ std::string Grammar::Translate(const std::string& input,
     error_count++;
     kgt::parsing_error error;
     parsing_error_queue_pop(&parsing_errors, &error);
-    std::cout << error.line << ":" << error.column << ":" << error.description
+    std::cout << error.line << ":" << error.col << ":" << error.description
               << std::endl;
   }
 
