@@ -1,3 +1,7 @@
-# 1.0.148
+# Current
 
+## Security:
+- See CVE-2023-27390. Check there are no "self" message.
+
+## Build
 - Set MSVC_RUNTIME_LIBRARY to /MT for static builds

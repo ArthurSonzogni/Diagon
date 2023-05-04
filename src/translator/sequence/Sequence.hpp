@@ -95,11 +95,13 @@ class Sequence : public Translator {
   int GetNumber(SequenceParser::NumberContext* number);
   std::wstring GetText(SequenceParser::TextContext* text);
 
+  // 1.1) Check input validity.
+  bool ContainsSelfMessage();
+
   // 2) Clean the representation.
   void UniformizeInternalRepresentation();
   void UniformizeActors();
   void UniformizeMessageID();
-
   void SplitByBackslashN();
 
   // 3) Layout.

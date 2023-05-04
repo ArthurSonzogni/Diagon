@@ -58,13 +58,14 @@ int main(int, const char**) {
         continue;
       }
 
+      // std::cout << "  [RUN ] " << test.path() << std::endl;
       std::string input = ReadFile(test.path() / "input");
       std::string output = ReadFile(test.path() / "output");
 
       std::string output_computed = translator->Translate(input, options);
 
       if (output_computed == output) {
-        //std::cout << "  [PASS] " << test.path() << std::endl;
+        std::cout << "  [PASS] " << test.path() << std::endl;
       } else {
         std::cout << "  [FAIL] " << test.path() << std::endl;
         std::cout << "---[Output]------------------" << std::endl;

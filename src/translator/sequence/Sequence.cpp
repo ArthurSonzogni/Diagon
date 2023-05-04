@@ -288,6 +288,7 @@ std::string Sequence::Translate(const std::string& input,
   UniformizeInternalRepresentation();
   if (actors.size() == 0)
     return "";
+
   SplitByBackslashN();
   Layout();
   return Draw();
@@ -361,7 +362,7 @@ void Sequence::UniformizeMessageID() {
     for (auto& message : messages) {
       if (message.id != -1) {
         if (used.count(message.id)) {
-          std::cout << "Found two messages with the same id: " << message.id
+          std::cerr << "Found two messages with the same id: " << message.id
                     << std::endl;
           message.id = -1;
         } else {
@@ -385,10 +386,10 @@ void Sequence::UniformizeMessageID() {
         for (int id : {dependency.from, dependency.to}) {
           auto it = message_index.find(id);
           if (it == message_index.end()) {
-            std::wcout << "* Ignored dependency: \"" << actor.name << ": "
+            std::wcerr << "* Ignored dependency: \"" << actor.name << ": "
                        << dependency.from << " < " << dependency.to << "\"."
                        << std::endl;
-            std::wcout << "  It cannot be used because the message ID \"" << id
+            std::wcerr << "  It cannot be used because the message ID \"" << id
                        << "\" doesn't exist" << std::endl;
             return true;
           }
@@ -396,10 +397,10 @@ void Sequence::UniformizeMessageID() {
           const Message& message = messages[it->second];
           if (actor.name != message.from &&  //
               actor.name != message.to) {
-            std::wcout << "* Ignored dependency: \"" << actor.name << ": "
+            std::wcerr << "* Ignored dependency: \"" << actor.name << ": "
                        << dependency.from << " < " << dependency.to << "\"."
                        << std::endl;
-            std::wcout << "  It cannot be used because the message \""
+            std::wcerr << "  It cannot be used because the message \""
                        << message.from << " -> " << message.to << ": "
                        << message.messages[0]
                        << "\" has nothing to do with actor " << actor.name
@@ -463,6 +464,14 @@ void Sequence::AddMessageCommand(
 
   message.from = GetText(message_command->text(0));
   message.to = GetText(message_command->text(1));
+
+  if (message.from == message.to) {
+    std::cerr << "Self messages are not supported yet. It has been ignored."
+              << std::endl;
+    std::cerr << "See https://github.com/ArthurSonzogni/Diagon/issues/63"
+              << std::endl;
+    return;
+  }
 
   if (message_command->arrow()->ARROW_LEFT()) {
     std::swap(message.from, message.to);
@@ -553,7 +562,7 @@ void Sequence::LayoutComputeActorsPositions() {
       }
     }
     if (i++ > 500) {
-      std::cout << "Something went wrong!" << std::endl;
+      std::cerr << "Something went wrong!" << std::endl;
       break;
     }
   }

@@ -8,6 +8,11 @@ project(Diagon
 
 option(DIAGON_BUILD_TESTS "Set to ON to build tests" OFF)
 option(DIAGON_BUILD_TESTS_FUZZER "Set to ON to enable fuzzing" OFF)
+option(DIAGON_ASAN "Set to ON to enable address sanitizer" OFF)
+option(DIAGON_LSAN "Set to ON to enable leak sanitizer" OFF)
+option(DIAGON_MSAN "Set to ON to enable memory sanitizer" OFF)
+option(DIAGON_TSAN "Set to ON to enable thread sanitizer" OFF)
+option(DIAGON_UBSAN "Set to ON to enable undefined behavior sanitizer" OFF)
 
 include(FetchContent)
 set(FETCHCONTENT_QUIET FALSE)
