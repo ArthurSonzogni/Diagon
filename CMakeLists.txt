@@ -67,7 +67,7 @@ function(target_set_common target)
     target_link_options(${target} PRIVATE "-fwasm-exceptions")
     # Nothing
   elseif (MSVC)
-    set_property(TARGET foo PROPERTY
+    set_property(TARGET ${target} PROPERTY
       MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     target_compile_options(${target} PRIVATE "/wd4244")
     target_compile_options(${target} PRIVATE "/wd4267")

@@ -71,7 +71,7 @@ jobs:
 
       - name: "Install boost for windows"
         if: ${{ runner.os == 'Windows' }}
-        uses: MarkusJx/install-boost@v1.0.1
+        uses: MarkusJx/install-boost@v2.4.4
         with:
           boost_version: 1.81.0
           platform_version: 2022 
