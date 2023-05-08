@@ -355,8 +355,8 @@ void GraphPlanar::Write() {
   // Create the planar embedding
   auto embedding_storage = EdgePermutationStorage(num_vertices);
   auto embedding = EdgePermutation(embedding_storage.begin(), vertex_index);
-  const bool is_planar = PlanarEmbedding(graph, embedding_storage, embedding);
-  if (!is_planar) {
+  const bool is_planar_1 = PlanarEmbedding(graph, embedding_storage, embedding);
+  if (!is_planar_1) {
     output_ = "Graph is not planar.\n";
     return;
   }
@@ -367,6 +367,7 @@ void GraphPlanar::Write() {
       graph, embedding, boost::get(boost::edge_index, graph), edge_updater);
   const bool is_planar_2 = PlanarEmbedding(graph, embedding_storage, embedding);
   assert(is_planar_2);
+  std::ignore = is_planar_2;
 
   // After executing `make_maximal_planar` edges are added to the graph, so
   // we must update the indexes and the embedding.
@@ -375,6 +376,7 @@ void GraphPlanar::Write() {
                              edge_updater);
   const bool is_planar_3 = PlanarEmbedding(graph, embedding_storage, embedding);
   assert(is_planar_3);
+  std::ignore = is_planar_3;
 
   // Find a canonical ordering.
   std::vector<size_t> ordering;

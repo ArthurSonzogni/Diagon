@@ -1,9 +1,9 @@
 cmake_minimum_required (VERSION 3.15)
 
-set(git_version 148)
+set(git_version 156) # Obtained with `git rev-list --count HEAD`
 project(Diagon
   LANGUAGES C CXX
-  VERSION 1.0.${git_version}
+  VERSION 1.1.${git_version}
 )
 
 option(DIAGON_BUILD_TESTS "Set to ON to build tests" OFF)
