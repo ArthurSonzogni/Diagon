@@ -15,7 +15,7 @@ base: core20
 icon: "./favicon.png"
 apps:
   diagon:
-    command: usr/local/bin/diagon
+    command: usr/bin/diagon
 
 parts:
   diagon:
