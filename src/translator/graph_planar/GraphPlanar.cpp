@@ -307,8 +307,15 @@ void GraphPlanar::Write() {
 
   // Create a graph.
   Graph graph(num_vertices);
-  for (auto& it : vertex)
+  for (auto& it : vertex) {
+    // Check if the edge already exists. Apparently, boost graph do not support
+    // it.
+    if (boost::edge(it.from, it.to, graph).second) {
+      continue;
+    }
+
     add_edge(it.from, it.to, graph);
+  }
   InitializeEdgeIndex(graph);
 
   // Make it connected.

@@ -2,6 +2,8 @@
 
 ## Security:
 - See CVE-2023-27390. Check there are no "self" message.
+- See CVE-2023-31194. Do not add twice an edge in the graph. This caused Boost
+                      algorithms to misbehave.
 
 ## Build
 - Set MSVC_RUNTIME_LIBRARY to /MT for static builds
