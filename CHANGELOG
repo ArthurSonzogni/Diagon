@@ -5,5 +5,8 @@
 - See CVE-2023-31194. Do not add twice an edge in the graph. This caused Boost
                       algorithms to misbehave.
 
+## Bug fix
+- Fix highlighter for the GraphPlanar translator.
+
 ## Build
 - Set MSVC_RUNTIME_LIBRARY to /MT for static builds
