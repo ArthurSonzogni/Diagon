@@ -58,7 +58,7 @@ int main(int, const char**) {
         continue;
       }
 
-      // std::cout << "  [RUN ] " << test.path() << std::endl;
+      std::cout << "  [RUN ] " << test.path() << std::endl;
       std::string input = ReadFile(test.path() / "input");
       std::string output = ReadFile(test.path() / "output");
 

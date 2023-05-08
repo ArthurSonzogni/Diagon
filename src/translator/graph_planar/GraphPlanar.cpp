@@ -2,8 +2,10 @@
 // Use of this source code is governed by the MIT license that can be found in
 // the LICENSE file.
 
+#include <cassert>
 #include <iostream>
 #include <map>
+#include <optional>
 #include <queue>
 #include <sstream>
 #include <string>
@@ -24,6 +26,7 @@
 #include <boost/graph/make_connected.hpp>
 #include <boost/graph/make_maximal_planar.hpp>
 #include <boost/graph/planar_canonical_ordering.hpp>
+#include <boost/graph/planar_detail/add_edge_visitors.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/property_map/property_map.hpp>
 
@@ -32,16 +35,18 @@ using Graph = boost::adjacency_list<boost::vecS,
                                     boost::undirectedS,
                                     boost::property<boost::vertex_index_t, int>,
                                     boost::property<boost::edge_index_t, int>>;
-
-using Embedding =
-    std::vector<std::vector<boost::graph_traits<Graph>::edge_descriptor>>;
-
-using Coordinates = struct {
+using EdgeT = boost::graph_traits<Graph>::edge_descriptor;
+using EdgePermutationStorage = std::vector<std::vector<EdgeT>>;
+using EdgePermutation = boost::iterator_property_map<
+    EdgePermutationStorage::iterator,
+    boost::property_map<Graph, boost::vertex_index_t>::type>;
+struct Coordinates {
   size_t x;
   size_t y;
 };
-
-using StraightLineDrawing = std::vector<Coordinates>;
+using StraightLineDrawing = boost::iterator_property_map<
+    std::vector<Coordinates>::iterator,
+    boost::property_map<Graph, boost::vertex_index_t>::type>;
 
 struct Box {
   int left;
@@ -51,22 +56,6 @@ struct Box {
   static Box Union(Box A, Box B);
   static Box Translate(Box A, int x, int y);
 };
-
-void InitializeEdgeIndex(Graph& graph) {
-  boost::property_map<Graph, boost::edge_index_t>::type e_index =
-      boost::get(boost::edge_index, graph);
-  boost::graph_traits<Graph>::edges_size_type edge_count = 0;
-  boost::graph_traits<Graph>::edge_iterator ei, ei_end;
-  for (boost::tie(ei, ei_end) = boost::edges(graph); ei != ei_end; ++ei)
-    boost::put(e_index, *ei, edge_count++);
-}
-
-bool ComputePlanarEmbedding(const Graph& graph, Embedding& embedding) {
-  embedding = Embedding(boost::num_vertices(graph));
-  return boost::boyer_myrvold_planarity_test(
-      boost::boyer_myrvold_params::graph = graph,
-      boost::boyer_myrvold_params::embedding = embedding.data());
-}
 
 class GraphPlanar;
 
@@ -147,7 +136,7 @@ class GraphPlanar : public Translator {
   std::vector<std::wstring> id_to_name;
   int next_id = 0;
 
-  std::vector<Edge> vertex;
+  std::vector<Edge> vertex_;
 };
 
 std::vector<Translator::OptionDescription> GraphPlanar::Options() {
@@ -233,7 +222,7 @@ void GraphPlanar::ReadEdges(GraphPlanarParser::EdgesContext* edges) {
     arrows.push_back(ReadArrow(arrow));
   }
   for (int i = 0; i < arrows.size(); ++i) {
-    vertex.push_back(Edge{nodes[i], nodes[i + 1], arrows[i]});
+    vertex_.push_back(Edge{nodes[i], nodes[i + 1], arrows[i]});
   }
 }
 
@@ -274,7 +263,7 @@ Arrow GraphPlanar::ReadArrow(GraphPlanarParser::ArrowContext* arrow) {
 
 void GraphPlanar::ComputeArrowStyle() {
   // Compute ArrowStyle
-  for (auto& v : vertex) {
+  for (auto& v : vertex_) {
     switch (v.arrow) {
       case Arrow::RIGHT:
         arrow_style[v.from][v.to] = ArrowStyle::ARROW;
@@ -296,18 +285,38 @@ void GraphPlanar::ComputeArrowStyle() {
   }
 }
 
+/// @brief Compute the planar embedding of a graph.
+///
+/// @param graph The graph to embed.
+/// @param embedding_storage The storage for the embedding.
+/// @param embedding The embedding.
+///
+/// @return True if the graph is planar.
+bool PlanarEmbedding(const Graph& graph,
+                     EdgePermutationStorage& embedding_storage,
+                     EdgePermutation& embedding) {
+  embedding_storage = EdgePermutationStorage(boost::num_vertices(graph));
+  embedding = EdgePermutation(embedding_storage.begin(),
+                              boost::get(boost::vertex_index, graph));
+  const bool is_planar = boyer_myrvold_planarity_test(
+      boost::boyer_myrvold_params::graph = graph,
+      boost::boyer_myrvold_params::embedding = embedding);
+  return is_planar;
+}
+
 void GraphPlanar::Write() {
   ComputeArrowStyle();
 
   if (id_to_name.size() <= 2) {
+    output_ = "Graph contains less than 3 edges.\n";
     return;
   }
 
-  int num_vertices = id_to_name.size();
+  const int num_vertices = id_to_name.size();
 
   // Create a graph.
   Graph graph(num_vertices);
-  for (auto& it : vertex) {
+  for (auto& it : vertex_) {
     // Check if the edge already exists. Apparently, boost graph do not support
     // it.
     if (boost::edge(it.from, it.to, graph).second) {
@@ -316,55 +325,85 @@ void GraphPlanar::Write() {
 
     add_edge(it.from, it.to, graph);
   }
-  InitializeEdgeIndex(graph);
+  auto edge_index = get(boost::edge_index, graph);
+  auto vertex_index = get(boost::vertex_index, graph);
 
-  // Make it connected.
-  boost::make_connected(graph);
-  InitializeEdgeIndex(graph);
+  // The `edge_updater` is used to automatically update the edge index when a
+  // new edge is added.
+  using EdgeVisitor = boost::edge_index_update_visitor<
+      boost::property_map<Graph, boost::edge_index_t>::type>;
+  EdgeVisitor edge_updater(edge_index, boost::num_edges(graph));
 
-  // Make it biconnected.
-  Embedding embedding;
-  bool is_planar = ComputePlanarEmbedding(graph, embedding);
+  // Initialize the edge index.
+  int edge_count = 0;
+  auto [ei, ei_end] = edges(graph);
+  while (ei != ei_end) {
+    boost::put(edge_index, *(ei++), edge_count++);
+  }
+
+  // To apply the `chrobak_payne_straight_line_drawing` algorithm, we need to
+  // add edges so that the graph is maximal planar. This can be achieve by
+  // executing in sequence:
+  // - `make_connected`
+  // - `make_biconnected_planar`
+  // - `make_maximal_planar`
+
+  // After executing `make_connected`, edges are added to the graph, so we must
+  // update the indexes and the embedding.
+  boost::make_connected(graph, vertex_index, edge_updater);
+
+  // Create the planar embedding
+  auto embedding_storage = EdgePermutationStorage(num_vertices);
+  auto embedding = EdgePermutation(embedding_storage.begin(), vertex_index);
+  const bool is_planar = PlanarEmbedding(graph, embedding_storage, embedding);
   if (!is_planar) {
     output_ = "Graph is not planar.\n";
     return;
   }
 
-  boost::make_biconnected_planar(graph, embedding.data());
-  InitializeEdgeIndex(graph);
-  Graph biconnected_graph(graph);
+  // After executing `make_biconnected_planar` edges are added to the graph, so
+  // we must update the indexes and the embedding.
+  boost::make_biconnected_planar(
+      graph, embedding, boost::get(boost::edge_index, graph), edge_updater);
+  const bool is_planar_2 = PlanarEmbedding(graph, embedding_storage, embedding);
+  assert(is_planar_2);
 
-  ComputePlanarEmbedding(graph, embedding);
-  boost::make_maximal_planar(graph, embedding.data());
-  InitializeEdgeIndex(graph);
+  // After executing `make_maximal_planar` edges are added to the graph, so
+  // we must update the indexes and the embedding.
+  boost::make_maximal_planar(graph, embedding, vertex_index,
+                             boost::get(boost::edge_index, graph),
+                             edge_updater);
+  const bool is_planar_3 = PlanarEmbedding(graph, embedding_storage, embedding);
+  assert(is_planar_3);
 
   // Find a canonical ordering.
-  ComputePlanarEmbedding(graph, embedding);
-  std::vector<boost::graph_traits<Graph>::vertex_descriptor> ordering;
-  boost::planar_canonical_ordering(graph, embedding.data(),
+  std::vector<size_t> ordering;
+  boost::planar_canonical_ordering(graph, embedding,
                                    std::back_inserter(ordering));
+  assert(ordering.size() == num_vertices);
+
+  std::vector<Coordinates> straight_line_drawing_storage(num_vertices);
+  auto drawing =
+      StraightLineDrawing(straight_line_drawing_storage.begin(), vertex_index);
+
+  // Compute the straight line drawing
+  chrobak_payne_straight_line_drawing(graph, embedding, ordering.begin(),
+                                      ordering.end(), drawing);
+
+  auto compare_with = [&](int i) {
+    return [&, i](int a, int b) {
+      int a_dx = drawing[a].x - drawing[i].x;
+      int a_dy = drawing[a].y - drawing[i].y;
+      int b_dx = drawing[b].x - drawing[i].x;
+      int b_dy = drawing[b].y - drawing[i].y;
+      return a_dx * b_dy - b_dx * a_dy < 0;
+    };
+  };
 
   std::vector<size_t> inverse_ordering(num_vertices);
   for (int i = 0; i < inverse_ordering.size(); ++i) {
     inverse_ordering[ordering[i]] = i;
   }
-
-  StraightLineDrawing straight_line_drawing(num_vertices);
-
-  // Compute the straight line drawing
-  boost::chrobak_payne_straight_line_drawing(graph, embedding, ordering.begin(),
-                                             ordering.end(),
-                                             straight_line_drawing.data());
-
-  auto compare_with = [&](int i) {
-    return [&, i](int a, int b) {
-      int a_dx = straight_line_drawing[a].x - straight_line_drawing[i].x;
-      int a_dy = straight_line_drawing[a].y - straight_line_drawing[i].y;
-      int b_dx = straight_line_drawing[b].x - straight_line_drawing[i].x;
-      int b_dy = straight_line_drawing[b].y - straight_line_drawing[i].y;
-      return a_dx * b_dy - b_dx * a_dy < 0;
-    };
-  };
 
   // Compute children.
   std::vector<std::vector<int>> children(num_vertices);
@@ -399,35 +438,6 @@ void GraphPlanar::Write() {
       x[i] = x[y];
       ++i;
     };
-  };
-
-  auto Draw = [&]() {
-    // Determine the screen dimension
-    int width = 0;
-    int height = 0;
-    for (int i = 0; i < num_vertices; ++i) {
-      if (!is_drawn[i])
-        continue;
-      width = std::max(width, drawn_vertices[i].right + 1);
-      height = std::max(height, 3 * drawn_vertices[i].y + 3);
-    }
-    Screen screen(width, height);
-    for (int i = 0; i < num_vertices; ++i) {
-      if (!is_drawn[i])
-        continue;
-      drawn_vertices[i].Draw(screen);
-    }
-    for (int i = 0; i < num_vertices; ++i) {
-      if (!is_drawn[i])
-        continue;
-      for (auto& edge : drawn_vertices[i].edges) {
-        edge.Draw(screen, *this);
-      }
-    }
-
-    if (ascii_only_)
-      screen.ASCIIfy(1);
-    output_ += screen.ToString();
   };
 
   std::function<void(int)> DrawNode = [&](int i) -> void {
@@ -493,7 +503,33 @@ void GraphPlanar::Write() {
     }
   }
 
-  return Draw();
+  // Determine the screen dimension
+  int width = 0;
+  int height = 0;
+  for (int i = 0; i < num_vertices; ++i) {
+    if (!is_drawn[i])
+      continue;
+    width = std::max(width, drawn_vertices[i].right + 1);
+    height = std::max(height, 3 * drawn_vertices[i].y + 3);
+  }
+
+  Screen screen(width, height);
+  for (int i = 0; i < num_vertices; ++i) {
+    if (!is_drawn[i])
+      continue;
+    drawn_vertices[i].Draw(screen);
+  }
+  for (int i = 0; i < num_vertices; ++i) {
+    if (!is_drawn[i])
+      continue;
+    for (auto& edge : drawn_vertices[i].edges) {
+      edge.Draw(screen, *this);
+    }
+  }
+
+  if (ascii_only_)
+    screen.ASCIIfy(1);
+  output_ += screen.ToString();
 }
 
 void DrawnVertex::Draw(Screen& screen) {
@@ -530,13 +566,12 @@ std::string GraphPlanar::Highlight(const std::string& input) {
 
   try {
     tokens.fill();
-  }
-  catch (...) {  // Ignore
+  } catch (...) {  // Ignore
   }
 
   size_t matched = 0;
   out << "<span class='GraphPlanar'>";
-  for(antlr4::Token* token : tokens.getTokens()) {
+  for (antlr4::Token* token : tokens.getTokens()) {
     std::string text = token->getText();
     if (text == "<EOF>") {
       continue;
