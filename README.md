@@ -613,6 +613,12 @@ make -j
 sudo make install 
 ```
             
+# Packaging status
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/diagon.svg)](https://repology.org/project/diagon/versions)
+
+[![diagon](https://snapcraft.io/diagon/badge.svg)](https://snapcraft.io/diagon)
+
 # Thanks
 
 This project has been possible thanks to these great projects
