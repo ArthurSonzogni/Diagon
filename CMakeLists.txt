@@ -34,8 +34,10 @@ endif()
 #-------------------------------------------------------------------------------
 
 FetchContent_Declare(antlr
-  GIT_REPOSITORY https://github.com/antlr/antlr4
-  GIT_TAG 1cb4669f84cea5b59661fd44b0f80509fdacd3f9
+  #GIT_REPOSITORY https://github.com/antlr/antlr4
+  GIT_REPOSITORY https://github.com/ArthurSonzogni/antlr4
+  # GIT_TAG 1cb4669f84cea5b59661fd44b0f80509fdacd3f9
+  GIT_TAG remove-pthread
   GIT_SHALLOW FALSE
   GIT_PROGRESS TRUE
 )
