@@ -86,9 +86,13 @@ EQ : '=' ;
 POW : '^' ;
 SUBSCRIPT: '_' ;
 EOL : '\r\n' | '\n' ;
-WS : [ \t]+ -> channel(HIDDEN);
 
 fragment CHAR : ~[!+-<>=_^(){}[\] \t\r\n"*] | [.0123456789];
 VARIABLE: CHAR+;
+
+// Ignored TOKENS
+WS: [ \t]+ -> channel(HIDDEN);
+COMMENT: '/' '*' .*? '*' '/' -> channel(HIDDEN);
+LINE_COMMENT: '/' '/' .*? ('\n' | EOF) -> channel(HIDDEN);
 
 // vim: filetype=antlr

@@ -2,6 +2,11 @@ grammar Sequence;
 
 // Lexer -----
 
+// Ignored TOKENS
+WS: [\t]+ -> channel(HIDDEN);
+COMMENT: '/' '*' .*? '*' '/' -> channel(HIDDEN);
+LINE_COMMENT: '/' '/' (~('\n'))* -> channel(HIDDEN);
+
 ARROW_RIGHT: '->';
 ARROW_LEFT: '<-';
 COMMA: ':';

@@ -2,8 +2,8 @@ grammar Flowchart;
 
 // Ignored TOKENS
 WS: [ \t\n]+ -> channel(HIDDEN);
-COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
-LINE_COMMENT: '//' .*? ('\r'? '\n' | EOF) -> channel(HIDDEN);
+COMMENT: '/' '*' .*? '*' '/' -> channel(HIDDEN);
+LINE_COMMENT: '/' '/' (~('\n'))* -> channel(HIDDEN);
 
 SEMICOLON: ';';
 PL: '(';

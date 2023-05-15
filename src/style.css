@@ -353,9 +353,17 @@ option {
   font-weight: bold;
 }
 
-.Math > .VARIABLE,
-.Math > .STRING {
+.Math > .COMMENT,
+.Math > .LINE_COMMENT {
+  color:gray;
+}
+
+.Math > .VARIABLE {
   color:var(--fg-color);
+}
+
+.Math > .STRING {
+  color:var(--code-green-color);
 }
 
 .Math > .LPAREN ,
@@ -400,6 +408,11 @@ option {
 .Sequence > .ARROW_LEFT {
   color:var(--code-red-color);
   font-weight: bold;
+}
+.Sequence > .COMMENT,
+.Sequence > .LINE_COMMENT
+{
+  color:gray;
 }
 
 .GraphPlanar > .STRING,
