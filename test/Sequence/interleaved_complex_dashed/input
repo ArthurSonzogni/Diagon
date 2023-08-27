@@ -1,0 +1,8 @@
+1) A-->B: message 1
+2) A-->B: message 2
+3) A-->B: message 3
+4) A-->B: message 4
+5) A-->B: message 5
+
+A: 1<2<3<4<5
+B: 2<1<5<4<3

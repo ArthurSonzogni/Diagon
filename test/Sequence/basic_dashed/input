@@ -1,0 +1,4 @@
+A --> B: Make me a sandwitch
+B --> A: No
+A --> B: Sudo make me a sandwitch
+B --> A: Okay

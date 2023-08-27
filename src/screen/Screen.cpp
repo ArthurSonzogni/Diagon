@@ -90,7 +90,7 @@ void Screen::DrawHorizontalLine(int left, int right, int y, wchar_t c) {
 
 void Screen::DrawVerticalLine(int top, int bottom, int x, wchar_t c) {
   for (int y = top; y <= bottom; ++y) {
-    lines_[y][x] = L'│';
+    lines_[y][x] = c;
   }
 }
 

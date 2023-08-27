@@ -58,26 +58,29 @@ int main(int, const char**) {
         continue;
       }
 
-      std::cout << "  [RUN ] " << test.path() << std::endl;
       std::string input = ReadFile(test.path() / "input");
-      std::string output = ReadFile(test.path() / "output");
-
       std::string output_computed = translator->Translate(input, options);
 
-      if (output_computed == output) {
-        // std::cout << "  [PASS] " << test.path() << std::endl;
-      } else {
-        std::cout << "  [FAIL] " << test.path() << std::endl;
-        std::cout << "---[Output]------------------" << std::endl;
-        std::cout << output_computed << std::endl;
-        std::cout << "---[Expected]----------------" << std::endl;
-        std::cout << output << std::endl;
-        std::cout << "---------------------" << std::endl;
-
-        //std::ofstream(test.path() / "output") << output_computed;
-
-        result = EXIT_FAILURE;
+      if (!std::filesystem::exists(test.path() / "output")) {
+        std::cout << "  [RUN ] " << test.path() << std::endl;
+        std::cout << "  [Create output] " << std::endl;
+        std::cout << output_computed;
+        std::ofstream(test.path() / "output") << output_computed;
+        continue;
       }
+
+      std::string output = ReadFile(test.path() / "output");
+      if (output_computed == output) {
+        continue;
+      }
+
+      std::cout << "  [FAIL] " << test.path() << std::endl;
+      std::cout << "---[Output]------------------" << std::endl;
+      std::cout << output_computed << std::endl;
+      std::cout << "---[Expected]----------------" << std::endl;
+      std::cout << output << std::endl;
+      std::cout << "---------------------" << std::endl;
+      result = EXIT_FAILURE;
     }
   }
 

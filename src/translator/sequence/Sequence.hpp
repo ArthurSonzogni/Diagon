@@ -42,6 +42,7 @@ struct Message {
   std::wstring to;
   int id = -1;
   std::vector<std::wstring> messages;
+  bool dashed = false;
 
   Direction direction = Direction::Right;
 

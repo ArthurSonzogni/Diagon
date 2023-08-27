@@ -8,7 +8,9 @@ COMMENT: '/' '*' .*? '*' '/' -> channel(HIDDEN);
 LINE_COMMENT: '/' '/' (~('\n'))* -> channel(HIDDEN);
 
 ARROW_RIGHT: '->';
+ARROW_RIGHT_DASHED: '-->';
 ARROW_LEFT: '<-';
+ARROW_LEFT_DASHED: '<--';
 COMMA: ':';
 LOWER: '<';
 GREATER: '>';
@@ -39,5 +41,5 @@ number: SPACE* NUMBER SPACE*;
 
 comparison: LOWER | GREATER;
 
-arrow: ARROW_LEFT | ARROW_RIGHT;
+arrow: ARROW_LEFT | ARROW_RIGHT | ARROW_LEFT_DASHED | ARROW_RIGHT_DASHED;
 // vim: filetype=ANTLR
