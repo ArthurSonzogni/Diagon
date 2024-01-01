@@ -319,8 +319,16 @@ class Tree : public Translator {
       lines.push_back(line);
     }
 
-    if (lines.size() == 0)
+    if (lines.size() == 0) {
       return "";
+    }
+
+    // Remove empty lines.
+    // See https://github.com/ArthurSonzogni/Diagon/issues/58
+    lines.erase(std::remove_if(
+                    lines.begin(), lines.end(),
+                    [](const Line& line) { return line.content.size() == 0; }),
+                lines.end());
 
     // Build the tree.
     auto tree = std::make_unique<Node>();
