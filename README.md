@@ -7,13 +7,13 @@ into an ascii-art representation.
 
 It is written in C++ and use WebAssembly, HTML and CSS to make a Web
 Application.
-We also expose a command line interface, for personal and 3rd party tools.
+We also expose a command line interface and a JS library, for personal and 3rd party tools.
 
-# Web application
+## Web application
 
 [https://arthursonzogni.com/Diagon/](https://arthursonzogni.com/Diagon/)
 
-# Command line interface
+## Command line interface
 
 Diagon is also usable as a command line tool.
 For instance:
@@ -33,15 +33,30 @@ sudo snap install diagon
 [![snapstore](https://snapcraft.io/diagon/badge.svg)](https://snapcraft.io/diagon)
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/diagon) 
 
-# IDE plugins
+## Javascript library
+See the JS library [diagonjs](https://github.com/elmouradiaminedev/diagonjs)
+```bash
+npm i diagonjs
+```
+```js
+import Diagon from "diagonjs";
+```
+```js
+const diagon = await Diagon.init();
+diagon.translate.math("f(x) = 1 + x / (1 + x)", { style: "Unicode" });
+
+//               x
+// f(x) = 1 + ─────
+//            1 + x
+```
+
+## IDE plugins
 
 Make diagon easy to use inside your IDE. Thanks to contributors:
 - [vim-diagon](https://github.com/willchao612/vim-diagon)
 - [vscode-diagon](https://github.com/ElmouradiAmine/vscode-diagon)
 
-### [https://arthursonzogni.com/Diagon/](https://arthursonzogni.com/Diagon/)
-
-**Table of content**
+# Table of content
  * [Diagon](#diagon)
  * [Generators](#generators)
  * [Command line interface](#command-line-interface)
@@ -49,11 +64,12 @@ Make diagon easy to use inside your IDE. Thanks to contributors:
  * [Build](#build)
  * [Thanks](#thanks)
 
-# Generators
+## Generators
 
 <details>
    <summary>Mathematic Expression</summary>
 
+### Mathematic Expression
 input:
 ~~~
 f(x) = 1 + x / (1 + x)
@@ -151,7 +167,7 @@ input:
 <details>
    <summary> Sequence Diagram </summary>
 
-## Sequence Diagram
+### Sequence Diagram
 
 input
 ~~~
@@ -241,6 +257,8 @@ Output (Unicode)
 <details>
    <summary>Tree</summary>
 
+### Tree
+
 Input
 ~~~
 Linux
@@ -314,6 +332,8 @@ Output (Style Unicode right center)
 <details>
    <summary>Frame</summary>
 
+### Frame
+
 Input
 ~~~
 #include <iostream>
@@ -367,6 +387,9 @@ Output (Style Unicode)
 <details>
    <summary>GraphPlanar</summary>
 
+### GraphPlanar
+
+
 Input
 ~~~
 if -> "then A" -> end
@@ -397,6 +420,8 @@ Output (Unicode)
    
 <details>
    <summary>GraphDAG</summary>
+
+### GraphDAG
 
 Input:
 ```
@@ -523,6 +548,8 @@ Output:
 <details>
    <summary>Flowchart</summary>
 
+### Flowchart
+
 Input:
 ```
 if ("DO YOU UNDERSTAND FLOW CHARTS?")                
@@ -596,11 +623,11 @@ Output:
    
 </details>
 
-# Download packages
+## Download packages
 
 Binaries using multiple formats are provided in the [release](https://github.com/ArthurSonzogni/Diagon/releases) section.
 
-# Build
+## Build
 
 This depends on cmake, uuid-dev and libboost-graph-dev
 On Linux:
