@@ -33,6 +33,14 @@ sudo snap install diagon
 [![snapstore](https://snapcraft.io/diagon/badge.svg)](https://snapcraft.io/diagon)
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/diagon) 
 
+It is also available as a Nix package:
+
+~~~bash
+nix run github:petertrotman/nixpkgs/Diagon#diagon
+~~~
+
+(A pull request is open to have this merged into NixOS/nixpkgs [**here**](https://github.com/NixOS/nixpkgs/pull/297736))
+
 ## Javascript library
 See the JS library [diagonjs](https://github.com/elmouradiaminedev/diagonjs)
 ```bash
