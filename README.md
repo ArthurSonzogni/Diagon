@@ -637,10 +637,10 @@ Binaries using multiple formats are provided in the [release](https://github.com
 
 ## Build
 
-This depends on cmake, uuid-dev and libboost-graph-dev
+This depends on cmake, and libboost-graph-dev
 On Linux:
 ```sh
-sudo apt install make uuid-dev libboost-graph-dev cmake default-jdk;
+sudo apt install make libboost-graph-dev cmake default-jdk;
 mkdir build;
 cd build;
 cmake .. -DCMAKE_BUILD_TYPE=Release

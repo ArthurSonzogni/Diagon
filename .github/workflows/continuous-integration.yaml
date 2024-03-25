@@ -67,7 +67,7 @@ jobs:
 
       - name: "Install Linux Dependencies"
         if: ${{ runner.os == 'Linux' }}
-        run: sudo apt install libboost-graph-dev uuid-dev
+        run: sudo apt install libboost-graph-dev
 
       - name: "Install boost for windows"
         if: ${{ runner.os == 'Windows' }}
@@ -194,7 +194,7 @@ jobs:
 
       - name: "Install Linux Dependencies"
         if: ${{ runner.os == 'Linux' }}
-        run: sudo apt install libboost-graph-dev uuid-dev
+        run: sudo apt install libboost-graph-dev
 
       - name: "Install boost for windows"
         if: ${{ runner.os == 'Windows' }}

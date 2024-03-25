@@ -28,7 +28,6 @@ parts:
       - pkg-config
       - unzip
       - curl
-      - uuid-dev
       - openjdk-11-jdk
       - libboost-graph-dev
     override-pull: |
