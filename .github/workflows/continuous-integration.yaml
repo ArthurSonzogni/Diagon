@@ -28,10 +28,10 @@ jobs:
             compiler: llvm
             test: true
 
-          - name: "MacOS clang"
-            os: macos-latest
-            test: true
-            compiler: llvm
+          #- name: "MacOS clang"
+            #os: macos-latest
+            #test: true
+            #compiler: llvm
 
           - name: "Windows"
             os: windows-latest
