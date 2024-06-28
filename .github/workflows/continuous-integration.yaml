@@ -266,9 +266,8 @@ jobs:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ${{ matrix.asset_path }}
           overwrite: true
-
   # Create a release on new v* tags
-  release:
+  publish:
     needs: test
     name: "Publish website"
     runs-on: ubuntu-latest
@@ -332,6 +331,7 @@ jobs:
           cp diagon*wasm diagon-Web;
           cp index.html diagon-Web;
           cp style.css diagon-Web;
+          echo "diagon.arthursonzogni.com" > diagon-Web/CNAME;
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
