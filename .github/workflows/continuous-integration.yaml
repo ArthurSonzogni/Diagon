@@ -266,3 +266,77 @@ jobs:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ${{ matrix.asset_path }}
           overwrite: true
+
+  # Create a release on new v* tags
+  release:
+    needs: test
+    name: "Publish website"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v2
+
+      - name: "Setup Cpp"
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          vcvarsall: ${{ contains(matrix.os, 'windows' )}}
+          cmake: true
+          ninja: true
+          clangtidy: false
+          cppcheck: false
+          gcovr: "5.0"
+          opencppcoverage: false
+
+      - name: "Setup Java"
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: '17'
+          check-latest: true
+
+      - name: "Install Linux Dependencies"
+        run: sudo apt install libboost-graph-dev
+
+      - name: "Setup Emscripten"
+        uses: mymindstorm/setup-emsdk@v7
+
+      - name: "Configure cmake with emscripten"
+        run: >
+          emcmake cmake -S .
+          -B ./build
+          -DCMAKE_BUILD_TYPE:STRING=Release
+          -DDIAGON_BUILD_TESTS:BOOL=OFF
+          -DDIAGON_BUILD_TESTS_FUZZER:BOOL=OFF;
+
+      - name: "Configure CMake"
+        if: ${{ !matrix.emscripten }}
+        run: >
+          cmake -S .
+          -B ./build
+          -DCMAKE_BUILD_TYPE:STRING=Release
+          -DDIAGON_BUILD_TESTS:BOOL=OFF
+          -DDIAGON_BUILD_TESTS_FUZZER:BOOL=OFF;
+
+      - name: "Build"
+        run: >
+          cmake
+          --build ./build
+          --target package;
+
+      - name: "Make webAssembly distribution"
+        run: >
+          cd build;
+          mkdir -p diagon-Web;
+          cp diagon.js diagon-Web;
+          cp diagon*wasm diagon-Web;
+          cp index.html diagon-Web;
+          cp style.css diagon-Web;
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/diagon-Web
+          publish_branch: gh-pages
+          force_orphan: true
