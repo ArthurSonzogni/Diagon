@@ -109,8 +109,7 @@ void Screen::DrawVerticalLineComplete(int top, int bottom, int x) {
           p = L'┌';
         else
           p = L'┼';
-      }
-      else if (y == bottom) {
+      } else if (y == bottom) {
         if (left && right)
           p = L'┴';
         else if (left)
@@ -119,8 +118,7 @@ void Screen::DrawVerticalLineComplete(int top, int bottom, int x) {
           p = L'└';
         else
           p = L'┼';
-      }
-      else {
+      } else {
         if (left && right)
           p = L'┼';
         else if (left)

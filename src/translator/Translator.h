@@ -1,9 +1,7 @@
 #ifndef TRANSLATOR_TRANSLATOR
 #define TRANSLATOR_TRANSLATOR
 
-#include <functional>
 #include <map>
-#include <memory>
 #include <string>
 #include <vector>
 

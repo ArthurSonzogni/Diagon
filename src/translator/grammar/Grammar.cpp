@@ -4,10 +4,9 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
+#include <memory>
 #include <string>
 #include <vector>
-#include "screen/Screen.h"
 #include "translator/Translator.h"
 
 #ifndef _WIN32
@@ -295,13 +294,11 @@ std::string Grammar::Translate(const std::string& input,
                              ? output_function_map[option_output]
                              : kgt::rrutf8_output;
 
-  int error_count = 0;
   kgt::parsing_error_queue parsing_errors = NULL;
   auto* model =
       input_function(StringReader::Read, &string_reader, &parsing_errors);
 
   while (parsing_errors) {
-    error_count++;
     kgt::parsing_error error;
     parsing_error_queue_pop(&parsing_errors, &error);
     std::cout << error.line << ":" << error.col << ":" << error.description
@@ -313,7 +310,6 @@ std::string Grammar::Translate(const std::string& input,
   dup2(old_stdout, 1);
   close(old_stdout);
   fclose(file_write);
-
 
   auto file_read = std::ifstream("/tmp/diagon_grammer.txt");
   return std::string((std::istreambuf_iterator<char>(file_read)),

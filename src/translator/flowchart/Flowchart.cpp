@@ -656,13 +656,12 @@ std::string Flowchart::Highlight(const std::string& input) {
 
   try {
     tokens.fill();
-  }
-  catch (...) {  // Ignore
+  } catch (...) {  // Ignore
   }
 
   size_t matched = 0;
   out << "<span class='flowchart'>";
-  for(antlr4::Token* token : tokens.getTokens()) {
+  for (antlr4::Token* token : tokens.getTokens()) {
     std::string text = token->getText();
     if (text == "<EOF>") {
       continue;

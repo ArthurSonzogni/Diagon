@@ -2,7 +2,6 @@
 #include <map>
 #include <queue>
 #include <set>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -48,7 +47,6 @@ struct Adapter {
   bool enabled;
   std::vector<std::set<int>> inputs;
   std::vector<std::set<int>> outputs;
-
 
   void Construct();
   void Render(Screen& screen);
@@ -255,7 +253,7 @@ void Context::AddToLayers() {
 
 void Context::OptimizeRowOrder() {
   // Compute the downward_closure.
-  for (int y = (int)(layers.size()) - 2; y>0; --y) {
+  for (int y = (int)(layers.size()) - 2; y > 0; --y) {
     auto& layer = layers[y];
     for (int up : layer.nodes) {
       auto& node_up = nodes[up];
@@ -439,8 +437,8 @@ void Context::Layout() {
       auto& node = nodes[a];
       for (int x = node.x + node.padding;
            x < node.x - node.padding + node.width; ++x) {
-        for(int b : node.downward) {
-          input[x].insert(GetID(a,b));
+        for (int b : node.downward) {
+          input[x].insert(GetID(a, b));
         }
       }
     }
@@ -449,8 +447,8 @@ void Context::Layout() {
       auto& node = nodes[b];
       for (int x = node.x + node.padding;
            x < node.x - node.padding + node.width; ++x) {
-        for(int a : node.upward) {
-          output[x].insert(GetID(a,b));
+        for (int a : node.upward) {
+          output[x].insert(GetID(a, b));
         }
       }
     }
@@ -579,8 +577,8 @@ bool Context::LayoutShiftConnectorNode() {
 void Adapter::Construct() {
   int width = inputs.size();
   int connector_length = 0;
-  for(int x = 0; x<width; ++x) {
-    for(int c : inputs[x])
+  for (int x = 0; x < width; ++x) {
+    for (int c : inputs[x])
       connector_length = std::max(connector_length, c);
   }
 
@@ -613,7 +611,7 @@ void Adapter::Construct() {
     nodes.resize(width * height * 2);
     edges.resize(width * height * 3);
 
-    auto index = [width, height=height](int x, int y, int layer) {
+    auto index = [width, height = height](int x, int y, int layer) {
       return x + width * (y + height * (layer));
     };
 
@@ -628,7 +626,7 @@ void Adapter::Construct() {
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
         // Vertical:
-        if (y != height- 1) {
+        if (y != height - 1) {
           connect(edges[index(x, y + 0, 0)],  //
                   nodes[index(x, y + 0, 0)],  //
                   nodes[index(x, y + 1, 0)],  //
@@ -636,7 +634,7 @@ void Adapter::Construct() {
         }
 
         // Horizontal:
-        if (y >= 1 && y<= height - 3 && x != width-1) {
+        if (y >= 1 && y <= height - 3 && x != width - 1) {
           connect(edges[index(x + 0, y, 1)],  //
                   nodes[index(x + 0, y, 1)],  //
                   nodes[index(x + 1, y, 1)],  //
@@ -645,12 +643,12 @@ void Adapter::Construct() {
 
         // Corners:
         {
-          //int dx = width / 2 - x;
+          // int dx = width / 2 - x;
           int dy = height / 2 - y;
           connect(edges[index(x, y, 2)],  //
                   nodes[index(x, y, 0)],  //
                   nodes[index(x, y, 1)],  //
-                  10+dy*dy);
+                  10 + dy * dy);
         }
       }
     }
@@ -659,8 +657,7 @@ void Adapter::Construct() {
     solution_found = true;
 
     // Add path one by one.
-    for(int connector = 1; connector <= connector_length; ++connector) {
-
+    for (int connector = 1; connector <= connector_length; ++connector) {
       int big_number = 1 << 15;
 
       // Clear:
@@ -671,7 +668,7 @@ void Adapter::Construct() {
 
       std::set<Node*> start;
       std::set<Node*> end;
-      for(int x = 0; x<width; ++x) {
+      for (int x = 0; x < width; ++x) {
         if (inputs[x].count(connector))
           start.insert(&nodes[index(x, 0, 0)]);
         if (outputs[x].count(connector))
@@ -712,7 +709,7 @@ void Adapter::Construct() {
       // Reconstruct the path from end to start.
       int best_score = big_number;
       Node* current = nullptr;
-      for(Node* node : end) {
+      for (Node* node : end) {
         if (best_score >= node->cost) {
           best_score = node->cost;
           current = node;
@@ -778,7 +775,7 @@ void Adapter::Construct() {
 }
 
 void Adapter::Render(Screen& screen) {
-  for (int dy = 0; dy < height-1; ++dy) {
+  for (int dy = 0; dy < height - 1; ++dy) {
     int x = 0;
     for (auto value : rendering[dy]) {
       if (value == L' ') {
@@ -786,7 +783,7 @@ void Adapter::Render(Screen& screen) {
         continue;
       }
 
-      auto& pixel = screen.Pixel(x, y+dy);
+      auto& pixel = screen.Pixel(x, y + dy);
 
       if (dy == 0) {
         if (pixel == L'─')

@@ -288,14 +288,18 @@ Draw Parse(MathParser::EquationContext* context, Style* style) {
   for (int i = 1; i < context->expression().size(); ++i) {
     auto op = context->relop(i - 1);
     std::wstring symbol;
-    // clang-format off
-         if (op->LT()) symbol = L'<';
-    else if (op->GT()) symbol = L'>';
-    else if (op->LE()) symbol = style->lower_or_equal;
-    else if (op->GE()) symbol = style->greater_or_equal;
-    else if (op->EQ()) symbol = L'=';
-    else if (op->LIME()) symbol = style->lime;
-    // clang-format on
+    if (op->LT())
+      symbol = L'<';
+    else if (op->GT())
+      symbol = L'>';
+    else if (op->LE())
+      symbol = style->lower_or_equal;
+    else if (op->GE())
+      symbol = style->greater_or_equal;
+    else if (op->EQ())
+      symbol = L'=';
+    else if (op->LIME())
+      symbol = style->lime;
 
     int op_x = draw.dim_x + 1;
     draw = ComposeHorizontal(draw, Parse(context->expression(i), style),
@@ -314,14 +318,18 @@ std::wstring ParseLatex(MathParser::EquationContext* context, Style* style) {
   for (int i = 1; i < context->expression().size(); ++i) {
     auto op = context->relop(i - 1);
     std::wstring symbol;
-    // clang-format off
-         if (op->LT()) out += L" < ";
-    else if (op->GT()) out += L" > ";
-    else if (op->LE()) out += L" \\leq ";
-    else if (op->GE()) out += L" \\geq ";
-    else if (op->LIME()) out += L" \\to ";
-    else if (op->EQ()) out += L" = ";
-    // clang-format on
+    if (op->LT())
+      out += L" < ";
+    else if (op->GT())
+      out += L" > ";
+    else if (op->LE())
+      out += L" \\leq ";
+    else if (op->GE())
+      out += L" \\geq ";
+    else if (op->LIME())
+      out += L" \\to ";
+    else if (op->EQ())
+      out += L" = ";
 
     out += ParseLatex(context->expression(i), style);
   }
@@ -561,7 +569,7 @@ Draw ParseFunctionLimit(MathParser::FunctionContext* context, Style* style) {
   Draw down = Parse(context->equation(0), style);
   Draw right = Parse(context->equation(1), style);
 
-  if (right.center_y == right.dim_y-1) {
+  if (right.center_y == right.dim_y - 1) {
     Draw lim_right = ComposeHorizontal(lim, right, 1);
     lim_right.center_x = 0;
     down.center_x = 0;
@@ -1215,7 +1223,7 @@ class Math : public Translator {
       style.divide = L'-';
       style.multiply = L'.';
       style.greater_or_equal = L">=";
-      style.lime= L"->";
+      style.lime = L"->";
       style.lower_or_equal = L"<=";
       style.left_parenthesis_0 = L'(';
       style.left_parenthesis_1 = L'/';
@@ -1248,7 +1256,7 @@ class Math : public Translator {
       // style.multiply = L'×';
       style.multiply = L'⋅';
       style.greater_or_equal = L"≥";
-      style.lime= L"⟶";
+      style.lime = L"⟶";
       style.lower_or_equal = L"≤";
 
       style.left_parenthesis_0 = L'(';

@@ -2,9 +2,8 @@
 // Use of this source code is governed by the MIT license that can be found in
 // the LICENSE file.
 
-#include <map>
-#include <vector>
 #include <set>
+#include <vector>
 
 namespace graph {
 

@@ -16,6 +16,7 @@ option(DIAGON_UBSAN "Set to ON to enable undefined behavior sanitizer" OFF)
 
 include(FetchContent)
 set(FETCHCONTENT_QUIET FALSE)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 #-------------------------------------------------------------------------------
 

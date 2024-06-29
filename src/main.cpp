@@ -139,7 +139,6 @@ int PrintTranslatorExamples(Translator* translator) {
     return EXIT_SUCCESS;
   }
 
-  
   std::cout << "EXAMPLES:" << std::endl;
   int i = 0;
   for (auto& it : translator->Examples()) {
@@ -283,7 +282,7 @@ int PrintTranslatorNotFound(const std::string& translator) {
   std::cout << "The translator: " << translator << " doesn't exist"
             << std::endl;
   std::cout << "List of available translator:" << std::endl;
-  for (auto& translator: TranslatorList())
+  for (auto& translator : TranslatorList())
     std::cout << std::string("  - ") + translator->Identifier() << std::endl;
 
   std::cout << "Please read the manual by using diagon --help" << std::endl;

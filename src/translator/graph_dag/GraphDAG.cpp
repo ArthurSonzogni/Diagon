@@ -1,7 +1,6 @@
-#include <sstream>
+#include <memory>
 #include <vector>
 
-#include "screen/Screen.h"
 #include "translator/Translator.h"
 
 std::string DagToText(const std::string& input);
@@ -10,7 +9,7 @@ class GraphDAG : public Translator {
  public:
   ~GraphDAG() override = default;
   const char* Identifier() final { return "GraphDAG"; }
-  const char* Name() final { return "Graph - DAG";}
+  const char* Name() final { return "Graph - DAG"; }
   const char* Description() final {
     return "Draw a graph, specialized for Directed Acyclic ones";
   }
@@ -88,7 +87,7 @@ std::vector<Translator::Example> GraphDAG::Examples() {
 }
 
 std::string GraphDAG::Translate(const std::string& input,
-                             const std::string& options_string) {
+                                const std::string& options_string) {
   return DagToText(input);
 }
 
