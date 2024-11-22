@@ -658,6 +658,8 @@ docker build -t diagon .
 Once built, the image can be invoked like the binary:
 ```sh
 docker run diagon Math -- "f(x) = 1 + x / (1 + x)"
+
+echo "f(x) = 1 + x / (1 + x)" | docker run -i diagon Math
 ```
             
 # Packaging status
