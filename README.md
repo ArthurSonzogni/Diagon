@@ -647,6 +647,20 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j
 sudo make install 
 ```
+
+## Build in Docker
+
+If you have Docker installed, the repository includes a Dockerfile for convenient building:
+```sh
+docker build -t diagon .
+```
+
+Once built, the image can be invoked like the binary:
+```sh
+docker run diagon Math -- "f(x) = 1 + x / (1 + x)"
+
+echo "f(x) = 1 + x / (1 + x)" | docker run -i diagon Math
+```
             
 # Packaging status
 
