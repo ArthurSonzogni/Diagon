@@ -45,18 +45,18 @@ void Message::Draw(Screen& screen) {
       screen.DrawPixel(line_left - 1, line_top, L'├');
     else
       screen.DrawPixel(line_right + 1, line_top, L'┤');
-    screen.DrawHorizontalLine(line_left, line_right, line_top, dashed ? L'╌' : L'─');
+    screen.DrawHorizontalLine(line_left, line_right, line_top, dashed ? L'╴' : L'─');
   } else if (direction == Direction::Right) {
     screen.DrawPixel(line_left - 1, line_top, L'├');
-    screen.DrawHorizontalLine(line_left, line_left + offset, line_top, dashed ? L'╌' : L'─');
-    screen.DrawVerticalLine(line_top, line_bottom, line_left + offset, dashed ? L'┊' : L'│');
-    screen.DrawHorizontalLine(line_left + offset, line_right, line_bottom, dashed ? L'╌' : L'─');
-    screen.DrawPixel(line_left + offset, line_top, dashed ? L'.' : L'┐');
-    screen.DrawPixel(line_left + offset, line_bottom, dashed ? L'`' : L'└');
+    screen.DrawHorizontalLine(line_left, line_left + offset, line_top, dashed ? L'╴' : L'─');
+    screen.DrawVerticalLine(line_top, line_bottom, line_left + offset, dashed ? L'╎' : L'│');
+    screen.DrawHorizontalLine(line_left + offset, line_right, line_bottom, dashed ? L'╴' : L'─');
+    screen.DrawPixel(line_left + offset, line_top, dashed ? L'┐' : L'┐'); // How do we draw a dashed corner?  We don't for now.
+    screen.DrawPixel(line_left + offset, line_bottom, dashed ? L'└' : L'└'); // How do we draw a dashed corner?  We don't for now.
   } else {
-    screen.DrawHorizontalLine(line_right - offset, line_right, line_top, dashed ? L'╌' : L'─');
-    screen.DrawVerticalLine(line_top, line_bottom, line_right - offset, dashed ? L'┊' : L'│');
-    screen.DrawHorizontalLine(line_left, line_right - offset, line_bottom, dashed ? L'╌' : L'─');
+    screen.DrawHorizontalLine(line_right - offset, line_right, line_top, dashed ? L'╴' : L'─');
+    screen.DrawVerticalLine(line_top, line_bottom, line_right - offset, dashed ? L'╎' : L'│');
+    screen.DrawHorizontalLine(line_left, line_right - offset, line_bottom, dashed ? L'╴' : L'─');
     screen.DrawPixel(line_right - offset, line_top, L'.');
     screen.DrawPixel(line_right - offset, line_bottom, L'`');
   }
