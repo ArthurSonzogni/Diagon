@@ -33,7 +33,7 @@ void SplitString(std::wstring input,
 
 void Actor::Draw(Screen& screen, int height) {
   screen.DrawBoxedText(left, 0, name);
-  screen.DrawVerticalLine(3, height - 4, center);
+  screen.DrawVerticalLine(3, height - 4, center, L'╎'); // Actors are drawn with dotted vertical lines
   screen.DrawBoxedText(left, height - 3, name);
   screen.DrawPixel(center, 2, L'┬');
   screen.DrawPixel(center, height - 3, L'┴');
@@ -42,12 +42,12 @@ void Actor::Draw(Screen& screen, int height) {
 void Message::Draw(Screen& screen) {
   if (line_top == line_bottom) {
     if (direction == Direction::Right)
-      screen.DrawPixel(line_left - 1, line_top, L'├');
+      screen.DrawPixel(line_left - 1, line_top, L'╎' );
     else
-      screen.DrawPixel(line_right + 1, line_top, L'┤');
+      screen.DrawPixel(line_right + 1, line_top, L'╎' );
     screen.DrawHorizontalLine(line_left, line_right, line_top, dashed ? L'╴' : L'─');
   } else if (direction == Direction::Right) {
-    screen.DrawPixel(line_left - 1, line_top, L'├');
+    screen.DrawPixel(line_left - 1, line_top, L'╎' );
     screen.DrawHorizontalLine(line_left, line_left + offset, line_top, dashed ? L'╴' : L'─');
     screen.DrawVerticalLine(line_top, line_bottom, line_left + offset, dashed ? L'╎' : L'│');
     screen.DrawHorizontalLine(line_left + offset, line_right, line_bottom, dashed ? L'╴' : L'─');
