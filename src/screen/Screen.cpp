@@ -190,8 +190,8 @@ void Screen::ASCIIfy(int style) {
           case L'▽': c = 'V'; break;
           case L'▶': c = '>'; break;
           case L'◀': c = '<'; break;
-          case L'╌': c = '-'; break; // Don't forget the dashed lines!
-          case L'┊': c = '|'; break; // Don't forget the dashed lines!
+          case L'╴': c = '-'; break; // Don't forget the dashed lines!
+          case L'╎': c = '|'; break; // Don't forget the dashed lines!
         }
       }
     }
