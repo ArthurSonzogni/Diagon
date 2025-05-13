@@ -264,14 +264,14 @@ std::vector<Translator::Example> Sequence::Examples() {
        "Actor 2:\n"
        "Actor 3:"},
       {"4-Message order",
-       "2) Actor 2 -> Actor 3: message 1\n"
+       "2) Actor 2 --> Actor 3: message 1\n"
        "1) Actor 1 -> Actor 2: message 2\n"
        "\n"
        "Actor 1:\n"
        "Actor 2: 1<2\n"
        "Actor 3:"},
       {"5-Message crossing",
-       "1) Renderer -> Browser: Message 1\n"
+       "1) Renderer --> Browser: Message 1\n"
        "2) Renderer <- Browser: Message 2\n"
        "\n"
        "Renderer: 1<2\n"
