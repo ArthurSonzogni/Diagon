@@ -156,16 +156,16 @@ void Screen::ASCIIfy(int style) {
           case L'┘': c = '\''; break;
           case L'┌': c = '.'; break;
           case L'└': c = '\''; break;
-          case L'┬': c = '-'; break; // Let's emphasize the horizontal nature
-          case L'┴': c = '-'; break; // Let's emphasize the horizontal nature
-          case L'├': c = '|'; break; // Let's emphasize the vertical nature
-          case L'┤': c = '|'; break; // Let's emphasize the vertical nature
+          case L'┬': c = '-'; break;
+          case L'┴': c = '-'; break;
+          case L'├': c = '-'; break;
+          case L'┤': c = '-'; break;
           case L'△': c = '^'; break;
           case L'▽': c = 'V'; break;
           case L'▶': c = '>'; break;
           case L'◀': c = '<'; break;
-          case L'╴': c = '-'; break; // Don't forget the dashed lines!
-          case L'╎': c = '|'; break; // Don't forget the dashed lines!
+          case L'╴': c = '-'; break;
+          case L'╎': c = '|'; break;
         }
       }
     }
@@ -184,14 +184,10 @@ void Screen::ASCIIfy(int style) {
           case L'└': c = '\''; break;
           case L'┬': c = '.'; break;
           case L'┴': c = '\''; break;
-          case L'├': c = '|'; break; // Let's emphasize the vertical nature
-          case L'┤': c = '|'; break; // Let's emphasize the vertical nature
+          case L'├': c = '-'; break;
+          case L'┤': c = '-'; break;
           case L'△': c = '^'; break;
           case L'▽': c = 'V'; break;
-          case L'▶': c = '>'; break;
-          case L'◀': c = '<'; break;
-          case L'╴': c = '-'; break; // Don't forget the dashed lines!
-          case L'╎': c = '|'; break; // Don't forget the dashed lines!
         }
       }
     }

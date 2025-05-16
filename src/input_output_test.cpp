@@ -22,7 +22,6 @@ std::string ReadFile(std::filesystem::path path) {
 void ParseDirectoryName(std::string name,
                         std::string* translator_name,
                         std::string* options) {
-
   // Split at the first '_' the first part is the translator name, the second is
   // the options.
   // The options follows name=value, split by '_', but name can contain '_'.
@@ -38,7 +37,7 @@ void ParseDirectoryName(std::string name,
   *translator_name = name.substr(0, pos);
 
   // Parse a key=value list.
-  while(true) {
+  while (true) {
     // Parse the name.
     std::string::size_type pos2 = name.find('=', pos);
     if (pos2 == std::string::npos) {
@@ -66,15 +65,22 @@ void ParseDirectoryName(std::string name,
 int main(int, const char**) {
   int result = EXIT_SUCCESS;
   std::string path = test_directory;
-  //std::cout << "test_directory = " << test_directory << std::endl;
 
   for (auto& dir : std::filesystem::directory_iterator(path)) {
     std::string translator_name;
     std::string options;
     ParseDirectoryName(dir.path().filename(), &translator_name, &options);
+    std::cout << std::endl
+              << "___" << std::setw(30) << std::setfill('_') << std::left
+              << (" " + translator_name + " ") << std::endl;
+
+    if (!options.empty()) {
+      std::cout << "  [INFO] Options:" << std::endl;
+      std::cout << options << std::endl;
+    }
 
     for (auto& test : std::filesystem::directory_iterator(dir.path())) {
-      std::cout << "  [TEST] " << test.path() << std::endl;
+      std::cout << "  [TEST] " << test.path().filename().string() << std::endl;
       auto translator = FindTranslator(translator_name);
       if (!translator) {
         std::cout << "Translator " << translator_name << " not found."
@@ -108,9 +114,9 @@ int main(int, const char**) {
 
       // Fix the expected output if it is not correct.
       // Uncomment the following lines to create the output file.
-      //std::cout << "  [Create output] " << std::endl;
-      //std::cout << output_computed;
-      //std::ofstream(test.path() / "output") << output_computed;
+      // std::cout << "  [Create output] " << std::endl;
+      // std::cout << output_computed;
+      // std::ofstream(test.path() / "output") << output_computed;
     }
   }
 
