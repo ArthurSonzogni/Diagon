@@ -1,0 +1,5 @@
+1) A -> B : message\nnumber\n1
+2) A -> B : message number 2
+
+A: 1<2
+B: 1>2

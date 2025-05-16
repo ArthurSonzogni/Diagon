@@ -1,0 +1,6 @@
+1) A --> B : message 1
+2) A --> B : message 2
+3) A <-- B : message 3
+
+A: 1<2
+B: 1>2
