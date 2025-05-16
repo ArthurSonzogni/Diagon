@@ -1,0 +1,14 @@
+7) B<-C: message 7
+2) B->C: message 2
+5) D<-E: message 5
+8) A<-B: message 8
+1) A->B: message 1
+3) C->D: message 3
+4) D->E: message 4
+6) C<-D: message 6
+
+A:
+B: 1<2, 7<8
+C: 2<3, 6<7
+D: 3<4, 5<6
+E: 4<5

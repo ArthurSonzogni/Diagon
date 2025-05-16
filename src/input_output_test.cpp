@@ -22,35 +22,65 @@ std::string ReadFile(std::filesystem::path path) {
 void ParseDirectoryName(std::string name,
                         std::string* translator_name,
                         std::string* options) {
-  std::vector<std::string> parts;
-  int left = 0;
-  int right = 0;
-  while (right < name.size()) {
-    if (name[right] == '_' || name[right] == '=') {
-      parts.push_back(name.substr(left, right - left));
-      left = right + 1;
-    }
-    ++right;
-  }
-  parts.push_back(name.substr(left, right - left));
+  // Split at the first '_' the first part is the translator name, the second is
+  // the options.
+  // The options follows name=value, split by '_', but name can contain '_'.
 
-  *translator_name = parts[0];
-  for (int i = 1; i < parts.size(); ++i) {
-    *options += parts[i] + "\n";
+  std::string::size_type pos = name.find('_');
+
+  if (pos == std::string::npos) {
+    *translator_name = name;
+    *options = "";
+    return;
+  }
+
+  *translator_name = name.substr(0, pos);
+
+  // Parse a key=value list.
+  while (true) {
+    // Parse the name.
+    std::string::size_type pos2 = name.find('=', pos);
+    if (pos2 == std::string::npos) {
+      break;
+    }
+
+    // Parse the value.
+    std::string::size_type pos3 = name.find('_', pos2);
+    if (pos3 == std::string::npos) {
+      pos3 = name.length();
+    }
+    std::string key = name.substr(pos + 1, pos2 - pos - 1);
+    std::string value = name.substr(pos2 + 1, pos3 - pos2 - 1);
+
+    *options += key + '\n' + value + '\n';
+    pos = pos3;
+  }
+
+  // Remove the last '\n' if any.
+  if (options->length() > 0) {
+    options->erase(options->length() - 1);
   }
 }
 
 int main(int, const char**) {
   int result = EXIT_SUCCESS;
   std::string path = test_directory;
-  //std::cout << "test_directory = " << test_directory << std::endl;
 
   for (auto& dir : std::filesystem::directory_iterator(path)) {
     std::string translator_name;
     std::string options;
     ParseDirectoryName(dir.path().filename(), &translator_name, &options);
+    std::cout << std::endl
+              << "___" << std::setw(30) << std::setfill('_') << std::left
+              << (" " + translator_name + " ") << std::endl;
+
+    if (!options.empty()) {
+      std::cout << "  [INFO] Options:" << std::endl;
+      std::cout << options << std::endl;
+    }
 
     for (auto& test : std::filesystem::directory_iterator(dir.path())) {
+      std::cout << "  [TEST] " << test.path().filename().string() << std::endl;
       auto translator = FindTranslator(translator_name);
       if (!translator) {
         std::cout << "Translator " << translator_name << " not found."
@@ -81,6 +111,12 @@ int main(int, const char**) {
       std::cout << output << std::endl;
       std::cout << "---------------------" << std::endl;
       result = EXIT_FAILURE;
+
+      // Fix the expected output if it is not correct.
+      // Uncomment the following lines to create the output file.
+      // std::cout << "  [Create output] " << std::endl;
+      // std::cout << output_computed;
+      // std::ofstream(test.path() / "output") << output_computed;
     }
   }
 

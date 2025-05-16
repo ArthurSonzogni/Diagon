@@ -43,24 +43,30 @@ void Message::Draw(Screen& screen) {
   if (line_top == line_bottom) {
     screen.DrawHorizontalLine(line_left, line_right, line_top, dashed ? L'-' : L'─');
   } else if (direction == Direction::Right) {
-    screen.DrawHorizontalLine(line_left, line_left + offset, line_top, dashed ? L'-' : L'─');
-    screen.DrawVerticalLine(line_top, line_bottom, line_left + offset, dashed ? L'|' : L'│');
-    screen.DrawHorizontalLine(line_left + offset, line_right, line_bottom, dashed ? L'-' : L'─');
+    screen.DrawHorizontalLine(line_left, line_left + offset, line_top,
+                              dashed ? L'-' : L'─');
+    screen.DrawVerticalLine(line_top, line_bottom, line_left + offset,
+                            dashed ? L'|' : L'│');
+    screen.DrawHorizontalLine(line_left + offset, line_right, line_bottom,
+                              dashed ? L'-' : L'─');
     screen.DrawPixel(line_left + offset, line_top, dashed ? L'.' : L'┐');
     screen.DrawPixel(line_left + offset, line_bottom, dashed ? L'`' : L'└');
   } else {
-    screen.DrawHorizontalLine(line_right - offset, line_right, line_top, dashed ? L'-' : L'─');
-    screen.DrawVerticalLine(line_top, line_bottom, line_right - offset, dashed ? L'|' : L'│');
-    screen.DrawHorizontalLine(line_left, line_right - offset, line_bottom, dashed ? L'-' : L'─');
+    screen.DrawHorizontalLine(line_right - offset, line_right, line_top,
+                              dashed ? L'-' : L'─');
+    screen.DrawVerticalLine(line_top, line_bottom, line_right - offset,
+                            dashed ? L'|' : L'│');
+    screen.DrawHorizontalLine(line_left, line_right - offset, line_bottom,
+                              dashed ? L'-' : L'─');
     screen.DrawPixel(line_right - offset, line_top, L'.');
     screen.DrawPixel(line_right - offset, line_bottom, L'`');
   }
 
   // Tip of the arrow.
   if (direction == Direction::Right) {
-    screen.DrawPixel(line_right, line_bottom, L'>');
+    screen.DrawPixel(line_right, line_bottom, L'▶');
   } else {
-    screen.DrawPixel(line_left, line_bottom, L'<');
+    screen.DrawPixel(line_left, line_bottom, L'◀');
   }
 
   // The message
@@ -271,6 +277,11 @@ std::vector<Translator::Example> Sequence::Examples() {
        "\n"
        "Renderer: 1<2\n"
        "Browser: 2<1"},
+      {"6-Dashed arrow",
+       "Alice -> Bob: Hello Bob!\n"
+       "Alice --> Bob: Hello Bob with a dashed arrow!\n"
+       "Bob -> Alice: Hello Alice!\n"
+       "Bob --> Alice: Hello Alice with a dashed arrow!\n"},
   };
 }
 

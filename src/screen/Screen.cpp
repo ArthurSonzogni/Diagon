@@ -162,6 +162,10 @@ void Screen::ASCIIfy(int style) {
           case L'┤': c = '-'; break;
           case L'△': c = '^'; break;
           case L'▽': c = 'V'; break;
+          case L'▶': c = '>'; break;
+          case L'◀': c = '<'; break;
+          case L'╴': c = '-'; break;
+          case L'╎': c = '|'; break;
         }
       }
     }
