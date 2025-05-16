@@ -1,3 +1,4 @@
+#include <memory>
 #include "translator/Translator.h"
 
 std::unique_ptr<Translator> GraphPlanarTranslator() {
