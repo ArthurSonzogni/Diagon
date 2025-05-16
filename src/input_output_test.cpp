@@ -83,9 +83,10 @@ int main(int, const char**) {
       result = EXIT_FAILURE;
 
       // Fix the expected output if it is not correct.
-      std::cout << "  [Create output] " << std::endl;
-      std::cout << output_computed;
-      std::ofstream(test.path() / "output") << output_computed;
+      // Uncomment the following lines to create the output file.
+      //std::cout << "  [Create output] " << std::endl;
+      //std::cout << output_computed;
+      //std::ofstream(test.path() / "output") << output_computed;
     }
   }
 
