@@ -81,6 +81,11 @@ int main(int, const char**) {
       std::cout << output << std::endl;
       std::cout << "---------------------" << std::endl;
       result = EXIT_FAILURE;
+
+      // Fix the expected output if it is not correct.
+      std::cout << "  [Create output] " << std::endl;
+      std::cout << output_computed;
+      std::ofstream(test.path() / "output") << output_computed;
     }
   }
 

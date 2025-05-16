@@ -33,7 +33,7 @@ void SplitString(std::wstring input,
 
 void Actor::Draw(Screen& screen, int height) {
   screen.DrawBoxedText(left, 0, name);
-  screen.DrawVerticalLine(3, height - 4, center, L'╎'); // Actors are drawn with dotted vertical lines
+  screen.DrawVerticalLine(3, height - 4, center);
   screen.DrawBoxedText(left, height - 3, name);
   screen.DrawPixel(center, 2, L'┬');
   screen.DrawPixel(center, height - 3, L'┴');
@@ -41,22 +41,23 @@ void Actor::Draw(Screen& screen, int height) {
 
 void Message::Draw(Screen& screen) {
   if (line_top == line_bottom) {
-    if (direction == Direction::Right)
-      screen.DrawPixel(line_left - 1, line_top, L'╎' );
-    else
-      screen.DrawPixel(line_right + 1, line_top, L'╎' );
-    screen.DrawHorizontalLine(line_left, line_right, line_top, dashed ? L'╴' : L'─');
+    screen.DrawHorizontalLine(line_left, line_right, line_top, dashed ? L'-' : L'─');
   } else if (direction == Direction::Right) {
-    screen.DrawPixel(line_left - 1, line_top, L'╎' );
-    screen.DrawHorizontalLine(line_left, line_left + offset, line_top, dashed ? L'╴' : L'─');
-    screen.DrawVerticalLine(line_top, line_bottom, line_left + offset, dashed ? L'╎' : L'│');
-    screen.DrawHorizontalLine(line_left + offset, line_right, line_bottom, dashed ? L'╴' : L'─');
-    screen.DrawPixel(line_left + offset, line_top, dashed ? L'┐' : L'┐'); // How do we draw a dashed corner?  We don't for now.
-    screen.DrawPixel(line_left + offset, line_bottom, dashed ? L'└' : L'└'); // How do we draw a dashed corner?  We don't for now.
+    screen.DrawHorizontalLine(line_left, line_left + offset, line_top,
+                              dashed ? L'-' : L'─');
+    screen.DrawVerticalLine(line_top, line_bottom, line_left + offset,
+                            dashed ? L'|' : L'│');
+    screen.DrawHorizontalLine(line_left + offset, line_right, line_bottom,
+                              dashed ? L'-' : L'─');
+    screen.DrawPixel(line_left + offset, line_top, dashed ? L'.' : L'┐');
+    screen.DrawPixel(line_left + offset, line_bottom, dashed ? L'`' : L'└');
   } else {
-    screen.DrawHorizontalLine(line_right - offset, line_right, line_top, dashed ? L'╴' : L'─');
-    screen.DrawVerticalLine(line_top, line_bottom, line_right - offset, dashed ? L'╎' : L'│');
-    screen.DrawHorizontalLine(line_left, line_right - offset, line_bottom, dashed ? L'╴' : L'─');
+    screen.DrawHorizontalLine(line_right - offset, line_right, line_top,
+                              dashed ? L'-' : L'─');
+    screen.DrawVerticalLine(line_top, line_bottom, line_right - offset,
+                            dashed ? L'|' : L'│');
+    screen.DrawHorizontalLine(line_left, line_right - offset, line_bottom,
+                              dashed ? L'-' : L'─');
     screen.DrawPixel(line_right - offset, line_top, L'.');
     screen.DrawPixel(line_right - offset, line_bottom, L'`');
   }
@@ -264,18 +265,23 @@ std::vector<Translator::Example> Sequence::Examples() {
        "Actor 2:\n"
        "Actor 3:"},
       {"4-Message order",
-       "2) Actor 2 --> Actor 3: message 1\n"
+       "2) Actor 2 -> Actor 3: message 1\n"
        "1) Actor 1 -> Actor 2: message 2\n"
        "\n"
        "Actor 1:\n"
        "Actor 2: 1<2\n"
        "Actor 3:"},
       {"5-Message crossing",
-       "1) Renderer --> Browser: Message 1\n"
+       "1) Renderer -> Browser: Message 1\n"
        "2) Renderer <- Browser: Message 2\n"
        "\n"
        "Renderer: 1<2\n"
        "Browser: 2<1"},
+      {"6-Dashed arrow",
+       "Alice -> Bob: Hello Bob!\n"
+       "Alice --> Bob: Hello Bob with a dashed arrow!\n"
+       "Bob -> Alice: Hello Alice!\n"
+       "Bob --> Alice: Hello Alice with a dashed arrow!\n"},
   };
 }
 

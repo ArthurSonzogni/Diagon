@@ -1,7 +1,7 @@
 # Current
 
 - Tree: Ignore emtpy lines.
-
+- Sequence: Use unicode arrow. PR by @mr-mocap in #84
 
 # 1.1.156 (2023-05-08)
 
